@@ -68,22 +68,21 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap:
 .ico svg { width: 18px; height: 18px; }
 .hint { color: var(--muted); font-size: 14px; margin: -4px 0 0; position: relative; }
 
-.paste-zone { position: relative; border: 1px solid var(--line); background: var(--chip); border-radius: 18px; max-height: 230px; min-height: 120px; overflow: auto; caret-color: transparent; cursor: text; }
-.paste-zone:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 4px var(--lime-soft); }
+.paste-zone { position: relative; border: 1px solid var(--line); background: var(--card); border-radius: 18px; max-height: 230px; min-height: 110px; overflow: auto; }
+.paste-zone:focus-within { border-color: var(--lime-deep); box-shadow: 0 0 0 4px var(--lime-soft); }
 .sheet { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
 .sheet th { position: sticky; top: 0; z-index: 1; background: var(--chip); text-align: left; font-size: 12px; font-weight: 700; color: var(--muted); padding: 8px 12px; border-bottom: 1px solid var(--line); }
-.sheet td { padding: 5px 12px; border-bottom: 1px solid var(--line); background: var(--card); white-space: nowrap; }
+.sheet td { padding: 5px 12px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); white-space: nowrap; outline: none; }
+.sheet td:last-child { border-right: 0; }
+.sheet td:focus { background: var(--lime-soft); }
 .sheet td:first-child { white-space: normal; min-width: 180px; }
 .sheet th:nth-child(n+2), .sheet td:nth-child(n+2) { text-align: center; width: 1%; }
-.sheet td.exp-soon { background: var(--orange-soft); color: var(--orange); font-weight: 700; }
-.sheet td.exp-gone { background: var(--red-soft); color: var(--red); font-weight: 700; }
-.sheet tr.bad td { background: var(--red-soft); color: var(--red); white-space: normal; }
 @media (max-width: 560px) {
   .sheet { font-size: 12px; }
   .sheet th, .sheet td { padding: 5px 6px; }
   .sheet td:first-child { min-width: 0; }
 }
-.paste-empty { padding: 26px 16px; text-align: center; color: var(--muted); font-size: 14px; font-weight: 600; }
+.paste-empty { padding: 22px 16px; text-align: center; color: var(--muted); font-size: 14px; font-weight: 600; outline: none; cursor: text; caret-color: transparent; }
 textarea#input { width: 100%; min-height: 190px; resize: vertical; border: 1px solid var(--line); background: var(--chip); border-radius: 18px; padding: 12px 14px; font-family: var(--f-mono); font-size: 11.5px; line-height: 1.6; tab-size: 3; white-space: pre; overflow-x: auto; }
 textarea#input:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 4px var(--lime-soft); }
 .input-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -236,13 +235,13 @@ dialog.how::backdrop { background: rgba(10,12,10,.45); }
         <h2 class="panel-title" id="t-paste"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/></svg></span>Paste the scripts on hold</h2>
         <span class="tag-example" id="exampleTag">Example rows</span>
       </div>
-      <p class="hint">Copy the rows from the Google Sheet, click the table below and press Cmd/Ctrl + V.</p>
-      <div class="paste-zone" id="pasteZone" contenteditable="true" spellcheck="false" role="textbox" aria-label="Paste the scripts on hold here" aria-multiline="true">
-        <table class="sheet" contenteditable="false">
+      <p class="hint">Copy the rows from the sheet, then click the table below and paste. Click any cell to edit it.</p>
+      <div class="paste-zone" id="pasteZone">
+        <table class="sheet">
           <thead><tr><th>Medication</th><th>Qty</th><th>Repeats</th><th>Expiry</th></tr></thead>
           <tbody id="sheetBody"></tbody>
         </table>
-        <div class="paste-empty" id="pasteEmpty" contenteditable="false">Click here and paste the rows from the sheet</div>
+        <div class="paste-empty" id="pasteEmpty" contenteditable="true" spellcheck="false" role="textbox" aria-label="Paste the scripts on hold here">Click here and paste the rows from the sheet</div>
       </div>
       <textarea id="input" spellcheck="false" aria-label="Scripts on hold as text" placeholder="Medcan FX200 Oil	1	Last Repeat	22/01/2027" hidden></textarea>
       <div class="input-actions">
@@ -714,7 +713,7 @@ function messageParts(items) {
 const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 let current = { items: [], text: "" };
 
-function render() {
+function render(keepSheet) {
   const { items, bad } = build();
   const parts = messageParts(items);
   const text = parts.map(p => p.t).join("");
@@ -813,7 +812,7 @@ function render() {
   document.getElementById("count").innerHTML = `Count: <b>${items.length}</b>` +
     (bad.length ? ` <span class="bad">· ${bad.length} unreadable</span>` : "");
   document.getElementById("exampleTag").hidden = input.value.trim() !== EXAMPLE.trim();
-  renderSheet();
+  if (!keepSheet) renderSheet();
   document.getElementById("fallback").hidden = true;
 }
 
@@ -883,8 +882,21 @@ function takePaste(text) {
   input.value = text.replace(/\r\n?/g, "\n").replace(/\n+$/, "");
   render();
 }
-zone.addEventListener("paste", e => { e.preventDefault(); takePaste((e.clipboardData || window.clipboardData).getData("text/plain")); });
-zone.addEventListener("beforeinput", e => { if (e.inputType !== "insertFromPaste") e.preventDefault(); });
+// Pasting rows (anything with tabs or several lines) replaces the list; pasting a single value into a cell just edits that cell.
+zone.addEventListener("paste", e => {
+  const text = (e.clipboardData || window.clipboardData).getData("text/plain");
+  e.preventDefault();
+  if (/[\t\n]/.test(text.trim()) || !e.target.closest("td")) takePaste(text);
+  else document.execCommand("insertText", false, text);
+});
+document.getElementById("pasteEmpty").addEventListener("beforeinput", e => { if (e.inputType !== "insertFromPaste") e.preventDefault(); });
+// Editing a cell updates the list straight away; the table is redrawn when you leave the cell.
+function sheetToText() {
+  return [...document.querySelectorAll("#sheetBody tr")].map(tr => [...tr.cells].map(td => td.textContent.replace(/[\t\n]+/g, " ").trim()).join("\t")).join("\n");
+}
+zone.addEventListener("input", e => { if (e.target.closest("td")) { input.value = sheetToText(); clearTimeout(t); t = setTimeout(() => render(true), 150); } });
+zone.addEventListener("focusout", e => { if (e.target.closest("td")) setTimeout(() => { if (!zone.contains(document.activeElement) || !document.activeElement.closest("td")) render(); }, 0); });
+zone.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.closest("td")) { e.preventDefault(); e.target.blur(); } });
 zone.addEventListener("drop", e => { e.preventDefault(); const t = e.dataTransfer && e.dataTransfer.getData("text/plain"); if (t) takePaste(t); });
 // Pasting anywhere on the page (outside a text box) also fills the table.
 document.addEventListener("paste", e => {
@@ -906,10 +918,11 @@ function renderSheet() {
   const body = document.getElementById("sheetBody");
   document.getElementById("pasteEmpty").hidden = lines.length > 0;
   body.innerHTML = lines.map(l => {
-    const p = parseLine(l);
-    if (p.error) return `<tr class="bad"><td colspan="4">${esc(l.replace(/\t/g, "  ·  "))}<br><small>${esc(p.error[0].toUpperCase() + p.error.slice(1))}</small></td></tr>`;
-    const cls = p.date < today ? "exp-gone" : p.date <= cutoff ? "exp-soon" : "";
-    return `<tr><td>${esc(p.name)}</td><td>${p.qty}</td><td>${esc(p.rep)}</td><td class="${cls}">${fmtDate(p.date)}</td></tr>`;
+    // Show each row exactly as pasted, one value per column (a row with extra columns keeps them in the name).
+    let cells = l.split("\t").map(c => c.trim());
+    if (cells.length > 4) cells = [cells.slice(0, cells.length - 3).join(" "), ...cells.slice(-3)];
+    while (cells.length < 4) cells.push("");
+    return `<tr>${cells.map(c => `<td contenteditable="true" spellcheck="false">${esc(c)}</td>`).join("")}</tr>`;
   }).join("");
 }
 document.getElementById("example").addEventListener("click", () => { input.value = EXAMPLE; render(); });
