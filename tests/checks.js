@@ -51,3 +51,7 @@ Date=RealDate;
 // Unreadable lines say why.
 input.value="ANTG Rocky Oil\t1\t0\t26/11/2026\nCymra Superbly Green Buzzy\t1\t1\t31/02/2027\nX\t1\t1\t29/02/2028\nY\t1\t1\t15/13/2027\nZ\t1\t1\tsoon\nW\tone\t1\t01/01/2027\nonly two\tcolumns";render();
 console.log("UNREADABLE",els.count.innerHTML);console.log("UNREADABLE",els.badLines.innerHTML.replace(/<[^>]+>/g," ").replace(/\s+/g," "));
+// No pricelist match at all -> kept as typed (probably discontinued), doesn't block copying.
+input.value="Gods Gift\t1\t1\t01/03/2027\nGod's Gift Flower\t1\t1\t01/03/2027\nTotally Fake Product\t1\t1\t01/03/2027\nMedcan FX200 Oil\t1\t1\t01/03/2027";render();
+current.items.forEach(i=>console.log("GONE",i.status.padEnd(7),i.out));console.log("GONE copy disabled:",els.copy.disabled);
+input.value="Cymra Superbly Ro\t1\t1\t01/03/2027";render();console.log("GONE partial stays flagged:",current.items[0].status,"copy disabled:",els.copy.disabled);

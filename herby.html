@@ -271,6 +271,7 @@ dialog.how::backdrop { background: rgba(10,12,10,.45); }
           <li>If a name is only <b>close</b> to the pricelist spelling (PURPLE RAIN vs PURPLE RAINE), nothing is changed until you tap <b>Yes, use pricelist name</b> or <b>No, keep what I typed</b>. Different products with similar names, like BLUE CHEESE and BLUEBERRY CHEESE, or WALKEN and WALKER, are kept apart.</li>
           <li>Flowers get their <b>tub size</b> and oils their <b>bottle size</b> from the pricelist, e.g. AVANI BLING BLAU 10g FLOWER, AURA CBD200 30ml OIL. If the size is missing, unclear or different from what you typed, the row is flagged.</li>
           <li>Medcan codes that come as a flower and a cart (GLU01, CC01, SC01) ask which one. The cart is written with <b>-V</b>, e.g. GLU01-V CART.</li>
+          <li>If a name has nothing in common with any pricelist product, it's probably discontinued and is kept exactly as typed.</li>
           <li><b>Last Repeat</b> becomes <b>0 Repeats</b>.</li>
           <li>Scripts expiring within <b>2 months</b> go under <b>Expiring Soon</b>. If none are, the list has no headings.</li>
           <li>Products sold as more than one type, like KIND ROSA (flower, oil and cart), are flagged orange and the message can't be copied until you pick one. Only the types the pricelist has for that product are shown. Names that aren't an exact pricelist match are flagged orange or red, and the message can't be copied until you pick one of the pricelist options shown, fix the name, or tap Keep as typed. Expired scripts are left out of the message.</li>
@@ -593,6 +594,8 @@ function analyse(line, parsed) {
     // Only products sharing a real word with the name (not just a lookalike such as FAKE/CAKE).
     for (const m of matches) if (m.score >= 0.4 && m.fuzzy < m.score * 10 && (m.fuzzy === 0 || m.score >= 0.6)) add(m.p);
   }
+  // Nothing in the pricelist even comes close: the product is probably discontinued, so keep the name exactly as typed.
+  if (status === "missing" && !options.length && !ov.keep) status = "gone";
   return { line, parsed, baseName, type, types, nameType, status, note, match, alts, options, out, fixed, size };
 }
 
@@ -685,6 +688,7 @@ function render() {
         else if (it.status === "pick") pill = `<span class="pill warn"><span class="t">Comes as ${esc(it.note)}. Pick one before sending</span></span>`;
         else if (it.status === "check") pill = `<span class="pill warn"><span class="t">${esc(it.note || "Closest match")} <span class="src">· ${esc(it.match.name)}</span></span></span>`;
         else if (it.status === "confirm") pill = `<span class="pill warn"><span class="t">Close to the pricelist but not exact. You typed ${esc(it.baseName.toUpperCase())} <span class="src">· pricelist has ${esc(it.match.name)}${it.alts.length ? `. Also close: ${esc(it.alts.join(", "))}. If you meant one of those, edit the name` : ""}</span></span></span>`;
+        else if (it.status === "gone") pill = `<span class="pill"><span class="t">Not in the pricelist, probably discontinued · kept as typed</span></span>`;
         else if (it.status === "kept") pill = `<span class="pill"><span class="t">Kept as typed by you · not in the pricelist</span></span>`;
         else pill = `<span class="pill bad"><span class="t">Not in pricelist. Fix the name or keep it as typed</span></span>`;
         const confirmBtns = it.status === "confirm"
@@ -697,7 +701,7 @@ function render() {
         const keep = (it.status === "check" || it.status === "missing")
           ? `<button type="button" class="keep" data-keep="${idx}">Keep as typed</button>`
           : it.status === "kept" ? `<button type="button" class="keep undo" data-keep="${idx}">Undo</button>` : "";
-        const typeBtns = it.nameType || !it.types.length ? "" : `<span class="types" role="group" aria-label="Product type">${it.types.map(t => `<button type="button" data-i="${idx}" data-type="${t}" aria-pressed="${it.type === t}">${t}</button>`).join("")}</span>`;
+        const typeBtns = it.nameType || !it.types.length || it.status === "gone" ? "" : `<span class="types" role="group" aria-label="Product type">${it.types.map(t => `<button type="button" data-i="${idx}" data-type="${t}" aria-pressed="${it.type === t}">${t}</button>`).join("")}</span>`;
         html += `<div class="row ${cls}">
           <span class="qty">${it.parsed.qty}×</span>
           <textarea class="name-in" id="name-${idx}" data-i="${idx}" rows="1" spellcheck="false" aria-label="Product name">${esc(it.out)}</textarea>
