@@ -63,3 +63,5 @@ input.value=["med FGW t20 smalls\t1\t1\t12/11/2026","kind iris \t1\t1\t12/11/202
 current.items.forEach(i=>console.log("DEMO",i.status.padEnd(7),i.out.padEnd(36),"·",i.match?i.match.name:"",i.discName?"disc: "+i.discName:""));
 console.log("DEMO copy disabled:",els.copy.disabled,"|",els.copyNote.textContent);
 for(const t of ["C100 oral liquid","Tasbot C100","Medicabilis T25:C25","Cannatrek C12T12 Ruby Oil","Antg Juno Cart 1g","Green Weekend Dry Flower Blue Cheese","Aura Live Cola Gummies","Elysian Aria Vape","Medcan GLU01-V","Kind Rosa Oil (dis)"]){const r=run(t);console.log("EXTRA",r.status.padEnd(7),t.padEnd(36),"=>",r.out);}
+// TBC100 = Tasmanian Botanics CBD100 oil.
+for(const t of ["TBC100","tbc100","TBC100 Oil","TB C100","TB T50","C100 Oil","Aura C200","ANTG Elan CBD100","Alfie CBD100"]){const r=run(t);console.log("TBC",r.status.padEnd(7),t.padEnd(18),"=>",r.out,"·",r.match&&r.match.name);}
