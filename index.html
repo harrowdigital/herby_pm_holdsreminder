@@ -121,7 +121,11 @@ textarea#input:focus { outline: none; border-color: var(--lime-deep); box-shadow
 .stat.soon .dot { background: var(--orange); }
 .stat.ok .dot { background: var(--lime-deep); }
 .stat.flag .dot { background: var(--red); }
-.groups { display: flex; flex-direction: column; }
+/* The list scrolls inside the card, so a long hold list doesn't push the whole page down. */
+.groups { display: flex; flex-direction: column; max-height: min(68vh, 760px); overflow-y: auto; overscroll-behavior: contain; margin-inline: -6px; padding-inline: 6px; scrollbar-gutter: stable; }
+.groups::-webkit-scrollbar { width: 8px; }
+.groups::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+.group-label { position: sticky; top: 0; z-index: 1; background: var(--card); }
 .group-label { font-size: 13px; font-weight: 700; color: var(--muted); padding: 14px 4px 6px; }
 .group-label.soon { color: var(--orange); }
 .group-label.expired { color: var(--red); }
@@ -655,6 +659,7 @@ function analyse(line, parsed) {
         .replace(ML_ALL, m => m.replace(/\s+/g, "").toLowerCase());
     }
   }
+  if (status === "disc") options.length = 0; // already handled as discontinued: no pricelist options to pick
   return { line, parsed, baseName, type, types, nameType, status, note, match, alts, options, out, fixed, size, discName, discNote };
 }
 
