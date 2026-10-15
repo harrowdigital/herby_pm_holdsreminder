@@ -1,0 +1,50 @@
+const WORD={OIL:"Oil",FLOWER:"Flower",CART:"Cart",PASTILLE:"Pastille",CAPS:"Caps"};
+const clean=n=>n.replace(/\([^)]*\)?/g," ").replace(/[*]/g," ").replace(/\b\d+(\.\d+)?\s*%/g," ").replace(/\s+/g," ").trim();
+const run=n=>analyse(n,{name:n,qty:1,rep:"1",date:new Date()});
+const key=p=>clean(p.name).toLowerCase();
+let n=0,fails=[];
+for(const P of PRODUCTS){ if(!TYPES.includes(P.type)) continue; n++;
+  const base=clean(P.name), hasWord=typeInName(base);
+  const inputs=[hasWord?base:base+" "+WORD[P.type]]; if(!hasWord) inputs.push(base);
+  for(const inp of inputs){
+    const r=run(inp), typedType=!!typeInName(inp), why=[];
+    if(r.fixed) why.push("respelled");
+    if(typedType){
+      if(r.status!=="ok") why.push("status "+r.status+" "+r.note);
+      if(!r.match||r.match.type!==P.type) why.push("wrong type match");
+      else if(key(r.match)!==key(P)) why.push("other product "+r.match.name);
+      const unit=SIZE_UNITS[P.type];
+      const midWord=new RegExp("\\b"+WORD[P.type]+"s?\\b.*\\S","i").test(base.replace(unit?new RegExp(unit.re.source,"gi"):/$^/,"").replace(/\s*-?\s*$/,""));
+      if(unit&&!midWord&&r.status==="ok"&&!r.out.endsWith(" "+P.size.split("|")[0]+" "+P.type)) why.push("bad ending");
+    } else {
+      if(!r.types.includes(P.type)) why.push("type not offered "+r.types);
+      if(r.status==="ok"&&r.type!==P.type) why.push("auto type "+r.type);
+    }
+    if(why.length) fails.push(`${inp}  =>  ${r.out}  [${r.status}] ${why.join("; ")}`);
+  }
+}
+console.log("products",n,"failures",fails.length);fails.forEach(f=>console.log(" -",f));
+for(const t of ["Kind Medical Rosa Oil","Kind Rosa Oil","Kind Rosa","Aura Purple Rain","Green Weekend Blueberry Cheese","Walken","Spectrum Blue Oil 50mL","Avani Bling Blau 15g","Alfie 25:25 Sativa Oil","Alma Calma","Medcan FX200 Oil","Rainbow Region Rainbow Moonlight","Cannatrek Medible 10:10","Antg Juno Cart"]){const r=run(t);console.log(r.status.padEnd(6),t.padEnd(34),"=>",r.out,"["+r.types+"]",r.note||"");}
+console.log("----");
+let conf=0;for(const P of PRODUCTS){if(!TYPES.includes(P.type))continue;const r=run(clean(P.name));if(r.status==="confirm")conf++;}
+console.log("pricelist names asking to confirm:",conf);
+for(const t of ["Tasbot T50 Oil","Tasbot T50","Tasmanian Botanics T50 Oil","Tasmanian T50 Oil","T50 Oil","Sativite T50 Oil","Tasbot C100 Oil","Alma Calma Live Rosin Night Cart","Cymra Superbly Ro","Kind Rosaa Flwr","Totally Fake Product"]){const r=run(t);
+ console.log(r.status.padEnd(8),t.padEnd(34),"=>",r.out,"|",r.note||"","·",r.match&&r.match.name);
+ if(r.options.length)console.log("          options:",r.options.map(p=>cleanProductName(p.name).toUpperCase()+" ("+(p.size?p.size+" ":"")+p.type+")").join(" | "));}
+// pick an option end to end
+input.value="Tasbot C100 Oil\t1\t1\t22/01/2027";render();const it=current.items[0];if(!it.options.length){console.log("no options, status",it.status,it.out);}else{
+console.log("button html:",(els.groups.innerHTML.match(/<div class="options">.*?<\/div>/)||[""])[0].slice(0,220));
+overrides[it.line]={name:cleanProductName(it.options[0].name),type:it.options[0].type};render();console.log("after picking option 1:",current.items[0].status,current.items[0].out);}
+let bb=0;for(const P of PRODUCTS){if(!TYPES.includes(P.type)||!P.supplier)continue;const b=P.supplier.split(/\s+/)[0];const r=run(b+" "+clean(P.name));if(!(r.status==="ok"||r.status==="pick")||r.fixed){bb++;console.log("BRAND-FAIL",b+" "+clean(P.name),"=>",r.status,r.note);}}
+console.log("brand-in-front failures:",bb);
+for(const t of ["Kind Medical Rosa Oil","Kind Medical Rosa","Byron Bio Crystalbrook Cream","Cymra Superbly Rosey","Aura Therapeutics CBD200","Medcan FX200 Oil","Curaleaf Superbly Rosey"]){const r=run(t);console.log("REG",r.status.padEnd(7),t.padEnd(30),"=>",r.out);}
+for(const t of ["Sativite T50 Oil","T50 Oil","T25 Ruby Oil","Cannatrek T25 Ruby Oil","Medcan GLU01","Medcan GLU01-V","Cannatrek Medible 10:10","Aura Purple Rain","Walken","Green Weekend Blueberry Cheese","Sativite PACT","Rainbow Region Rainbow Moonlight","Alfie K Mint","Superbly Rosy"]){const r=run(t);console.log("REG2",r.status.padEnd(7),t.padEnd(30),"=>",r.out,"·",r.match&&r.match.name);}
+for(const t of ["Kind Medical Rosa","Kind Rosa","Kind Medical Libra","Antg Juno","Tasbot C100 Oil","Sativite T50 Oil"]){const r=run(t);console.log("REG3",r.status.padEnd(7),t.padEnd(22),"=>",r.out,"["+r.types+"]");}
+for(const t of ["Tasbot C100 Oil","Tasbot C100","Tasmanian Botanics C100 Oil","Sativite C100 Oil","Tasbot T50 Oil","C100 Oil"]){const r=run(t);console.log("TAS",r.status.padEnd(7),t.padEnd(30),"=>",r.out,"·",r.match&&r.match.name);}
+// Simulate the clock moving to just after midnight on 15/12/2026 (a script expiring 14/12 becomes expired; one expiring 15/02/2027 becomes "soon").
+input.value="Medcan FX200 Oil\t1\t1\t14/12/2026\nAvani Mango Passion\t1\t1\t15/02/2027";render();
+console.log("before:",els.today.textContent,current.items.map(i=>i.group).join(","));
+const RealDate=Date;Date=function(...a){return a.length?new RealDate(...a):new RealDate(2026,11,15,0,0,5);};Date.prototype=RealDate.prototype;
+checkNewDay();
+console.log("after midnight:",els.today.textContent,current.items.map(i=>i.group).join(","));
+Date=RealDate;

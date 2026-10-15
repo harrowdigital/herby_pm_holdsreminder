@@ -1,0 +1,9 @@
+# The pricelist (prices and supplier data) stays out of the repo
+*.xlsx
+*.xls
+catalog.json
+
+.DS_Store
+__pycache__/
+venv/
+.venv/

@@ -1,0 +1,822 @@
+<title>Herby</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="100 110 300 270" fill="none"%3E %3Cpath d="M248 182 Q247 166 251 152" stroke="%234E7F4B" stroke-width="7" stroke-linecap="round"/%3E %3Cellipse cx="228" cy="150" rx="25" ry="13" transform="rotate(22 228 150)" fill="%235E8E5A"/%3E %3Cellipse cx="274" cy="143" rx="30" ry="14" transform="rotate(-24 274 143)" fill="%235E8E5A"/%3E %3Cpath d="M168 268 Q150 292 147 314" stroke="%232A2D2A" stroke-width="7" stroke-linecap="round"/%3E %3Cpath d="M328 262 Q350 262 356 278" stroke="%232A2D2A" stroke-width="7" stroke-linecap="round"/%3E %3Cpath d="M218 298 Q208 314 202 330" stroke="%232A2D2A" stroke-width="6" stroke-linecap="round"/%3E %3Cpath d="M264 298 Q268 314 262 332" stroke="%232A2D2A" stroke-width="6" stroke-linecap="round"/%3E %3Crect x="120" y="325" width="12" height="20" rx="5" transform="rotate(20 126 335)" fill="%232A2D2A"/%3E %3Crect x="134" y="330" width="12" height="20" rx="5" transform="rotate(20 140 340)" fill="%232A2D2A"/%3E %3Ccircle cx="140" cy="318" r="20" fill="%23EDEDEA" stroke="%23D3D5D0" stroke-width="2"/%3E %3Crect x="372" y="268" width="20" height="11" rx="5" transform="rotate(-18 382 273)" fill="%232A2D2A"/%3E %3Crect x="372" y="283" width="20" height="11" rx="5" transform="rotate(-18 382 288)" fill="%232A2D2A"/%3E %3Ccircle cx="357" cy="284" r="20" fill="%23EDEDEA" stroke="%23D3D5D0" stroke-width="2"/%3E %3Cg transform="rotate(10 192 342)"%3E%3Crect x="172" y="322" width="40" height="40" rx="12" fill="%23EDEDEA" stroke="%23D3D5D0" stroke-width="2"/%3E%3Cpath d="M178 360 L206 366" stroke="%235E8E5A" stroke-width="7" stroke-linecap="round"/%3E%3C/g%3E %3Cg transform="rotate(4 258 342)"%3E%3Crect x="238" y="322" width="40" height="40" rx="12" fill="%23EDEDEA" stroke="%23D3D5D0" stroke-width="2"/%3E%3Cpath d="M244 362 L272 364" stroke="%235E8E5A" stroke-width="7" stroke-linecap="round"/%3E%3C/g%3E %3Cellipse cx="160" cy="245" rx="18" ry="24" fill="%23D9DAD6" stroke="%23D3D5D0" stroke-width="2"/%3E %3Cellipse cx="340" cy="240" rx="13" ry="20" fill="%23D9DAD6" stroke="%23D3D5D0" stroke-width="2"/%3E %3Crect x="150" y="178" width="192" height="126" rx="56" fill="%23EDEDEA" stroke="%23D3D5D0" stroke-width="2"/%3E %3Cellipse cx="248" cy="183" rx="24" ry="7" fill="%23D9DAD6"/%3E %3Crect x="200" y="206" width="106" height="72" rx="15" fill="%23232523"/%3E %3Cellipse cx="231" cy="244" rx="8" ry="10.5" fill="%23ECECE8"/%3E %3Cellipse cx="276" cy="244" rx="8" ry="10.5" fill="%23ECECE8"/%3E %3Cpath d="M247 257 Q253 266 259 257 Z" fill="%23ECECE8"/%3E %3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one soft rounded app shell on a grey canvas; white cards with big radii, the message card in lime like a rewards tile. */
+:root {
+  --canvas: #D6D9D1;
+  --shell: #E4E7E0;
+  --card: #F3F4EF;
+  --ink: #111410;
+  --muted: #747A70;
+  --line: #DCDFD7;
+  --chip: #E7E9E2;
+  --lime: #B6EA7B;
+  --lime-deep: #A3DE5E;
+  --lime-soft: #EEF9E1;
+  --lime-ink: #142E0C;
+  --forest: #1E4A16;
+  --forest-ink: #FFFFFF;
+  --good: #2F9E35;
+  --orange: #F0712C;
+  --orange-soft: #FFF3EB;
+  --orange-line: #FAD3BC;
+  --red: #E5484D;
+  --red-soft: #FDEDED;
+  --red-line: #F7C6C7;
+  --shadow: 0 1px 2px rgba(17,20,16,.04);
+  --f-body: "Urbanist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { background: var(--canvas); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; padding-inline: 16px; padding-block: 24px; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--lime-deep); outline-offset: 2px; }
+
+.shell { max-width: 1240px; margin: 0 auto; background: var(--shell); border-radius: 32px; padding: 22px; display: flex; flex-direction: column; gap: 20px; }
+@media (max-width: 560px) { .shell { padding: 12px; border-radius: 24px; } body { padding-inline: 10px; padding-block: 10px; } }
+
+/* header */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 4px 6px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.mark { width: 58px; height: 52px; flex: none; display: grid; place-items: center; }
+.mark svg { width: 58px; height: 52px; overflow: visible; }
+.wordmark { font-weight: 700; font-size: 26px; letter-spacing: -0.02em; line-height: 1.1; }
+.sub { font-size: 12px; color: var(--muted); font-weight: 500; }
+.dates { display: flex; gap: 8px; flex-wrap: wrap; }
+.date-pill { background: var(--card); border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; box-shadow: var(--shadow); }
+.date-pill span { color: var(--muted); font-weight: 500; }
+.date-pill.lime { background: var(--lime); color: var(--lime-ink); }
+.date-pill.lime span { color: var(--lime-ink); opacity: .7; }
+.credit svg { width: 18px; height: 18px; margin-right: -2px; }
+.credit b { letter-spacing: .04em; }
+
+main { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 980px) { main { grid-template-columns: minmax(0, 1fr); } }
+.col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+/* cards */
+.panel { background: var(--card); border-radius: 26px; padding: 22px; box-shadow: var(--shadow); min-width: 0; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; position: relative; }
+.panel-title { font-weight: 600; font-size: 19px; letter-spacing: -0.01em; margin: 0; display: flex; align-items: center; gap: 12px; }
+.ico { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; flex: none; background: var(--card); }
+.ico svg { width: 18px; height: 18px; }
+.hint { color: var(--muted); font-size: 14px; margin: -4px 0 0; position: relative; }
+
+textarea#input { width: 100%; min-height: 190px; resize: vertical; border: 1px solid var(--line); background: var(--chip); border-radius: 18px; padding: 12px 14px; font-family: var(--f-mono); font-size: 11.5px; line-height: 1.6; tab-size: 3; white-space: pre; overflow-x: auto; }
+textarea#input:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 4px var(--lime-soft); }
+.input-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.count { margin-left: auto; display: inline-flex; align-items: baseline; gap: 6px; background: var(--lime); color: var(--lime-ink); border-radius: 999px; padding: 7px 16px; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.count b { font-size: 16px; font-weight: 800; }
+.count .bad { color: var(--red); font-weight: 700; }
+.ghost { background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.ghost:hover { border-color: var(--ink); }
+.tag-example { font-size: 12.5px; font-weight: 600; color: var(--orange); background: var(--orange-soft); border-radius: 999px; padding: 5px 12px; }
+
+/* message card: the lime tile */
+.panel.lime { background: var(--lime); color: var(--lime-ink); }
+.panel.lime .ico { background: var(--lime-ink); border-color: var(--lime-ink); color: var(--lime); }
+.star { position: absolute; right: -36px; top: -40px; width: 190px; height: 190px; color: var(--lime-ink); opacity: .07; pointer-events: none; }
+.msg { position: relative; padding: 20px 22px; border-radius: 20px; background: var(--card); color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.6; font-weight: 500; }
+.msg .h { font-weight: 800; }
+.msg .h.soon { color: var(--orange); }
+.msg .flagname { background: var(--red-soft); color: var(--red); border-radius: 6px; padding: 0 4px; }
+.msg .pickname { background: var(--orange-soft); color: var(--orange); border-radius: 6px; padding: 0 4px; }
+.msg .picktag { font-size: 11.5px; font-weight: 700; margin-left: 8px; color: #FFFFFF; background: var(--orange); border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+.copy-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; position: relative; }
+.copy { background: var(--lime-ink); color: var(--lime); border: 0; border-radius: 999px; padding: 13px 22px; font-weight: 700; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: transform .12s ease, opacity .12s ease; }
+.copy:hover { opacity: .92; }
+.copy:active { transform: translateY(1px); }
+.copy svg { width: 17px; height: 17px; }
+.copy:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+.copy-note { font-size: 14px; font-weight: 600; color: var(--lime-ink); }
+.copy-note.bad { background: var(--card); color: var(--red); border-radius: 999px; padding: 6px 12px; }
+.copy-note.ok { background: var(--card); color: var(--good); border-radius: 999px; padding: 6px 12px; }
+.notes { display: flex; flex-direction: column; gap: 8px; position: relative; }
+.note-row { display: flex; align-items: center; justify-content: space-between; gap: 10px 12px; flex-wrap: wrap; background: var(--card); color: var(--ink); border-radius: 16px; padding: 10px 10px 10px 16px; }
+.note-text { font-size: 13.5px; font-weight: 700; letter-spacing: .02em; min-width: 0; overflow-wrap: anywhere; }
+.note-label { color: var(--muted); font-weight: 600; letter-spacing: 0; }
+.note-value { letter-spacing: 0; }
+.note-copy { flex: none; border: 0; background: var(--lime-ink); color: var(--lime); font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px; cursor: pointer; }
+.note-copy:hover { opacity: .9; }
+.note-copy.done { background: var(--good); color: #FFFFFF; }
+.fallback { width: 100%; min-height: 120px; border-radius: 16px; border: 0; padding: 12px 14px; background: var(--card); color: var(--ink); }
+
+/* check names */
+.stats { display: flex; gap: 8px; flex-wrap: wrap; }
+.stat { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 999px; background: var(--chip); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.stat.soon .dot { background: var(--orange); }
+.stat.ok .dot { background: var(--lime-deep); }
+.stat.flag .dot { background: var(--red); }
+.groups { display: flex; flex-direction: column; }
+.group-label { font-size: 13px; font-weight: 700; color: var(--muted); padding: 14px 4px 6px; }
+.group-label.soon { color: var(--orange); }
+.group-label.expired { color: var(--red); }
+.row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; align-items: center; padding: 12px 10px; border-radius: 18px; border: 1px solid transparent; border-bottom-color: var(--line); }
+.row:last-child { border-bottom-color: transparent; }
+.row.flagged { background: var(--red-soft); border-color: var(--red-line); margin-block: 4px; }
+.row.warn { background: var(--orange-soft); border-color: var(--orange-line); margin-block: 4px; }
+.qty { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); display: grid; place-items: center; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; grid-row: span 3; align-self: start; }
+.name-in { width: 100%; min-width: 0; border: 1px solid transparent; background: transparent; border-radius: 10px; padding: 3px 6px; font-weight: 700; font-size: 15px; line-height: 1.35; text-transform: uppercase; resize: none; overflow: hidden; display: block; field-sizing: content; }
+.name-in:hover { border-color: var(--line); }
+.name-in:focus { outline: none; border-color: var(--lime-deep); background: var(--card); }
+.meta { grid-column: 2; font-size: 13px; color: var(--muted); font-weight: 600; padding-left: 6px; font-variant-numeric: tabular-nums; }
+.row-sub { grid-column: 2; display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; padding-left: 6px; }
+.types { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.types button { border: 1px solid var(--line); background: var(--card); font-size: 12px; font-weight: 700; padding: 4px 11px; border-radius: 999px; cursor: pointer; color: var(--muted); }
+.types button:hover { color: var(--ink); border-color: var(--ink); }
+.types button[aria-pressed="true"] { background: var(--lime); border-color: var(--lime); color: var(--lime-ink); }
+.pill { font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.pill .t { overflow-wrap: anywhere; }
+.pill.ok { color: var(--good); }
+.pill.warn { color: var(--orange); }
+.pill.bad { color: var(--red); }
+.pill.fix { color: var(--good); font-weight: 500; }
+.keep { border: 1px solid var(--ink); background: var(--ink); color: var(--card); font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+.options { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; width: 100%; }
+.options-label { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-right: 2px; }
+.keep.opt { text-align: left; }
+.opt-meta { opacity: .65; font-weight: 600; margin-left: 4px; }
+.keep.undo { background: transparent; color: var(--muted); border-color: var(--line); }
+.pill .src { color: var(--muted); font-weight: 500; }
+@media (max-width: 560px) {
+  .row-sub { grid-column: 1 / 3; padding-left: 0; }
+  .qty { grid-row: span 2; }
+}
+.empty { padding: 28px 8px; color: var(--muted); text-align: center; font-size: 14px; }
+.bad-lines { padding: 12px 14px; border-radius: 16px; background: var(--red-soft); color: var(--red); font-size: 14px; }
+.bad-lines code { font-family: var(--f-mono); font-size: 12px; }
+
+.rules { font-size: 14px; color: var(--muted); }
+.rules b { color: var(--ink); font-weight: 700; }
+.rules ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+footer { color: var(--muted); font-size: 13px; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; }
+.how-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: var(--shadow); }
+.how-btn:hover { border-color: var(--ink); }
+.how-btn svg { width: 17px; height: 17px; }
+dialog.how { width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); overflow: auto; border: 0; border-radius: 26px; padding: 22px 24px 24px; background: var(--card); color: var(--ink); box-shadow: 0 24px 60px rgba(0,0,0,.25); }
+dialog.how::backdrop { background: rgba(10,12,10,.45); }
+.how-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.how-head h2 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.how-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--chip); color: var(--ink); font-size: 20px; line-height: 1; cursor: pointer; }
+.how-close:hover { border-color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="shell">
+<header class="top">
+  <div class="brand">
+    <div class="mark" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none">
+      <!-- Herby robot: colours as in the reference picture -->
+      <path d="M248 182 Q247 166 251 152" stroke="#4E7F4B" stroke-width="7" stroke-linecap="round"/>
+      <ellipse cx="228" cy="150" rx="25" ry="13" transform="rotate(22 228 150)" fill="#5E8E5A"/>
+      <ellipse cx="274" cy="143" rx="30" ry="14" transform="rotate(-24 274 143)" fill="#5E8E5A"/>
+      <path d="M168 268 Q150 292 147 314" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/>
+      <path d="M328 262 Q350 262 356 278" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/>
+      <path d="M218 298 Q208 314 202 330" stroke="#2A2D2A" stroke-width="6" stroke-linecap="round"/>
+      <path d="M264 298 Q268 314 262 332" stroke="#2A2D2A" stroke-width="6" stroke-linecap="round"/>
+      <rect x="120" y="325" width="12" height="20" rx="5" transform="rotate(20 126 335)" fill="#2A2D2A"/>
+      <rect x="134" y="330" width="12" height="20" rx="5" transform="rotate(20 140 340)" fill="#2A2D2A"/>
+      <circle cx="140" cy="318" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
+      <rect x="372" y="268" width="20" height="11" rx="5" transform="rotate(-18 382 273)" fill="#2A2D2A"/>
+      <rect x="372" y="283" width="20" height="11" rx="5" transform="rotate(-18 382 288)" fill="#2A2D2A"/>
+      <circle cx="357" cy="284" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
+      <g transform="rotate(10 192 342)"><rect x="172" y="322" width="40" height="40" rx="12" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/><path d="M178 360 L206 366" stroke="#5E8E5A" stroke-width="7" stroke-linecap="round"/></g>
+      <g transform="rotate(4 258 342)"><rect x="238" y="322" width="40" height="40" rx="12" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/><path d="M244 362 L272 364" stroke="#5E8E5A" stroke-width="7" stroke-linecap="round"/></g>
+      <ellipse cx="160" cy="245" rx="18" ry="24" fill="#D9DAD6" stroke="#D3D5D0" stroke-width="2"/>
+      <ellipse cx="340" cy="240" rx="13" ry="20" fill="#D9DAD6" stroke="#D3D5D0" stroke-width="2"/>
+      <rect x="150" y="178" width="192" height="126" rx="56" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
+      <ellipse cx="248" cy="183" rx="24" ry="7" fill="#D9DAD6"/>
+      <rect x="200" y="206" width="106" height="72" rx="15" fill="#232523"/>
+      <ellipse cx="231" cy="244" rx="8" ry="10.5" fill="#ECECE8"/>
+      <ellipse cx="276" cy="244" rx="8" ry="10.5" fill="#ECECE8"/>
+      <path d="M247 257 Q253 266 259 257 Z" fill="#ECECE8"/>
+    </svg></div>
+    <div>
+      <div class="wordmark">Herby</div>
+      <div class="sub">PlantMed Dispensary hold reminders</div>
+    </div>
+  </div>
+  <div class="dates">
+    <span class="date-pill"><span>Today</span><b id="today"></b></span>
+    <span class="date-pill lime credit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-8" stroke="#2F5E2C" stroke-width="2.2" stroke-linecap="round"/><path d="M12 13c-.6-3.6-3.3-5.6-7.2-5.4.1 3.8 2.9 5.9 7.2 5.4Z" fill="#4E8A49"/><path d="M12 11.5c.8-4 3.8-6.2 8-5.9-.2 4.2-3.3 6.5-8 5.9Z" fill="#3F7A3B"/></svg><span>Created by:</span><b>JCIHB</b></span>
+  </div>
+</header>
+
+<main>
+  <div class="col">
+    <section class="panel" aria-labelledby="t-paste">
+      <div class="panel-head">
+        <h2 class="panel-title" id="t-paste"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/></svg></span>Paste the scripts on hold</h2>
+        <span class="tag-example" id="exampleTag">Example rows</span>
+      </div>
+      <p class="hint">Copy the rows straight from the sheet: name, quantity, repeats, expiry.</p>
+      <textarea id="input" spellcheck="false" aria-label="Scripts on hold" placeholder="Medcan FX200 Oil	1	Last Repeat	22/01/2027"></textarea>
+      <div class="input-actions">
+        <button class="ghost" id="clear" type="button">Clear</button>
+        <button class="ghost" id="example" type="button">Load example</button>
+        <span class="count" id="count" aria-live="polite">Count: <b>0</b></span>
+      </div>
+    </section>
+
+    <section class="panel lime" aria-labelledby="t-msg">
+      <svg class="star" viewBox="0 0 100 100" aria-hidden="true"><path fill="currentColor" d="M50 0C54 30 70 46 100 50 70 54 54 70 50 100 46 70 30 54 0 50 30 46 46 30 50 0Z"/></svg>
+      <div class="panel-head">
+        <h2 class="panel-title" id="t-msg"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span>Message</h2>
+      </div>
+      <div class="msg" id="msg" aria-live="polite"></div>
+      <div class="copy-row">
+        <button class="copy" id="copy" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span id="copyLabel">Copy message</span></button>
+        <span class="copy-note" id="copyNote"></span>
+      </div>
+      <textarea class="fallback" id="fallback" readonly hidden aria-label="Message text to copy"></textarea>
+      <div class="notes" aria-label="Notes to copy">
+        <div class="note-row"><span class="note-text">HOLD SCRIPTS EXPIRY REMINDER SENT VIA SMS</span><button type="button" class="note-copy" data-note="HOLD SCRIPTS EXPIRY REMINDER SENT VIA SMS">Copy note</button></div>
+        <div class="note-row"><span class="note-text">HOLD SCRIPTS EXPIRY REMINDER SENT VIA EMAIL</span><button type="button" class="note-copy" data-note="HOLD SCRIPTS EXPIRY REMINDER SENT VIA EMAIL">Copy note</button></div>
+        <div class="note-row"><span class="note-text"><span class="note-label">From:</span> <span class="note-value">PlantMed - Hold Scripts Team</span></span><button type="button" class="note-copy" data-note="PlantMed - Hold Scripts Team">Copy</button></div>
+        <div class="note-row"><span class="note-text"><span class="note-label">Subject:</span> <span class="note-value">PlantMed | Hold Scripts Courtesy Reminder</span></span><button type="button" class="note-copy" data-note="PlantMed | Hold Scripts Courtesy Reminder">Copy</button></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="col">
+    <section class="panel" aria-labelledby="t-review">
+      <div class="panel-head">
+        <h2 class="panel-title" id="t-review"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg></span>Check names</h2>
+      </div>
+      <p class="hint">Each name is checked against the PlantMed pricelist. Tap a type to change it, or click a name to edit it.</p>
+      <div class="stats" id="stats"></div>
+      <div id="badLines"></div>
+      <div class="groups" id="groups"></div>
+    </section>
+
+  </div>
+</main>
+<footer>
+  <button type="button" class="how-btn" id="howOpen" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>How it formats</button>
+  <span>Pricelist: PlantMed RRP Pricelist Jan 2025 · <span id="catCount"></span> products</span>
+</footer>
+<dialog class="how" id="how" aria-labelledby="howTitle">
+  <div class="how-head">
+    <h2 id="howTitle">How it formats</h2>
+    <button type="button" class="how-close" id="howClose" aria-label="Close">×</button>
+  </div>
+  <div class="rules"><ul>
+          <li>Names go to <b>UPPER CASE</b> and get <b>OIL, FLOWER, CART, PASTILLE</b> or <b>CAPS</b> added when missing, using the pricelist.</li>
+          <li>If a name is only <b>close</b> to the pricelist spelling (PURPLE RAIN vs PURPLE RAINE), nothing is changed until you tap <b>Yes, use pricelist name</b> or <b>No, keep what I typed</b>. Different products with similar names, like BLUE CHEESE and BLUEBERRY CHEESE, or WALKEN and WALKER, are kept apart.</li>
+          <li>Flowers get their <b>tub size</b> and oils their <b>bottle size</b> from the pricelist, e.g. AVANI BLING BLAU 10g FLOWER, AURA CBD200 30ml OIL. If the size is missing, unclear or different from what you typed, the row is flagged.</li>
+          <li>Medcan codes that come as a flower and a cart (GLU01, CC01, SC01) ask which one. The cart is written with <b>-V</b>, e.g. GLU01-V CART.</li>
+          <li><b>Last Repeat</b> becomes <b>0 Repeats</b>.</li>
+          <li>Scripts expiring within <b>2 months</b> go under <b>Expiring Soon</b>. If none are, the list has no headings.</li>
+          <li>Products sold as more than one type, like KIND ROSA (flower, oil and cart), are flagged orange and the message can't be copied until you pick one. Only the types the pricelist has for that product are shown. Names that aren't an exact pricelist match are flagged orange or red, and the message can't be copied until you pick one of the pricelist options shown, fix the name, or tap Keep as typed. Expired scripts are left out of the message.</li>
+          <li>Everything stays in your browser. Nothing you paste is saved or sent anywhere.</li>
+        </ul></div>
+</dialog>
+</div>
+
+<script>
+const CATALOG = [["Alfie CBD100 complete 30mL( NOTE 5mg THC/mL)","ALFIE","OIL","30ml"],["Alfie 25:25 Sativa Oil 30mL* (SATIVA)","ALFIE","OIL","30ml"],["ANTG Elan CBD100","ANTG","OIL","30ml"],["ANTG Rocky THC oil* (indica)","ANTG","OIL","50ml"],["ANTG Eve CBD oil (full spec)","ANTG","OIL","50ml"],["ANTG Luna Oil* (10:10) 50mL","ANTG","OIL","50ml"],["ANTG Luna Oil* (25:25) 50mL","ANTG","OIL","50ml"],["ANTG Elan Oil (0% THC - isolated CBD)","ANTG","OIL","30ml"],["ANTG Eve #4 CBD oil (100mg/mL)","ANTG","OIL","50ml"],["Aura CBD200** (indica)","AURA THERAPEUTICS","OIL","30ml"],["Aura THC50 (INDICA)","AURA THERAPEUTICS","OIL","50ml"],["Beacon THC 30 GSC oil (girl scout cookies)","BEACON","OIL","30ml"],["C12T12 Ruby Balanced oil","Cannatrek","OIL","30ml"],["C25T25 Ruby Balanced oil*","Cannatrek","OIL","30ml"],["T25 Ruby oil (sativa dom)","Cannatrek","OIL","30ml"],["T50 Ruby oil*(sativa dom)","Cannatrek","OIL","30ml"],["T25 Topaz oil (indica)","Cannatrek","OIL","30ml"],["T50 Topaz oil (indica)*","Cannatrek","OIL","30ml"],["Cybis oil 30mL (organic)","Cannatrek","OIL","30ml"],["Entoura CBD200 Full Spectrum","Cannatrek","OIL","30ml"],["Entoura CBD200 Broad Spectrum (30mL) 200mg CBD/mL","Cannatrek","OIL","30ml"],["Entoura EMC 10:15 (30mL)","Cannatrek","OIL","30ml"],["Entoura EMC THC30 (30mL)","Cannatrek","OIL","30ml"],["Entoura THCV 25 OIL (30mL)","Cannatrek","OIL","30ml"],["Entoura ULTRA spectrum 350 oil (CBD240 Broad Spectrum (30mL)","Cannatrek","OIL","30ml"],["Grandiosa Water Soluble CBD","Grandiosa Balance","OIL","10ml"],["Grandiosa Balance- THC/CBD oil 25mg/25mg 30mL*","Grandiosa Balance","OIL","30ml"],["Grandiosa CBD200 30mL/ thirty","Grandiosa Balance","OIL","30ml"],["Heyday CBD:CBDv OIL","Heyday","OIL","30ml"],["KIND Rosa Oil (50:1)- INDICA*","KIND","OIL","30ml"],["KIND Libra Oil (25:25)- THC: CBD balanced*","KIND","OIL","30ml"],["KIND CBD200 FS","KIND","OIL","60ml"],["LGP 20:5 50mL","LGP","OIL","50ml"],["LGP CBD50 50mL","LGP","OIL","50ml"],["Medcan FX01","Medcan","OIL","30ml"],["Medcan FX05","Medcan","OIL","30ml"],["Medcan FX06*","Medcan","OIL","30ml"],["Medcan FX200","Medcan","OIL","30ml"],["Medicabilis 200 CBD FS","MEDICABILIS","OIL","30ml"],["Medicabilis T25:C25 30mL***","MEDICABILIS","OIL","30ml"],["SatiOil CBD 200FS","SATIVITE","OIL","60ml"],["Solara THC 35 sunset oil (50mL)","SATIVITE","OIL","50ml"],["Solara 2:250:30 Femme CBD oil (50mL)","SATIVITE","OIL","50ml"],["Somai 25:25 balanced Oil Indica**","SATIVITE","OIL","30ml"],["Spectrum Blue Oil 50mL (sativa dom hybrid)","SATIVITE","OIL","50ml"],["Spectrum Red Oil 50mL (indica)","SATIVITE","OIL","50ml"],["T50 oral liquid (ind dom)","Tasmanian Botanics (Tasbot)","OIL","30ml"],["C100 oral liquid","Tasmanian Botanics (Tasbot)","OIL","30ml"],["Alfie Coastal Kush 22% (Kurpel Fantasy x Sherbert)","ALFIE","FLOWER","10g"],["Alfie GT Haze (Ghost OG x Nevilles Wreck)","ALFIE","FLOWER","10g"],["Alfie Queen Sangria 27%","ALFIE","FLOWER","10g"],["Alfie Orion Kush 29% (ind dom)","ALFIE","FLOWER","10g"],["Alfie K MINTS 22% (ind dom)","ALFIE","FLOWER","10g"],["Alfie SKY WALKER OG 28% (ind dom)","ALFIE","FLOWER","10g"],["Grape Galena 25% (OG Kush x Lost Sailor x Platinum Kush)*","ALMA","FLOWER","10g"],["Flawless Victory 26% (Ice Cream Cake x Cherry Cheesecake)*","ALMA","FLOWER","10g"],["Pink Zugar 27% (Skittlez x Strawberry Guava)*","ALMA","FLOWER","10g"],["Cream Fritter 27% Apple Fritter x Grape Cream Cake)*","ALMA","FLOWER","10g"],["Eve CBD FLOWER","ANTG","FLOWER","10g"],["JUNO (balanced)**","ANTG","FLOWER","10g"],["Mariposa**","ANTG","FLOWER","10g"],["ANTG Rocky Flower **","ANTG","FLOWER","10g"],["Aura Apples and Bananas*","Aura Therapeutics","FLOWER","10g"],["Aura Key Lime Kush*","Aura Therapeutics","FLOWER","10g"],["Aura Purple Raine*","Aura Therapeutics","FLOWER","15g"],["Aura Snowman**","Aura Therapeutics","FLOWER","10g"],["Aura Base+ Mocha Truffle T27 (INDICA)","Aura Therapeutics","FLOWER","15g"],["Aura Base+ Zupa T27 (SATIVA)","Aura Therapeutics","FLOWER","15g"],["Aura Base AB smalls T24","Aura Therapeutics","FLOWER","15g"],["Aura Base KINGS TART T27","Aura Therapeutics","FLOWER","15g"],["Aura Base Jokerz Candy T24","Aura Therapeutics","FLOWER","15g"],["Aussie Budz Outback diesel 26 (Aussie Budz) 10g","AUSSIE BUDZ","FLOWER","10g"],["Aussie Budz Brissy Berry 26 (Aussie Budz) 10g","AUSSIE BUDZ","FLOWER","10g"],["Aussie Budz Velvet Thunder 25 (Aussie Budz) 10g","AUSSIE BUDZ","FLOWER","10g"],["AVANI LIME HAZE T23 SATIVA **","AVANI","FLOWER","10g"],["AVANI MANGO PASSION T25 INDICA**","AVANI","FLOWER","10g"],["AVANI BLING BLAU T30 INDICA***","AVANI","FLOWER","10g"],["BAKERY Rotation 25 Sativa","BAKERY","FLOWER","15g"],["BAKERY Rotation 25 Indica","BAKERY","FLOWER","15g"],["Bathera 28 Facetz *** (2.2% terps)- 30G","BATHERA","FLOWER","30g"],["Bathera 25 Blue Z *** (3% terps)- 30G","BATHERA","FLOWER","30g"],["Girl Scout Cookies","BEACON MEDICAL","FLOWER","10g"],["Pink Kush (Beacon) 22%","BEACON MEDICAL","FLOWER","10g"],["Sensi Star","BEACON MEDICAL","FLOWER","10g"],["Wappa","BEACON MEDICAL","FLOWER","10g"],["Black Dolato","BEACON MEDICAL","FLOWER","10g"],["Ventura Dawg","BEACON MEDICAL","FLOWER","10g"],["Beacon Face Mintz THC30","BEACON MEDICAL","FLOWER","10g"],["Beacon Select THC30*","BEACON MEDICAL","FLOWER","10g"],["Broken Coast AH THC 26 (AMNESIA HAZE)***","Broken Coast","FLOWER","10g"],["Broken CCC THC 24 (CHERRY CHEESE CAKE)***","Broken Coast","FLOWER","10g"],["Broken Coast EMZ THC 26 (EMERGENZ)***","Broken Coast","FLOWER","10g"],["Broken Coast PP THC 28 (PLATINUM PAVE)***","Broken Coast","FLOWER","10g"],["Broken Coast OGKB THC 25 (OG Kush Breath)***","Broken Coast","FLOWER","10g"],["Crystalbrook Cream THC 28 (PROJECT 33)*","Byron Bioceutiocals","FLOWER","10g"],["Daybreak Don Green THC 28 (DON GREEN)*","Byron Bioceutiocals","FLOWER","10g"],["Bubba Moonshade THC 25 *","Byron Bioceutiocals","FLOWER","10g"],["Candied Pine Cinderella THC 22 *","Byron Bioceutiocals","FLOWER","10g"],["Twighlight Glow Cake THC 28 *","Byron Bioceutiocals","FLOWER","10g"],["T25 Topaz Flower ** (Kush cookies)","Cannatrek","FLOWER","10g"],["C9T7 Argaman (White Widow x CBD critical mass)","Cannatrek","FLOWER","10g"],["T27 Narooma (GSC + Chemdawg)","Cannatrek","FLOWER","10g"],["T25 Golden Bay (Ultra Sour)","Cannatrek","FLOWER","10g"],["T26 Sorrento (Sour Diesel X Sage)","Cannatrek","FLOWER","10g"],["T28 Eden (Medelin = Wedding cake X Chemdawg)","Cannatrek","FLOWER","10g"],["Cannatrek Gold T28 Jet Fuel Gelato 10g **","Cannatrek","FLOWER","10g"],["T55 Topaz Bubble Hash (Kush Cookies)*","EXTRACTS","EXTRACT",""],["Curaleaf Daybreak THC22%- Huckleberry","Curaleaf","FLOWER","10g"],["Curaleaf Nightfall THC THC25% - Fire OG","Curaleaf","FLOWER","10g"],["Superbly Rosey (CBD)**","CYMRA BOTANICALS","FLOWER","10g"],["Superbly Blissy (22% THC Banana OG)**","CYMRA BOTANICALS","FLOWER","10g"],["Superbly Sunny (25% THC Super lemon Haze)**","CYMRA BOTANICALS","FLOWER","10g"],["Superbly Buzzy (22% THC Sativa, Durban Poison)**","CYMRA BOTANICALS","FLOWER","10g"],["Superbly Dusky (25% THC Vanilla cream cookies)**","CYMRA BOTANICALS","FLOWER","10g"],["Rainbow Region Moonlight 25% LSO","CYMRA BOTANICALS","FLOWER","15g"],["Rainbow Region Rainbow Roots 28% LSO","CYMRA BOTANICALS","FLOWER","15g"],["Elysian Harmony 16% CBD 10g*","Elysian Botanics","FLOWER","10g"],["Entoura Varaski T26 15g*","ENTOURA","FLOWER","15g"],["Entoura Tropicana Cookies T26","ENTOURA","FLOWER","10g"],["Entoura GSD THCv 12% THC 5% (10g/ten g)","ENTOURA","FLOWER","10g"],["Sol Northern lights 10g (heritage chemovar)","Gamma Biomed","FLOWER","10g"],["Grandiosa Gorilla Glue***","GRANDIOSA BALANCE","FLOWER","10g"],["Grandiosa Bubba Jungle Pie***","GRANDIOSA BALANCE","FLOWER","10g"],["Grandiosa Original Blitz ***","GRANDIOSA BALANCE","FLOWER","10g"],["Grandiosa Limoncello Daydream**","GRANDIOSA BALANCE","FLOWER","10g"],["Grandiosa Golden Kief 50% THC** (blue cheese)","GRANDIOSA EXTRACTS","EXTRACT",""],["Grandiosa HASH- BUENAS NOCHES ** T48 \"GSC = \"Durban poison x OG kush\"","GRANDIOSA EXTRACTS","EXTRACT",""],["Grandiosa HASH-N BUENOS DIAS HASH** T48 \"Sour Diesel\"","GRANDIOSA EXTRACTS","EXTRACT",""],["Green weekend Jungle Cake","GRANDIOSA EXTRACTS","FLOWER","15g"],["Green weekend Mandarin Sunset","GRANDIOSA EXTRACTS","FLOWER","15g"],["Green weekend Blue Cheese (Baby Buds) 15g","GRANDIOSA EXTRACTS","FLOWER","15g"],["Green weekend BLUEBERRY Cheese (Baby Buds) 15g","GRANDIOSA EXTRACTS","FLOWER","15g"],["Haiiku White Hot Guava","Haiiku","FLOWER","10g"],["Hana Blue Tango 25% (Sativa Dom Hybrid)","HANA wellness","FLOWER","10g"],["Hana Lemon Skunk (Sativa Dom Hybrid)","HANA wellness","FLOWER","10g"],["Hana Gelato 30% (Balance Hybrid)","HANA wellness","FLOWER","10g"],["Hana Sugar baby 25% (Indica Dom Hybrid)","HANA wellness","FLOWER","10g"],["KIND Libra","KIND medical","FLOWER","10g"],["KIND Azure","KIND medical","FLOWER","10g"],["KIND Iris","KIND medical","FLOWER","10g"],["KIND Sol- CBD ONLY FLOWER","KIND medical","FLOWER","10g"],["KIND Rosa","KIND medical","FLOWER","10g"],["KIND Dulce","KIND medical","FLOWER","10g"],["KIND Thea","KIND medical","FLOWER","10g"],["KIND Deus","KIND medical","FLOWER","10g"],["Kind permanent marker (indica)","KIND medical","FLOWER","10g"],["KIND Payton Pie (Gary Payton x georgia pie) 29% THC*","KIND medical","FLOWER","10g"],["Desert Flame - sativa (Australian grown)","LGP","FLOWER","10g"],["Moonlight THC 22 - indica","LGP","FLOWER","10g"],["Lemon Glow THC 20 - sativa","LGP","FLOWER","10g"],["Bush Lantern THC25- indica","LGP","FLOWER","10g"],["Silver Mist CBD flower - CBD","LGP","FLOWER","10g"],["LGP Frosted King THC26 - Sativa (Australian grown)","LGP","FLOWER","10g"],["LGP Wild Sunset THC26 - Indica (Australian grown)","LGP","FLOWER","10g"],["Lot420 Gelato #33*","Lot420","FLOWER","10g"],["Lush Labs GastroPop 28% Indica","Lush Labs (LGP premium)","FLOWER","10g"],["Lush Labs Black BiscottiI 25% Indica","Lush Labs (LGP premium)","FLOWER","10g"],["Lush Labs Mac Powdered Donuts 22% Indica","Lush Labs (LGP premium)","FLOWER","10g"],["Lush Labs Lemon Mac 25% Sativa","Lush Labs (LGP premium)","FLOWER","10g"],["Lush Labs Royal mac 20% Hybrid","Lush Labs (LGP premium)","FLOWER","10g"],["CC01 (Cold Creek Kush/ Afghan Kush) 10g","MEDCAN","FLOWER","10g"],["SC01 (Strawberry Cake) 10g","MEDCAN","FLOWER","10g"],["ULTRA01 (Ultra Sour) 10g","MEDCAN","FLOWER","10g"],["GLU01 (Sherbert Glu) 10g*","MEDCAN","FLOWER","10g"],["STT01 (Scotties Cake) 10g","MEDCAN","FLOWER","10g"],["HGH01 (Human Growth Hormone) 10g","MEDCAN","FLOWER","10g"],["SAC01 (Space Age Cake) 10g*","MEDCAN","FLOWER","10g"],["Medcan LAK01 (L.A. Kush Cake)","MEDCAN","FLOWER","10g"],["FGW smalls T25 indica Green dragon","MEDICABILIS","FLOWER","15g"],["FGW smalls T20 Sativa Super Lemon Haze 15g","MEDICABILIS","FLOWER","15g"],["Mediquest Bazookas THC 10g**","MEDIQUEST","FLOWER","10g"],["Mediquest Gas Cake THC 10g**","MEDIQUEST","FLOWER","10g"],["Mediquest Dirty Taxi THC 10g ***","MEDIQUEST","FLOWER","10g"],["Mediquest Long Valley Legend THC 10g**","MEDIQUEST","FLOWER","10g"],["Mediquest Grape Stank THC 10g**","MEDIQUEST","FLOWER","10g"],["Motherplant CCN(Critical Condition)","Motherplant","FLOWER","10g"],["Motherplant MPC (Forum GSC)","Motherplant","FLOWER","10g"],["Afghan Layer Cake THC 30","Mystery Mountain","FLOWER","15g"],["Kimbo Gelato THC 25","Mystery Mountain","FLOWER","15g"],["Sunset Soap THC 25","Mystery Mountain","FLOWER","15g"],["The Big Mango THC8 CBD 11","Mystery Mountain","FLOWER","15g"],["Stone Fruit Cake THC 30","Mystery Mountain","FLOWER","15g"],["Jealous Pop THC 30 (gastro pop x jealousy)","Mystery Mountain","FLOWER","15g"],["Candy Blast THC 25","Mystery Mountain","FLOWER","15g"],["Cookies n Chem THC 25","Mystery Mountain","FLOWER","15g"],["Coco-Bamba THC 27","Mystery Mountain","FLOWER","15g"],["NOOSA SELECTS T23 SATIVA (15G/FIFTEEN)","PHARMACROP","FLOWER","15g"],["NOOSA SELECTS T25 SATIVA (15G/FIFTEEN)","PHARMACROP","FLOWER","15g"],["NOOSA SELECTS T26 INDICA (15G/FIFTEEN)","PHARMACROP","FLOWER","15g"],["Wedding Cake THC27 10g***","PEACE NATURALS","FLOWER","10g"],["Phytoca Monkey Business THC23 (LSO)10g***","PHYTOCA","FLOWER","10g"],["Phytoca Zurple Punch THC21 (LSO)10g***","PHYTOCA","FLOWER","10g"],["Phytoca Cherry Skunk 10g*","PHYTOCA","FLOWER","10g"],["Bunyipp 31 10g (Titanimal- heavy indica 31 %)***","Sativite","FLOWER","10g"],["DIRRAG LSO 27 10g ( 27 %)***","Sativite","FLOWER","10g"],["Eurroka 29 10g (Mango Sour - stimulating sativa 29%)","Sativite","FLOWER","10g"],["Moorok 21 LSO (balanced hybrid)- MAC 1","Sativite","FLOWER","10g"],["Walken 26% 10g (Gastropop- heavy indica 26%)**","Sativite","FLOWER","10g"],["Pankinna 25% 10g (Zurple Sunset - Zurple x citradelic sunset)**","Sativite","FLOWER","10g"],["Sativite Azsend HBx 22% (Heladosa x Randylosa Cherry) AUSTRALIA","Sativite","FLOWER","10g"],["Sativite PACT SW01 THC","Sativite","FLOWER","15g"],["Sativite PACT SW02 THC (Huckleberry)","Sativite","FLOWER","15g"],["Sativite PACT (GMO animal cookies- Chem D X animal cookies)***","Sativite","FLOWER","10g"],["Cerenity Marlin THC26 (GMO animal cookies - Chem D x animal cookies 26%)","Sativite Cerenity","FLOWER","10g"],["Cerenity Pink Cusk THC26 (Pink Gas (bubba kush x pink kush- indica 26%)","Sativite Cerenity","FLOWER","10g"],["Southern Sky - INDICA 26% (10g)","SOUTHERN SKY (Alfie Therapeutics)","FLOWER","10g"],["Southern Sky - HYBRID 26% (10g)","SOUTHERN SKY (Alfie Therapeutics)","FLOWER","10g"],["Southern Sky - SATIVA 24% (10g)","SOUTHERN SKY (Alfie Therapeutics)","FLOWER","10g"],["Spectrum Red No1 flower 15g***","SPECTRUM","FLOWER","15g"],["Tweed Krypton Kush25 15g***","SPECTRUM","FLOWER","15g"],["Canopy Hindu Kush 23 15g","SPECTRUM","FLOWER","15g"],["Canopy OGD 27 15g","SPECTRUM","FLOWER","15g"],["Canopy FZ 30 15g*","SPECTRUM","FLOWER","15g"],["Canopy KMI 28 15g**","SPECTRUM","FLOWER","15g"],["TWEED Orange Chemsicle 28 15g***","SPECTRUM","FLOWER","15g"],["Canopy VALLEY 12:14 10g *** (CBD:THC BALANCED )","SPECTRUM","FLOWER","10g"],["7 Acres Jack Frost 10g SATIVA","SPECTRUM","FLOWER","10g"],["7 Acres Ultra Jack 10g SATIVA","SPECTRUM","FLOWER","10g"],["7 Acres GPS 22 10g *** INDICA","SPECTRUM","FLOWER","10g"],["Jungle Driver THC26","SPIRIT BEAR","FLOWER","10g"],["Frosted Guava THC25","SPIRIT BEAR","FLOWER","10g"],["Citrus Temple THC25","SPIRIT BEAR","FLOWER","10g"],["Strawberry Meltshake THC28","SPIRIT BEAR","FLOWER","10g"],["Fruit Sundae THC30","SPIRIT BEAR","FLOWER","10g"],["Stanley Brothers INDICA 25 flower 15g","STANLEY BROTHERS","FLOWER","15g"],["Stanley Brothers SATIVA 22 flower 15g","STANLEY BROTHERS","FLOWER","15g"],["Stanley Brothers INDICA 28 15g","STANLEY BROTHERS","FLOWER","15g"],["Super Seed Blueberry Purps 10g LSO","SUPER SEED","FLOWER","10g"],["Herb Pave (Paris OG x The Menthol)","TREEHOUSE","FLOWER","10g"],["Delta Tetra (Orange Cake)","TREEHOUSE","FLOWER","10g"],["MIDZ INDICA (rotating curation)","TREEHOUSE","FLOWER","15g"],["MIDZ SATIVA (rotating curation)","TREEHOUSE","FLOWER","15g"],["Zaari GMO Cookies Live Rosin 2g","ZAARI (supplied Entoura)","EXTRACT",""],["Zaari Strawnana Live Rosin 2g","ZAARI (supplied Entoura)","EXTRACT",""],["Zaari Gorilla DieselLive Rosin 2g","ZAARI (supplied Entoura)","EXTRACT",""],["ANTG Rocky cart 1g INDICA**","","CART",""],["ANTG Juno cart 1g (CBD: THC balanced)**","","CART",""],["Aura Dymond Jealosy LR cart 1g (LIVE RESIN)","","CART",""],["ALFIE GT Haze Vape 1g (SATIVA DOMINANT)","","CART",""],["ALFIE Balanced GTH/CBD 1g (balanced hybrid day + CBD balanced)","","CART",""],["ALFIE Crescendo Kush Vape 1g (INDICA)","","CART",""],["ALFIE EVO LIVE RESIN Vape 1g (BALANCED HYBRID)","","CART",""],["Beacon GSC cart 850mg Indica (LIVE RESIN)","","CART",""],["Beacon PK Cart 850mg Indica (LIVE RESIN)","","CART",""],["Beacon CBB Cart 850mg Sativa (LIVE RESIN)","","CART",""],["Beacon Pineapple Haze Cart CBD (LIVE RESIN)","","CART",""],["mCART THC NIGHT 1g (INDICA) (Kush Cookies= TOPAZ)","CANNATREK CARTS","CART",""],["mCART THC DAY 1g (SATIVA) (Blueberry Indica x super silver haze)","CANNATREK CARTS","CART",""],["mCART BLEND S 1g (CBD:THC BALANCED) (Cherry blossom x Blue dream)","CANNATREK CARTS","CART",""],["mCart Petra 1.0g BALANCED HYBRID (Creamy Kees, karels haze x cookies and cream)","CANNATREK CARTS","CART",""],["mCart Sheba 1.0g SATIVA HYBRID (Bafokens Choice, white lemon x marala bay)","CANNATREK CARTS","CART",""],["mCart Babylon 1.0g INDICA (Critical Kush)","CANNATREK CARTS","CART",""],["Elysian Aria FS CBD vape 1g","CANNATREK CARTS","CART",""],["ELYSIAN Aria FS CBD Vape 1g STARTER (includes battery)","CANNATREK CARTS","CART",""],["Cymra Zingy Cart sativa 1g (Organic)","CANNATREK CARTS","CART",""],["Cymra Zenny Cart indica 1g (Organic)","CANNATREK CARTS","CART",""],["Buenos Diaz Cart 1g (DAY) (Jack Herer)","CANNATREK CARTS","CART",""],["Buenos Noches Cart 1g (night ) (wedding cake)","CANNATREK CARTS","CART",""],["Buenos Diaz Cart 1g (DAY) + Battery (STARTER KIT) (Jack Herer)","CANNATREK CARTS","CART",""],["Buenos Noches Cart 1g (NIGHT) + Battery (STARTER KIT) (wedding cake)","CANNATREK CARTS","CART",""],["Harbour LR Day Cart 2g- LIVE RESIN- biodynamic","CANNATREK CARTS","CART",""],["Harbour LR NIGHT Cart 2g- LIVE RESIN-biodynamic","CANNATREK CARTS","CART",""],["KIND libra cart 1G (indica)- CO2 extraction","CANNATREK CARTS","CART",""],["KIND Azure cart 1G (Sativa dominant)- CO2 extraction","CANNATREK CARTS","CART",""],["KIND Rosa cart 1G- (Indica) CO2 extraction","CANNATREK CARTS","CART",""],["KIND LUNA cart 1G- (Indica) CO2 extraction","CANNATREK CARTS","CART",""],["LGP Cart Night 1G (indica)","CANNATREK CARTS","CART",""],["LGP Cart Day 1G (sativa)","CANNATREK CARTS","CART",""],["LGP Live resin Day Cart 1G (sativa)** (LIVE RESIN)","CANNATREK CARTS","CART",""],["LGP Live resin Night Cart 1G (indica)** (LIVE RESIN)","CANNATREK CARTS","CART",""],["Medcan CC01-V (cart)","CANNATREK CARTS","CART",""],["Medcan SC01-V (cart)","CANNATREK CARTS","CART",""],["Medcan GLU01-V (cart)","CANNATREK CARTS","CART",""],["Edison Black Cherry Punch 1g/one g (cart) INDICA","","CART",""],["Edison LIMELIGHT 1g/one g (cart) SATIVA","","CART",""],["BoxHot Strawberry Diesel THC:CBD:CBG 1.2g/one point two g (cart) SATIVA","","CART",""],["BoxHot Cherry KushTHC + CBN 1.2g/one point two g (cart) INDICA","","CART",""],["Phytoca BK Cart (BlueBerry Kush)","","CART",""],["Phytoca BCP Cart (Black Cherry Punch)**","","CART",""],["Phytoca Sour Tangie LR (Sativa)** (LIVE RESIN)","","CART",""],["REDECAN Live Rosin Daytime THC pen 1g","","CART",""],["REDECAN Live Rosin THCv Skinny Vape 1g","","CART",""],["Satipen PC01 (Peach Chem) 1g (LIVE RESIN)","","CART",""],["7 Acres Fondant LR vape 1g/ one g - INDICA","","CART",""],["Spectrum Reserve Berea LR vape 1g/ one g - SATIVA","","CART",""],["ALMA Revive Pastilles SATIVA pastilles (60 chews) Pineapple (THC/ CBD/CBG/CBC)","","PASTILLE",""],["ALMA Mellow Pastilles INDICA pastilles (60 chews) Mixed Berry (THC/ CBD/CBN/CBC)","","PASTILLE",""],["ALMA Calma Pastilles INDICA pastilles (60 chews) Sour Cola (THC/ CBD/CBN/CBC)","","PASTILLE",""],["JUNO 20:20 balanced pastilles (60 chews)","ANTG","PASTILLE",""],["Rocky THC 30 pastilles (60 chews)","ANTG","PASTILLE",""],["Aura Blood Orange 10:10 Gummies- VEGAN","","PASTILLE",""],["Aura Live Cola Pastilles VEGAN***","","PASTILLE",""],["Aura 40:20:20 LIVE NIGHT BERRY Pastilles VEGAN***","","PASTILLE",""],["Avani THC10 caps","","CAPS",""],["Avani Balanced 5:5 caps","","CAPS",""],["Avani Advanced 2.5:20","","PASTILLE",""],["Avani Advanced CBD25","","PASTILLE",""],["Ctrek C10T10 Medibles- Strawberry 60 chews)","","PASTILLE",""],["Cymra Aurelius DAY Pastilles C100 (60 chews)","","PASTILLE",""],["Cymra Cylin NIGHT Pastilles C100 (60 chews)","","PASTILLE",""],["Entoura THC10 soft chew (90 chews)*","","PASTILLE",""],["Entoura 15:15 soft chews (90 chews)*","","PASTILLE",""],["Grandiosa CBD100 patilles 60/sixty","","PASTILLE",""],["Heyday Tangerine Threes (60 chews)","","PASTILLE",""],["MediChew Lime 50 CBD (60 chews)","","PASTILLE",""],["MediChew 10:25 (60 chew)","","PASTILLE",""],["EclipX Mango Square Bears CBD50:CBG20:CBC3 (SATIVA)","","PASTILLE",""],["EclipX Blueberry Square Bears CBD50:CBN20:CBG5 (INDICA)","","PASTILLE",""],["Phytoca Indica 30 rosin pastilles*","","PASTILLE",""],["Saticap CBD50 softgel (60 caps)","","CAPS",""],["SPECTRUM BLUE 2.5/3.75 soft gels SOFT GELS (60 )*","","CAPS",""],["Stanley 40:40:40 PASTILLES (60pack)","","PASTILLE",""],["Superseed CBD100 PASTILLES (60pack)","","PASTILLE",""],["MTL Frosted Flakes 30% (Cereal Milk xd MAC 1)**","ALMA / MTL","FLOWER","15g"],["MTL Larry Black 22% (Biscotti x Scotty 2 Hotty)**","ALMA / MTL","FLOWER","15g"],["Aura Base KINGS TART T24","Aura Therapeutics","FLOWER","15g"],["AVANI BLING BLAU T30 INDICA**","AVANI","FLOWER","10g"],["Green weekend Dry Flower Blue Cheese (Baby Buds) 15g","GREEN WEEKEND","FLOWER","15g"],["FGW smalls T25 indica Green dragon***","MEDICABILIS","FLOWER","15g"],["FGWsmalls T20 Sativa Super Lemon Haze 15g***","MEDICABILIS","FLOWER","15g"]];
+const TYPES = ["OIL", "FLOWER", "CART", "PASTILLE", "CAPS"];
+const NEEDS_ACTION = new Set(["pick", "check", "missing", "confirm"]);
+const EXAMPLE = "Aura Purple Rain\t1\t2\t02/12/2026\nKind Rosa\t1\tLast Repeat\t15/02/2027\nMedcan FX200 Oil\t1\tLast Repeat\t22/01/2027\nAvani Mango Passion\t1\tLast Repeat\t08/04/2027\nRainbow Region Rainbow Moonlight\t1\tLast Repeat\t08/04/2027\nAntg Juno Cart\t2\t1\t28/11/2026";
+
+// ---------- matching ----------
+const TYPE_WORDS = {
+  OIL: ["oil", "oils"], FLOWER: ["flower", "flowers"], CART: ["cart", "carts", "vape", "vapes", "pen"],
+  PASTILLE: ["pastille", "pastilles", "gummies", "gummy", "chews", "chew"], CAPS: ["caps", "capsules", "capsule", "softgel", "softgels"]
+};
+const TYPE_OF_WORD = {};
+for (const t in TYPE_WORDS) for (const w of TYPE_WORDS[t]) TYPE_OF_WORD[w] = t;
+const STOP = new Set(["g", "gm", "ml", "mg", "x", "the", "and", "of", "lso", "new", "only", "per", "full", "spec"]);
+const ALIAS = { ctrek: "cannatrek", cana: "cannatrek", antg: "antg", medibles: "medible", mcart: "mcart" };
+
+function rawWords(s) {
+  return s.toLowerCase().replace(/[*#"]/g, " ").replace(/&/g, " and ").split(/[^a-z0-9.:]+/).filter(Boolean);
+}
+function tokens(s) {
+  const out = [];
+  const split = s.toLowerCase().replace(/[*#"]/g, " ")
+    .replace(/([a-z])(\d)/g, "$1 $2").replace(/(\d)([a-z])/g, "$1 $2")
+    .split(/[^a-z0-9.]+/);
+  for (let w of split) {
+    w = w.replace(/^\.+|\.+$/g, "");
+    if (!w || STOP.has(w) || TYPE_OF_WORD[w]) continue;
+    w = ALIAS[w] || w;
+    if (w.length > 4 && w.endsWith("s") && !w.endsWith("ss")) w = w.slice(0, -1);
+    out.push(w);
+  }
+  // Codes like T50, FX200 or GLU01 are also kept whole, so T50 must match T50 (not just any "50").
+  for (const w of s.toLowerCase().split(/[^a-z0-9]+/)) if (/[a-z]/.test(w) && /\d/.test(w)) out.push(w);
+  return out;
+}
+function lev1(a, b) {
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0, j = 0, edits = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++edits > 1) return false;
+    if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; }
+  }
+  return edits + (a.length - i) + (b.length - j) <= 1;
+}
+function tokMatch(a, b) {
+  if (a === b) return true;
+  // Prefix only for small endings (RAIN/RAINE, MINT/MINTS), never BLUE/BLUEBERRY.
+  if (a.length >= 4 && b.length >= 4 && Math.abs(a.length - b.length) <= 2 && (a.startsWith(b) || b.startsWith(a))) return true;
+  // One letter off (ROSY/ROSEY). Safe because a near-spelling always asks before it's used.
+  if (a.length >= 4 && b.length >= 4 && lev1(a, b)) return true;
+  return false;
+}
+
+const PRODUCTS = CATALOG.map(([name, supplier, type, size]) => {
+  const own = tokens(name);
+  const sup = tokens(supplier);
+  // The brand is usually the first word of the name (KIND Rosa cart, listed under its distributor Cannatrek).
+  const first = name.trim().split(/\s+/)[0].toLowerCase();
+  const lead = /^[a-z]{3,}$/.test(first) ? first : "";
+  return { name, supplier, type, size, own, sup, lead, all: [...new Set([...own, ...sup])] };
+});
+const DF = {};
+for (const p of PRODUCTS) for (const t of new Set(p.own)) DF[t] = (DF[t] || 0) + 1;
+const N = PRODUCTS.length;
+const idf = t => Math.log(1 + N / (1 + (DF[t] || 0)));
+const SUPPLIER_ONLY = new Set();
+for (const p of PRODUCTS) for (const t of tokens(p.supplier)) if (!DF[t]) SUPPLIER_ONLY.add(t);
+
+function findMatches(name) {
+  const q = [...new Set(tokens(name))];
+  if (!q.length) return [];
+  const scored = [];
+  for (const p of PRODUCTS) {
+    let hit = 0, hits = 0, total = 0, fuzzy = 0;
+    // Extra brand words (KIND MEDICAL) are only forgiven when the product's own brand is named too;
+    // a different brand's word (TASBOT on a Sativite product) still counts against it.
+    const ownBrandNamed = q.some(t => isBrandWord(t, p) || (p.lead && t === p.lead));
+    for (const t of q) {
+      // Brand words count as the brand however they're written: BYRON BIO = BYRON BIOCEUTIOCALS.
+      const brand = !p.own.includes(t) && isBrandWord(t, p);
+      const exact = brand || p.all.includes(t);
+      const ok = exact || p.all.some(c => tokMatch(t, c));
+      // A near-spelling counts a little less, so an exact name always beats a lookalike (WALKEN vs WALKER).
+      if (ok) { hit += exact ? idf(t) : 0.9 * idf(t); hits++; if (!exact) fuzzy++; }
+      // Company words like MEDICAL or THERAPEUTICS only appear in supplier labels; missing one shouldn't count against a product.
+      if (ok || !(SUPPLIER_ONLY.has(t) && ownBrandNamed)) total += idf(t);
+    }
+    if (!hits || !total) continue;
+    const ownCover = p.own.length ? p.own.filter(c => q.some(t => tokMatch(t, c))).length / p.own.length : 0;
+    scored.push({ p, score: hit / total, rank: hit / total + 0.08 * ownCover, fuzzy });
+  }
+  scored.sort((a, b) => b.rank - a.rank);
+  return scored;
+}
+
+function isBrandWord(t, p) {
+  return p.sup.some(c => c === t || (t.length >= 3 && c.startsWith(t)) || tokMatch(t, c));
+}
+
+// Swap misspelt words for the pricelist's spelling, e.g. PURPLE RAIN -> PURPLE RAINE.
+// Brand words are always left exactly as typed.
+function fixSpelling(name, p) {
+  const words = p.name.split(/[^A-Za-z0-9.:+]+/).filter(Boolean);
+  return name.split(/\s+/).map(w => {
+    const lw = w.toLowerCase().replace(/[^a-z0-9.:+]/g, "");
+    if (!lw || TYPE_OF_WORD[lw] || /\d/.test(lw)) return w;
+    if (tokens(w).every(t => isBrandWord(t, p))) return w;
+    if (words.some(x => x.toLowerCase() === lw)) return w;
+    const c = words.find(x => {
+      const lx = x.toLowerCase();
+      return lx.length >= 3 && !/\d/.test(lx) && lx !== lw + "s" && lw !== lx + "s" && tokMatch(lw, lx);
+    });
+    return c || w;
+  }).join(" ");
+}
+
+const GRAMS = /\b\d+(?:\.\d+)?\s*(?:g|gm|gms|grams?)\b/i;
+const GRAMS_ALL = new RegExp(GRAMS.source, "gi");
+const ML = /\b\d+(?:\.\d+)?\s*ml\b/i;
+const ML_ALL = new RegExp(ML.source, "gi");
+const SIZE_UNITS = {
+  FLOWER: { re: GRAMS, label: "tub size", word: /\s*\bFLOWERS?\b/ },
+  OIL: { re: ML, label: "bottle size", word: /\s*\bOILS?\b/ }
+};
+
+// For a name that isn't in the pricelist, point at the product sharing its rarest word
+// (ALMA CALMA LIVE ROSIN CART -> ALMA Calma Pastilles), not one sharing common words like LIVE or NIGHT.
+function closestByName(name, matches) {
+  const q = [...new Set(tokens(name.replace(GRAMS_ALL, " ").replace(ML_ALL, " ")))].filter(t => DF[t]);
+  if (!q.length) return null;
+  q.sort((a, b) => DF[a] - DF[b]);
+  const m = matches.find(x => x.p.own.includes(q[0]));
+  return m ? m.p : null;
+}
+
+// The pricelist name without notes, strengths and sizes: "Superbly Rosey (CBD)**" -> "Superbly Rosey".
+function cleanProductName(n) {
+  return n.replace(/\([^)]*\)?/g, " ").replace(/[*"]/g, " ").replace(/\b\d+(?:\.\d+)?\s*%/g, " ")
+    .replace(GRAMS_ALL, " ").replace(ML_ALL, " ")
+    .split(/\s+/).filter(w => !TYPE_OF_WORD[w.toLowerCase().replace(/[^a-z]/g, "")]).join(" ")
+    .replace(/\s*-\s*$/, "").replace(/\s+/g, " ").trim();
+}
+
+function typeInName(name) {
+  for (const w of rawWords(name)) if (TYPE_OF_WORD[w]) return TYPE_OF_WORD[w];
+  return null;
+}
+
+// ---------- parsing ----------
+function parseDate(s) {
+  const m = String(s).trim().match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2}|\d{4})$/);
+  if (!m) return null;
+  let [, d, mo, y] = m; d = +d; mo = +mo; y = +y; if (y < 100) y += 2000;
+  const dt = new Date(y, mo - 1, d);
+  if (dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+  return dt;
+}
+const pad = n => String(n).padStart(2, "0");
+const fmtDate = d => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+
+function parseLine(line) {
+  let parts = line.split("\t").map(s => s.trim()).filter(s => s !== "");
+  if (parts.length < 4) {
+    const m = line.trim().match(/^(.+?)\s+(\d+)\s*x?\s+(.+?)\s+(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4})\s*$/i);
+    if (m) parts = [m[1], m[2], m[3], m[4]];
+  }
+  if (parts.length < 4) return null;
+  const date = parseDate(parts[parts.length - 1]);
+  const qty = parseInt(parts[1], 10);
+  if (!date || !qty) return null;
+  return { name: parts[0].replace(/\s+/g, " "), qty, rep: parts.slice(2, parts.length - 1).join(" "), date };
+}
+function fmtRepeats(r) {
+  if (/last/i.test(r)) return "0 Repeats";
+  const m = r.match(/\d+/);
+  if (!m) return r;
+  const n = +m[0];
+  return n === 1 ? "1 Repeat" : `${n} Repeats`;
+}
+
+// ---------- state ----------
+const overrides = {}; // keyed by line text: { name?, type? }
+const input = document.getElementById("input");
+// Today's date in the viewer's own timezone (the device clock). Recomputed at local midnight.
+let today, cutoff;
+function setToday() {
+  today = new Date(); today.setHours(0, 0, 0, 0);
+  cutoff = new Date(today); cutoff.setMonth(cutoff.getMonth() + 2);
+  if (cutoff.getDate() !== today.getDate()) cutoff.setDate(0); // e.g. 31 Dec -> 28/29 Feb
+  document.getElementById("today").textContent = fmtDate(today);
+}
+setToday();
+document.getElementById("catCount").textContent = PRODUCTS.length;
+
+function analyse(line, parsed) {
+  const ov = overrides[line] || {};
+  const baseName = (ov.name ?? parsed.name).trim();
+  const nameType = typeInName(baseName);
+  const matches = ov.confirm === false ? [] : findMatches(baseName.replace(GRAMS_ALL, " ").replace(ML_ALL, " "));
+  const best = matches[0];
+  let status, note = "", type = nameType, match = best && best.score >= 0.5 ? best.p : null;
+  if (best && best.score >= 0.75) {
+    const ties = matches.filter(m => m.score >= best.score - 0.02 && m.score >= 0.75);
+    const tieTypes = [...new Set(ties.map(m => m.p.type).filter(t => TYPES.includes(t)))];
+    if (nameType) {
+      const same = ties.find(m => m.p.type === nameType) || matches.find(m => m.p.type === nameType && m.score >= 0.75);
+      if (same) { match = same.p; status = "ok"; }
+      else { status = "check"; match = closestByName(baseName, matches) || match; note = `Pricelist has no ${nameType} called this. Closest product`; }
+    } else if (tieTypes.length > 1) {
+      status = "pick"; type = null; note = tieTypes.join(", ");
+    } else {
+      status = "ok"; type = TYPES.includes(best.p.type) ? best.p.type : null;
+    }
+  } else if (best && best.score >= 0.5) {
+    // A partial match never decides the type or the spelling; the row waits for a person.
+    status = "check"; match = closestByName(baseName, matches) || best.p;
+    note = nameType ? `Pricelist has no ${nameType} called this. Closest product` : "No exact pricelist match. Closest product";
+  } else {
+    status = "missing"; match = null;
+  }
+  if (ov.type !== undefined) { type = ov.type; if (status === "pick" && type) status = "ok"; }
+  if (type && match && match.type !== type && status === "ok") {
+    const tm = matches.find(m => m.p.type === type && m.score >= 0.75);
+    if (tm) match = tm.p;
+  }
+  const fixedName = match && (status === "ok" || status === "pick") && ov.name === undefined ? fixSpelling(baseName, match) : baseName;
+  const fixed = fixedName.toUpperCase() !== baseName.toUpperCase();
+  // Medcan carts use the flower code plus -V (GLU01 flower, GLU01-V cart). Once it's the cart, write the code as GLU01-V.
+  let named = fixedName;
+  if (match && type === "CART" && match.type === "CART" && (status === "ok" || status === "pick")) {
+    named = named.split(/\s+/).map(w => {
+      const code = w.replace(/[^A-Za-z0-9]/g, "");
+      return /\d/.test(code) && new RegExp(`\\b${code}-V\\b`, "i").test(match.name) && !/-V$/i.test(w) ? `${w}-V` : w;
+    }).join(" ");
+  }
+  let out = named.toUpperCase()
+    .replace(GRAMS_ALL, m => m.replace(/\s+/g, "").replace(/g.*$/i, "g"))
+    .replace(ML_ALL, m => m.replace(/\s+/g, "").toLowerCase());
+
+  // Flowers carry their tub size and oils their bottle size from the pricelist, placed just before the type.
+  let size = "", typed = "";
+  const unit = SIZE_UNITS[type];
+  if (unit) {
+    const typedM = baseName.match(unit.re);
+    typed = typedM ? typedM[0].replace(/\s+/g, "").toLowerCase().replace(/g.*$/, "g") : "";
+  }
+  if (unit && status === "ok") {
+    let prod = match && match.type === type ? match : null;
+    const prodScore = prod ? (matches.find(m => m.p === prod) || { score: 0 }).score : 0;
+    const ties = prod ? matches.filter(m => m.p.type === type && m.score >= 0.75 && m.score >= prodScore - 0.02) : [];
+    let sizes = [...new Set(ties.flatMap(m => (m.p.size || "").split("|")).filter(Boolean))];
+    if (sizes.length > 1) {
+      // SATIVITE PACT is the plain PACT (10g), not PACT SW01 or SW02 (15g): prefer the one product
+      // whose whole pricelist name is covered by what was typed.
+      const q = tokens(baseName.replace(GRAMS_ALL, " ").replace(ML_ALL, " "));
+      const whole = ties.filter(m => tokens(cleanProductName(m.p.name)).every(t => q.some(x => x === t)));
+      if (whole.length === 1) { prod = match = whole[0].p; sizes = [prod.size]; }
+    }
+    if (!prod || !prod.size) {
+      if (!typed && status === "ok") { status = "check"; note = `No ${unit.label} in the pricelist for this ${type.toLowerCase()}. Closest`; }
+    } else if (prod.size.includes("|") && !typed) {
+      status = "check"; note = `Pricelist lists this as both ${prod.size.split("|").join(" and ")}. Add the size to the name. Closest`;
+    } else if (sizes.length > 1 && !typed) {
+      status = "check"; note = `${unit.label[0].toUpperCase() + unit.label.slice(1)} unclear (${sizes.join(" or ")}). Add the size to the name. Closest`;
+    } else if (typed && !prod.size.split("|").includes(typed)) {
+      status = "check"; note = `Pricelist ${unit.label} is ${prod.size.replace("|", " / ")}, not ${typed}. Closest`;
+    } else if (!typed) size = prod.size;
+  }
+  // Final shape: NAME [SIZE] TYPE. A size or type word the user typed is moved into place, not doubled.
+  if (unit) {
+    const sz = size || typed;
+    let core = sz ? out.replace(new RegExp(unit.re.source, "gi"), " ") : out;
+    core = core.replace(/\s*-\s*$/, "").replace(/\s+/g, " ").trim();
+    const endWord = core.match(new RegExp(`\\s(${TYPE_WORDS[type].join("|")})$`, "i"));
+    if (endWord) core = core.slice(0, endWord.index);
+    const typeAtEnd = !nameType || endWord;
+    out = core + (sz ? " " + sz : "") + (typeAtEnd ? " " + type : "");
+  } else if (type && !nameType) out += " " + type;
+  // A name that only matches the pricelist by a near-spelling is never changed silently: it waits for a yes.
+  const chosen = match && matches.find(m => m.p === match);
+  if ((status === "ok" || status === "pick") && chosen && chosen.fuzzy > 0 && ov.confirm !== true) status = "confirm";
+  // When more than one product is just as close (ROSY: KIND Rosa or Superbly Rosey), name them all.
+  const stem = p => p.own.slice(0, 2).join(" ");
+  const alts = status === "confirm"
+    ? [...new Set(matches.filter(m => m.p !== match && m.score >= chosen.score - 0.02 && stem(m.p) !== stem(match)).map(m => m.p.name))].slice(0, 3)
+    : [];
+  // A flagged row only clears when someone confirms it.
+  if ((status === "check" || status === "missing") && (ov.keep || ov.confirm === false)) status = "kept";
+  // Only offer the types this product actually comes in; unknown names get every type.
+  const strong = best && best.score >= 0.75
+    ? new Set(matches.filter(m => m.score >= best.score - 0.02 && m.score >= 0.75).map(m => m.p.type))
+    : null;
+  const types = strong ? TYPES.filter(t => strong.has(t)) : TYPES;
+  // For rows that aren't a pricelist match, offer the closest pricelist products to pick from.
+  const options = [];
+  if (status === "check" || status === "missing") {
+    const add = p => { if (p && TYPES.includes(p.type) && !options.includes(p) && options.length < 4) options.push(p); };
+    add(match);
+    // Only products sharing a real word with the name (not just a lookalike such as FAKE/CAKE).
+    for (const m of matches) if (m.score >= 0.4 && m.fuzzy < m.score * 10 && (m.fuzzy === 0 || m.score >= 0.6)) add(m.p);
+  }
+  return { line, parsed, baseName, type, types, nameType, status, note, match, alts, options, out, fixed, size };
+}
+
+function build() {
+  const lines = input.value.split(/\r?\n/).map(l => l.replace(/\s+$/, "")).filter(l => l.trim());
+  const items = [], bad = [];
+  for (const l of lines) {
+    const p = parseLine(l);
+    if (p) items.push(analyse(l, p)); else bad.push(l);
+  }
+  for (const it of items) {
+    const d = it.parsed.date;
+    it.group = d < today ? "expired" : d <= cutoff ? "soon" : "other";
+    it.text = `${it.parsed.qty}x ${it.out} - ${fmtRepeats(it.parsed.rep)} - Expiry ${fmtDate(d)}`;
+  }
+  items.sort((a, b) => a.parsed.date - b.parsed.date);
+  return { items, bad };
+}
+
+function messageParts(items) {
+  const soon = items.filter(i => i.group === "soon"), other = items.filter(i => i.group === "other");
+  const intro = soon.length + other.length === 1
+    ? "This is a friendly reminder that you have an active prescription currently on hold with us:"
+    : "This is a friendly reminder that you have active prescriptions currently on hold with us:";
+  const parts = [{ t: `Hi from PlantMed Dispensary!\n\n${intro}\n\n` }];
+  const add = list => list.forEach((i, n) => parts.push({ t: i.text, flag: i.status === "missing", pick: i.status === "pick", check: i.status === "check", confirm: i.status === "confirm" }, { t: n < list.length - 1 ? "\n" : "" }));
+  if (soon.length) {
+    parts.push({ t: "Expiring Soon:", h: "soon" }, { t: "\n" }); add(soon);
+    if (other.length) { parts.push({ t: "\n\n" }, { t: "Your Other Active Scripts:", h: "other" }, { t: "\n" }); add(other); }
+  } else add(other);
+  parts.push({ t: "\n\nPlease note: S8 prescriptions expire after 6 months, so we encourage you to order before they expire.\n\nReady to order? Submit a request online here: https://plantmed.net.au/current-patient-medication-request/ or give our clinic a call.\n\n(Please do not reply directly to this message)\n\nWarm regards,\nThe PlantMed Team" });
+  return parts;
+}
+
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let current = { items: [], text: "" };
+
+function render() {
+  const { items, bad } = build();
+  const parts = messageParts(items);
+  const text = parts.map(p => p.t).join("");
+  current = { items, text };
+
+  // message
+  const msg = document.getElementById("msg");
+  const live = items.filter(i => i.group !== "expired");
+  if (!live.length) {
+    msg.innerHTML = `<span style="color:var(--muted)">Paste scripts above and the message appears here.</span>`;
+  } else {
+    msg.innerHTML = parts.map(p => {
+      const t = esc(p.t);
+      if (p.h) return `<span class="h ${p.h}">${t}</span>`;
+      if (p.flag) return `<span class="flagname" title="Not found in the pricelist">${t}</span>`;
+      if (p.pick) return `<span class="pickname" title="Pick a type below">${t}</span><span class="picktag">Pick a type</span>`;
+      if (p.confirm) return `<span class="pickname" title="Confirm the spelling below">${t}</span><span class="picktag">Confirm name</span>`;
+      if (p.check) return `<span class="pickname" title="Not an exact pricelist match">${t}</span><span class="picktag">Check name</span>`;
+      return t;
+    }).join("");
+  }
+
+  // stats
+  const c = k => items.filter(i => i.group === k).length;
+  const flagged = items.filter(i => NEEDS_ACTION.has(i.status) && i.group !== "expired").length;
+  const st = [];
+  if (c("soon")) st.push(`<span class="stat soon"><span class="dot"></span>${c("soon")} expiring soon</span>`);
+  if (c("other")) st.push(`<span class="stat ok"><span class="dot"></span>${c("other")} other active</span>`);
+  if (c("expired")) st.push(`<span class="stat flag"><span class="dot"></span>${c("expired")} expired, left out</span>`);
+  st.push(flagged ? `<span class="stat flag"><span class="dot"></span>${flagged} to check</span>` : (items.length ? `<span class="stat ok"><span class="dot"></span>All names matched</span>` : ""));
+  document.getElementById("stats").innerHTML = st.join("");
+
+  document.getElementById("badLines").innerHTML = bad.length
+    ? `<div class="bad-lines">Couldn't read ${bad.length === 1 ? "this line" : "these lines"}. Each row needs a name, quantity, repeats and a dd/mm/yyyy expiry:<br>${bad.map(b => `<code>${esc(b)}</code>`).join("<br>")}</div>` : "";
+
+  // review list
+  const groups = document.getElementById("groups");
+  if (!items.length) { groups.innerHTML = `<div class="empty">No scripts yet. Paste rows from the sheet above.</div>`; }
+  else {
+    const order = [["soon", "Expiring soon"], ["other", "Other active scripts"], ["expired", "Expired · left out of message"]];
+    let html = "";
+    for (const [g, label] of order) {
+      const list = items.filter(i => i.group === g);
+      if (!list.length) continue;
+      html += `<div class="group-label ${g}">${label}</div>`;
+      for (const it of list) {
+        const idx = items.indexOf(it);
+        const cls = it.status === "missing" ? "flagged" : (it.status === "check" || it.status === "pick" || it.status === "confirm") ? "warn" : "";
+        let pill;
+        const fix = it.fixed ? `<span class="pill fix"><span class="t">Spelling matched to pricelist · was ${esc(it.baseName.toUpperCase())}</span></span>` : "";
+        if (it.status === "ok") pill = `<span class="pill ok"><span class="t">✓ In pricelist <span class="src">· ${esc(it.match ? it.match.name : "")}${it.size ? ` · ${it.size} ${it.type === "OIL" ? "bottle" : "tub"}` : ""}</span></span></span>`;
+        else if (it.status === "pick") pill = `<span class="pill warn"><span class="t">Comes as ${esc(it.note)}. Pick one before sending</span></span>`;
+        else if (it.status === "check") pill = `<span class="pill warn"><span class="t">${esc(it.note || "Closest match")} <span class="src">· ${esc(it.match.name)}</span></span></span>`;
+        else if (it.status === "confirm") pill = `<span class="pill warn"><span class="t">Close to the pricelist but not exact. You typed ${esc(it.baseName.toUpperCase())} <span class="src">· pricelist has ${esc(it.match.name)}${it.alts.length ? `. Also close: ${esc(it.alts.join(", "))}. If you meant one of those, edit the name` : ""}</span></span></span>`;
+        else if (it.status === "kept") pill = `<span class="pill"><span class="t">Kept as typed by you · not in the pricelist</span></span>`;
+        else pill = `<span class="pill bad"><span class="t">Not in pricelist. Fix the name or keep it as typed</span></span>`;
+        const confirmBtns = it.status === "confirm"
+          ? `<button type="button" class="keep" data-confirm="1" data-i="${idx}">Yes, use pricelist name</button><button type="button" class="keep undo" data-confirm="0" data-i="${idx}">No, keep what I typed</button>`
+          : "";
+        const use = it.options.length
+          ? `<div class="options"><span class="options-label">Pricelist options:</span>${it.options.map((p, k) =>
+              `<button type="button" class="keep opt" data-use="${idx}:${k}">${esc(cleanProductName(p.name).toUpperCase())} <span class="opt-meta">${p.size ? p.size + " " : ""}${p.type}</span></button>`).join("")}</div>`
+          : "";
+        const keep = (it.status === "check" || it.status === "missing")
+          ? `<button type="button" class="keep" data-keep="${idx}">Keep as typed</button>`
+          : it.status === "kept" ? `<button type="button" class="keep undo" data-keep="${idx}">Undo</button>` : "";
+        const typeBtns = it.nameType || !it.types.length ? "" : `<span class="types" role="group" aria-label="Product type">${it.types.map(t => `<button type="button" data-i="${idx}" data-type="${t}" aria-pressed="${it.type === t}">${t}</button>`).join("")}</span>`;
+        html += `<div class="row ${cls}">
+          <span class="qty">${it.parsed.qty}×</span>
+          <textarea class="name-in" id="name-${idx}" data-i="${idx}" rows="1" spellcheck="false" aria-label="Product name">${esc(it.out)}</textarea>
+          <span class="meta">${esc(fmtRepeats(it.parsed.rep))} · ${fmtDate(it.parsed.date)}</span>
+          <div class="row-sub">${typeBtns}${pill}${it.status === "confirm" ? "" : fix}${confirmBtns}${use}${keep}</div>
+        </div>`;
+      }
+    }
+    groups.innerHTML = html;
+    // Grow each name box to fit, so long names wrap instead of being cut off.
+    groups.querySelectorAll(".name-in").forEach(t => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; });
+  }
+
+  const note = document.getElementById("copyNote");
+  const picks = live.filter(i => i.status === "pick");
+  const unsure = live.filter(i => i.status === "check" || i.status === "missing");
+  const confirms = live.filter(i => i.status === "confirm");
+  const copyBtn = document.getElementById("copy");
+  copyBtn.disabled = picks.length + unsure.length + confirms.length > 0;
+  note.className = "copy-note" + (copyBtn.disabled ? " bad" : "");
+  const parts2 = [];
+  if (confirms.length) parts2.push(`confirm the spelling of ${confirms.map(i => i.out).join(", ")}`);
+  if (picks.length) parts2.push(`pick a type for ${picks.map(i => i.out).join(", ")}`);
+  if (unsure.length) parts2.push(`fix or keep ${unsure.map(i => i.out).join(", ")}`);
+  note.textContent = parts2.length ? `Before copying, ${parts2.join(" and ")} in Check names` : "";
+  // Count: every row read as a medication (expired ones included), plus any lines that couldn't be read.
+  document.getElementById("count").innerHTML = `Count: <b>${items.length}</b>` +
+    (bad.length ? ` <span class="bad">· ${bad.length} unreadable</span>` : "");
+  document.getElementById("exampleTag").hidden = input.value.trim() !== EXAMPLE.trim();
+  document.getElementById("fallback").hidden = true;
+}
+
+// edits
+document.getElementById("groups").addEventListener("click", e => {
+  const u = e.target.closest("button[data-use]");
+  if (u) {
+    const [i, k] = u.dataset.use.split(":").map(Number);
+    const it = current.items[i];
+    const p = it.options[k];
+    // The type comes from the product itself, so it's added once at the end (and Rosa Oil stays an oil).
+    overrides[it.line] = { name: cleanProductName(p.name), type: p.type };
+    render();
+    return;
+  }
+  const cf = e.target.closest("button[data-confirm]");
+  if (cf) {
+    const it = current.items[+cf.dataset.i];
+    const ov = overrides[it.line] = overrides[it.line] || {};
+    ov.confirm = cf.dataset.confirm === "1";
+    render();
+    return;
+  }
+  const k = e.target.closest("button[data-keep]");
+  if (k) {
+    const it = current.items[+k.dataset.keep];
+    const ov = overrides[it.line] = overrides[it.line] || {};
+    if (ov.confirm === false) delete ov.confirm; else ov.keep = !ov.keep;
+    render();
+    return;
+  }
+  const b = e.target.closest("button[data-type]");
+  if (!b) return;
+  const it = current.items[+b.dataset.i];
+  const ov = overrides[it.line] = overrides[it.line] || {};
+  ov.type = it.type === b.dataset.type ? null : b.dataset.type;
+  render();
+});
+document.getElementById("groups").addEventListener("keydown", e => {
+  if (e.key === "Enter" && e.target.closest(".name-in")) { e.preventDefault(); e.target.blur(); }
+});
+document.getElementById("groups").addEventListener("change", e => {
+  const el = e.target.closest(".name-in");
+  if (!el) return;
+  const it = current.items[+el.dataset.i];
+  const ov = overrides[it.line] = overrides[it.line] || {};
+  let v = el.value.trim();
+  // strip the type we appended so it isn't doubled; keep a type the user typed themselves
+  if (it.type && !it.nameType && v.toUpperCase().endsWith(" " + it.type) && v.toUpperCase() === it.out) v = it.baseName;
+  ov.name = v; delete ov.type; delete ov.keep; delete ov.confirm;
+  render();
+});
+
+let t;
+input.addEventListener("input", () => { clearTimeout(t); t = setTimeout(render, 120); });
+document.getElementById("clear").addEventListener("click", () => { input.value = ""; render(); input.focus(); });
+document.getElementById("example").addEventListener("click", () => { input.value = EXAMPLE; render(); });
+
+document.getElementById("copy").addEventListener("click", () => {
+  const label = document.getElementById("copyLabel"), note = document.getElementById("copyNote");
+  if (!current.items.some(i => i.group !== "expired")) { note.className = "copy-note bad"; note.textContent = "Nothing to copy yet"; return; }
+  const done = () => { label.textContent = "Copied"; note.className = "copy-note ok"; note.textContent = "Ready to paste"; setTimeout(() => { label.textContent = "Copy message"; render(); }, 1800); };
+  const fallback = () => {
+    const f = document.getElementById("fallback");
+    f.value = current.text; f.hidden = false; f.focus(); f.select();
+    note.className = "copy-note"; note.textContent = "Press Ctrl/Cmd + C to copy the selected text";
+  };
+  try { navigator.clipboard.writeText(current.text).then(done, fallback); } catch (e) { fallback(); }
+});
+
+// Copy-note buttons: copy the note text; if the clipboard is blocked, select the text so it can be copied by hand.
+document.querySelectorAll(".note-copy").forEach(btn => btn.addEventListener("click", () => {
+  const text = btn.dataset.note;
+  const label = btn.textContent;
+  const done = () => { btn.textContent = "Copied"; btn.classList.add("done"); setTimeout(() => { btn.textContent = label; btn.classList.remove("done"); }, 1600); };
+  const fallback = () => {
+    // Select only the copyable part (not the From:/Subject: label).
+    const target = btn.previousElementSibling.querySelector(".note-value") || btn.previousElementSibling;
+    const r = document.createRange(); r.selectNodeContents(target);
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    btn.textContent = "Press Ctrl/Cmd + C";
+  };
+  try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+}));
+
+const how = document.getElementById("how");
+document.getElementById("howOpen").addEventListener("click", () => { try { how.showModal(); } catch (e) { how.setAttribute("open", ""); } });
+document.getElementById("howClose").addEventListener("click", () => how.close ? how.close() : how.removeAttribute("open"));
+// Tap outside the box to close (clicks on the box's own padding don't count).
+how.addEventListener("click", e => {
+  const r = how.getBoundingClientRect();
+  if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) how.close();
+});
+
+input.value = EXAMPLE;
+render();
+
+// Roll over to the new day at local midnight, even if the page stays open. Checking every
+// 30 seconds (and when the tab comes back into view) also covers a computer that was asleep at midnight.
+function checkNewDay() {
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  if (now.getTime() !== today.getTime()) { setToday(); render(); }
+}
+setInterval(checkNewDay, 30000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) checkNewDay(); });
+</script>
