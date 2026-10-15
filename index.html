@@ -158,6 +158,7 @@ textarea#input:focus { outline: none; border-color: var(--lime-deep); box-shadow
 }
 .empty { padding: 28px 8px; color: var(--muted); text-align: center; font-size: 14px; }
 .bad-lines { padding: 12px 14px; border-radius: 16px; background: var(--red-soft); color: var(--red); font-size: 14px; }
+.bad-lines ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 6px; }
 .bad-lines code { font-family: var(--f-mono); font-size: 12px; }
 
 .rules { font-size: 14px; color: var(--muted); }
@@ -454,11 +455,23 @@ function parseLine(line) {
     const m = line.trim().match(/^(.+?)\s+(\d+)\s*x?\s+(.+?)\s+(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4})\s*$/i);
     if (m) parts = [m[1], m[2], m[3], m[4]];
   }
-  if (parts.length < 4) return null;
-  const date = parseDate(parts[parts.length - 1]);
+  if (parts.length < 4) return { error: "it needs four columns: name, quantity, repeats and expiry" };
+  const last = parts[parts.length - 1];
+  const date = parseDate(last);
   const qty = parseInt(parts[1], 10);
-  if (!date || !qty) return null;
+  if (!date) return { error: dateProblem(last) };
+  if (!qty) return { error: `the quantity "${parts[1]}" isn't a number` };
   return { name: parts[0].replace(/\s+/g, " "), qty, rep: parts.slice(2, parts.length - 1).join(" "), date };
+}
+// Say exactly what's wrong with an expiry, e.g. 31/02/2027 -> February 2027 has 28 days.
+function dateProblem(text) {
+  const m = String(text).trim().match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2}|\d{4})$/);
+  if (!m) return `the expiry "${text}" isn't a dd/mm/yyyy date`;
+  const d = +m[1], mo = +m[2]; let y = +m[3]; if (y < 100) y += 2000;
+  if (mo < 1 || mo > 12) return `${text} isn't a real date (there's no month ${mo})`;
+  const days = new Date(y, mo, 0).getDate();
+  const month = new Date(y, mo - 1, 1).toLocaleString("en-AU", { month: "long" });
+  return `${text} isn't a real date (${month} ${y} has ${days} days)`;
 }
 function fmtRepeats(r) {
   if (/last/i.test(r)) return "0 Repeats";
@@ -597,7 +610,7 @@ function build() {
   const items = [], bad = [];
   for (const l of lines) {
     const p = parseLine(l);
-    if (p) items.push(analyse(l, p)); else bad.push(l);
+    if (p.error) bad.push({ line: l, why: p.error }); else items.push(analyse(l, p));
   }
   for (const it of items) {
     const d = it.parsed.date;
@@ -660,7 +673,7 @@ function render() {
   document.getElementById("stats").innerHTML = st.join("");
 
   document.getElementById("badLines").innerHTML = bad.length
-    ? `<div class="bad-lines">Couldn't read ${bad.length === 1 ? "this line" : "these lines"}. Each row needs a name, quantity, repeats and a dd/mm/yyyy expiry:<br>${bad.map(b => `<code>${esc(b)}</code>`).join("<br>")}</div>` : "";
+    ? `<div class="bad-lines">Couldn't read ${bad.length === 1 ? "this line" : "these lines"}. Fix ${bad.length === 1 ? "it" : "them"} in the sheet and paste again:<ul>${bad.map(b => `<li><code>${esc(b.line)}</code><br>${esc(b.why[0].toUpperCase() + b.why.slice(1))}.</li>`).join("")}</ul></div>` : "";
 
   // review list
   const groups = document.getElementById("groups");

@@ -48,3 +48,6 @@ const RealDate=Date;Date=function(...a){return a.length?new RealDate(...a):new R
 checkNewDay();
 console.log("after midnight:",els.today.textContent,current.items.map(i=>i.group).join(","));
 Date=RealDate;
+// Unreadable lines say why.
+input.value="ANTG Rocky Oil\t1\t0\t26/11/2026\nCymra Superbly Green Buzzy\t1\t1\t31/02/2027\nX\t1\t1\t29/02/2028\nY\t1\t1\t15/13/2027\nZ\t1\t1\tsoon\nW\tone\t1\t01/01/2027\nonly two\tcolumns";render();
+console.log("UNREADABLE",els.count.innerHTML);console.log("UNREADABLE",els.badLines.innerHTML.replace(/<[^>]+>/g," ").replace(/\s+/g," "));
