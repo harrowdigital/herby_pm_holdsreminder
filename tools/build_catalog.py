@@ -50,8 +50,8 @@ for ws in wb.worksheets:
 FIXES={'alfie 25:25 sativa oil 30ml* (sativa)':{3:'30ml'},
   'juno 20:20 balanced pastilles (60 chews)':{1:'ANTG'},
   'rocky thc 30 pastilles (60 chews)':{1:'ANTG'},
-  't50 oral liquid (ind dom)':{1:'Tasmanian Botanics (Tasbot)'},
-  'c100 oral liquid':{1:'Tasmanian Botanics (Tasbot)'}}
+  't50 oral liquid (ind dom)':{1:'Tasmanian Botanics (Tasbot, TB)'},
+  'c100 oral liquid':{1:'Tasmanian Botanics (Tasbot, TB)'}}
 for k,f in FIXES.items():
   for i,v in f.items(): out[k][i]=v
 json.dump(list(out.values()),open('catalog.json','w'),separators=(',',':'))
