@@ -10,3 +10,4 @@ venv/
 
 # Local preview settings
 .claude/
+discontinued.json

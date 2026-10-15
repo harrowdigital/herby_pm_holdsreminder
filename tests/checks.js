@@ -55,3 +55,6 @@ console.log("UNREADABLE",els.count.innerHTML);console.log("UNREADABLE",els.badLi
 input.value="Gods Gift\t1\t1\t01/03/2027\nGod's Gift Flower\t1\t1\t01/03/2027\nTotally Fake Product\t1\t1\t01/03/2027\nMedcan FX200 Oil\t1\t1\t01/03/2027";render();
 current.items.forEach(i=>console.log("GONE",i.status.padEnd(7),i.out));console.log("GONE copy disabled:",els.copy.disabled);
 input.value="Cymra Superbly Ro\t1\t1\t01/03/2027";render();console.log("GONE partial stays flagged:",current.items[0].status,"copy disabled:",els.copy.disabled);
+// Discontinued list from the inventory.
+for(const t of ["Gods Gift","God's Gift","Mystery Mountain Gods Gift 15g","Mystery Mountain El Chapo","Superbly Cozey","Superbly Dusky","Cymra Superbly Dusky","Sativite PACT T26","Sativite PACT","Kind Taurus","Stanley Brothers Night","Medcan FX200 Oil","Kind Rosa","Aura Purple Rain","Totally Fake Product"]){const r=run(t);console.log("DISC",r.status.padEnd(7),t.padEnd(34),"=>",r.out,"|",r.discName||"",r.discNote?"(note: "+r.discNote+")":"");}
+input.value="Gods Gift\t1\t1\t01/03/2027\nMedcan FX200 Oil\t1\t1\t01/03/2027";render();console.log("DISC copy disabled:",els.copy.disabled);
