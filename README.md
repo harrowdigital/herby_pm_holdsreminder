@@ -2,7 +2,7 @@
 
 Herby formats PlantMed Dispensary hold-script reminders. Paste the rows for a patient's scripts on hold (name, quantity, repeats, expiry) and Herby writes the SMS/email reminder, checking every product name against the PlantMed RRP pricelist.
 
-Live page: https://claude.ai/artifact/9uj9ELvUbmEwXnCAphzUZy
+Live page: https://claude.ai/artifact/9uj9ELvUbmEwXnCAphzUZy (also deployable as-is on Vercel or any static host, which serves `index.html`).
 
 ## What it does
 
@@ -16,7 +16,9 @@ Live page: https://claude.ai/artifact/9uj9ELvUbmEwXnCAphzUZy
 
 | File | What it is |
 | --- | --- |
-| `herby.html` | The whole tool: page, styles, matching logic and the built-in product list. |
+| `herby.html` | The whole tool: page, styles, matching logic and the built-in product list. This is the source to edit. |
+| `index.html` | The same page as a standalone web page, which Vercel serves. Generated: run `python3 tools/build_index.py` after editing `herby.html`. |
+| `tools/build_index.py` | Makes `index.html` from `herby.html`. |
 | `tools/build_catalog.py` | Rebuilds the product list from the pricelist spreadsheet and applies the staff-confirmed corrections. |
 | `tests/run_tests.py`, `tests/checks.js` | Puts every pricelist product and the staff-reported names through the matcher. |
 
@@ -27,6 +29,7 @@ The spreadsheet itself is not in this repo (see `.gitignore`).
 ```bash
 pip install openpyxl
 python3 tools/build_catalog.py "path/to/! PlantMed RRP Pricelist.xlsx" herby.html
+python3 tools/build_index.py
 python3 tests/run_tests.py
 ```
 

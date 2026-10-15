@@ -7,3 +7,6 @@ catalog.json
 __pycache__/
 venv/
 .venv/
+
+# Local preview settings
+.claude/

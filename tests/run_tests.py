@@ -17,7 +17,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 STUBS = """var OUT=[];var console={log:function(){OUT.push(Array.prototype.join.call(arguments,' '))}};
 var els={};var document={getElementById:function(id){return els[id]||(els[id]={textContent:'',innerHTML:'',value:'',hidden:false,disabled:false,className:'',addEventListener:function(){},focus:function(){},querySelectorAll:function(){return []}})}};
-var navigator={};var setInterval=function(){};document.addEventListener=function(){};document.hidden=false;document.querySelectorAll=function(){return []};
+var window={addEventListener:function(){}};var navigator={};var setInterval=function(){};document.addEventListener=function(){};document.hidden=false;document.querySelectorAll=function(){return []};
 """
 
 
