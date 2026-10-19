@@ -40,6 +40,6 @@ Staff-confirmed corrections the raw sheet gets wrong live in `FIXES` in `tools/b
 
 ## Tests
 
-`python3 tests/run_tests.py` needs macOS (it uses the built-in `osascript` JavaScript engine). Expect `products 313 failures 0`.
+`python3 tests/run_tests.py` needs macOS (it uses the built-in `osascript` JavaScript engine). Expect `products 315 failures 0`.
 
 Created by JCIHB.
