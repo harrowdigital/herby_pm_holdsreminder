@@ -40,6 +40,6 @@ Staff-confirmed corrections the raw sheet gets wrong live in `FIXES` in `tools/b
 
 ## Tests
 
-`python3 tests/run_tests.py` needs macOS (it uses the built-in `osascript` JavaScript engine). Expect `products 313 failures 1`: the one listed is ANTG Elan Oil, which ties with its sister product ANTG Elan CBD100 at the same type and size, so the message line is still correct.
+`python3 tests/run_tests.py` needs macOS (it uses the built-in `osascript` JavaScript engine). Expect `products 313 failures 0`.
 
 Created by JCIHB.

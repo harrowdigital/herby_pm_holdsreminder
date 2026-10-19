@@ -296,7 +296,8 @@ dialog.how::backdrop { background: rgba(10,12,10,.45); }
     <button type="button" class="how-close" id="howClose" aria-label="Close">×</button>
   </div>
   <div class="rules"><ul>
-          <li>Names go to <b>UPPER CASE</b> and get <b>OIL, FLOWER, CART, PASTILLE</b> or <b>CAPS</b> added when missing, using the pricelist.</li>
+          <li>Each product is written <b>the way the pricelist names it</b>, in UPPER CASE, with its type (<b>OIL, FLOWER, CART, PASTILLE</b> or <b>CAPS</b>) at the end, e.g. AURA NIGHT BERRY PASTILLE becomes AURA 40:20:20 LIVE NIGHT BERRY PASTILLE. A brand you typed is kept when the pricelist leaves it out (CYMRA SUPERBLY ROSEY), and Cannatrek products always start with <b>CANNATREK</b>.</li>
+          <li>If more than one pricelist product fits a name equally well (like C100 OIL), Herby asks you to pick instead of guessing.</li>
           <li>If a name is only <b>close</b> to the pricelist spelling (PURPLE RAIN vs PURPLE RAINE), nothing is changed until you tap <b>Yes, use pricelist name</b> or <b>No, keep what I typed</b>. Different products with similar names, like BLUE CHEESE and BLUEBERRY CHEESE, or WALKEN and WALKER, are kept apart.</li>
           <li>Flowers get their <b>tub size</b> and oils their <b>bottle size</b> from the pricelist, e.g. AVANI BLING BLAU 10g FLOWER, AURA CBD200 30ml OIL. If the size is missing, unclear or different from what you typed, the row is flagged.</li>
           <li>Medcan codes that come as a flower and a cart (GLU01, CC01, SC01) ask which one. The cart is written with <b>-V</b>, e.g. GLU01-V CART.</li>
@@ -337,6 +338,7 @@ function tokens(s) {
   s = s.replace(/\baustralian\s+natural(\s+therapeutics?)?(\s+group)?\b/gi, "antg"); // AUSTRALIAN NATURAL = ANTG
   s = s.replace(/\bfull[\s-]*spec(trum)?\b/gi, "fs"); // FULL SPECTRUM = FS, as the pricelist writes it
   s = s.replace(/\btbc(\d{2,3})\b/gi, "tb cbd$1"); // TBC100 = Tasmanian Botanics (TB) CBD100 oil
+  s = s.replace(/\b([a-z]{3,})c(\d{2,3})\b/gi, "$1 cbd$2"); // AURAC200 = AURA CBD200
   s = s.replace(/\bc(\d{2,3})\b/gi, "cbd$1"); // C200 = CBD200, like the pricelist's own C100
   const split = s.toLowerCase().replace(/[*#"]/g, " ")
     .replace(/([a-z])(\d)/g, "$1 $2").replace(/(\d)([a-z])/g, "$1 $2")
@@ -451,6 +453,49 @@ function closestByName(name, matches) {
   q.sort((a, b) => DF[a] - DF[b]);
   const m = matches.find(x => x.p.own.includes(q[0]));
   return m ? m.p : null;
+}
+
+// How a product is written in the message: its pricelist name without notes in brackets, stars, percentages,
+// sizes, pack counts or type words (the size and type are added separately). "Aura 40:20:20 LIVE NIGHT BERRY
+// Pastilles VEGAN***" -> "AURA 40:20:20 LIVE NIGHT BERRY".
+// Cannatrek's own products are always written with CANNATREK first (the pricelist lists them under the
+// Cannatrek heading, often without the brand: "T25 Ruby oil"). Entoura has its own brand and isn't included.
+// Keep the brand typed in front of a name when the pricelist name leaves it out:
+// CYMRA + SUPERBLY ROSEY, BYRON BIO + CRYSTALBROOK CREAM THC 28, TB + T50, MEDCAN + GLU01.
+function withTypedBrand(display, typed, p) {
+  if (isCannatrek(p)) return display;
+  const t = typed.replace(/\baustralian\s+natural(\s+therapeutics?)?(\s+group)?\b/gi, "ANTG").replace(/\btbc(\d{2,3})\b/gi, "TB C$1");
+  const lead = [];
+  for (const w of t.split(/\s+/)) {
+    const tk = tokens(w);
+    if (tk.length && tk.every(x => isBrandWord(x, p))) lead.push(w); else break;
+  }
+  if (!lead.length) return display;
+  const shown = new Set(tokens(display));
+  if (lead.some(w => tokens(w).some(x => shown.has(x)))) return display;
+  return (lead.join(" ").toUpperCase() + " " + display).trim();
+}
+function isCannatrek(p) {
+  return /^cannatrek$/i.test(p.supplier.trim()) && !/^entoura\b/i.test(p.name) || /^mcart\b/i.test(p.name) || /^ctrek\b/i.test(p.name);
+}
+function displayName(p) {
+  let n = p.name
+    .replace(/\b\d+(?:\.\d+)?\s*%[^()]*\)/g, " ")            // "27% Apple Fritter x Grape Cream Cake)" (no opening bracket)
+    .replace(/\([^)]*\)?/g, " ").replace(/[()*"]/g, " ")
+    .replace(/\b\d+(?:\.\d+)?\s*mg\s+[a-z]+\/ml\b/gi, " ")    // "200mg CBD/mL"
+    .replace(/\b\d+(?:\.\d+)?\s*%/g, " ").replace(/%/g, " ")
+    .replace(GRAMS_ALL, " ").replace(ML_ALL, " ")
+    .replace(/\b\d+(?:\.\d+)?\s*mg\b/gi, " ")
+    .replace(/(?<![:\d.])\b\d+\s*(?:\/\s*sixty|chews?|pack|caps|pk)\b/gi, " ")
+    .replace(/\/\s*(?:one point two|one|two|ten|fifteen|thirty|sixty)(?:\s*g\b)?/gi, " ")
+    .replace(/\boral liquid\b|\bsoft ?gels?\b|\bsoft(?=\s+chews?\b)|\bvegan\b|\bpatilles\b/gi, " ")
+    .replace(/(\w)-(?=\s|$)/g, "$1 ").replace(/(\w):(?=\s|$)/g, "$1 ").replace(/\bctrek\b/gi, "Cannatrek");
+  let words = n.split(/\s+/).filter(w => w && !TYPE_OF_WORD[w.toLowerCase().replace(/[^a-z]/g, "")]);
+  words = words.filter((w, i) => i === 0 || w.toLowerCase() !== words[i - 1].toLowerCase()); // "CBD CBD"
+  let out = words.join(" ").replace(/(^|\s)[-\/:+]+(?=\s|$)/g, " ").replace(/[-\/:]+$/g, "")
+    .replace(/\bTHC\s+(?=THC\d)/gi, "").replace(/\s+THC$/i, "").replace(/\s+/g, " ").trim().toUpperCase();
+  if (isCannatrek(p) && !/^CANNATREK\b/.test(out)) out = "CANNATREK " + out;
+  return out;
 }
 
 // The pricelist name without notes, strengths and sizes: "Superbly Rosey (CBD)**" -> "Superbly Rosey".
@@ -583,8 +628,25 @@ function analyse(line, parsed) {
     const tm = matches.find(m => m.p.type === type && m.score >= 0.75);
     if (tm) match = tm.p;
   }
-  let fixedName = match && (status === "ok" || status === "pick") && ov.name === undefined ? fixSpelling(baseName, match) : baseName;
-  const fixed = fixedName.toUpperCase() !== baseName.toUpperCase();
+  // Several different products matching equally well (C100 OIL: C100 oral liquid, ANTG Elan CBD100, Alfie CBD100)
+  // means the name doesn't say which one. Take the one whose whole pricelist name was typed; otherwise ask.
+  let tieOptions = [];
+  if (status === "ok" && match) {
+    const sc = (matches.find(m => m.p === match) || { score: 0 }).score;
+    const same = matches.filter(m => m.p.type === match.type && m.score >= 0.75 && m.score >= sc - 0.02);
+    if (new Set(same.map(m => displayName(m.p))).size > 1) {
+      const q = tokens(baseName.replace(GRAMS_ALL, " ").replace(ML_ALL, " "));
+      const whole = same.filter(m => tokens(cleanProductName(m.p.name)).every(t => q.includes(t)));
+      if (new Set(whole.map(m => displayName(m.p))).size === 1) match = whole[0].p;
+      else { status = "check"; note = "More than one pricelist product matches. Pick the right one"; tieOptions = same.map(m => m.p); }
+    }
+  }
+  // A confident pricelist match is written the way the pricelist names it (plus the brand you typed, when the
+  // pricelist leaves it out). Anything else keeps the name exactly as typed.
+  const usePricelistName = match && status === "ok" && (ov.name === undefined || ov.picked); // a "pick a type" row waits for the pick
+  const spelled = usePricelistName ? fixSpelling(baseName, match) : baseName;
+  const fixed = spelled.toUpperCase() !== baseName.toUpperCase();
+  let fixedName = usePricelistName ? withTypedBrand(displayName(match), baseName, match) : baseName;
   // Write split codes the way the matched product does: BEACON THC 30 GSC -> BEACON THC30 GSC.
   if (match && (status === "ok" || status === "pick")) {
     const codes = match.name.split(/[^A-Za-z0-9]+/).filter(w => /^[A-Za-z]+\d+$/.test(w));
@@ -630,7 +692,11 @@ function analyse(line, parsed) {
       // whose whole pricelist name is covered by what was typed.
       const q = tokens(baseName.replace(GRAMS_ALL, " ").replace(ML_ALL, " "));
       const whole = ties.filter(m => tokens(cleanProductName(m.p.name)).every(t => q.some(x => x === t)));
-      if (whole.length === 1) { prod = match = whole[0].p; sizes = [prod.size]; }
+      if (whole.length === 1) {
+        prod = match = whole[0].p; sizes = [prod.size];
+        // The name was written from the first guess; write it from the product actually chosen.
+        if (usePricelistName) out = withTypedBrand(displayName(match), baseName, match);
+      }
     }
     if (!prod || !prod.size) {
       if (!typed && status === "ok") { status = "check"; note = `No ${unit.label} in the pricelist for this ${type.toLowerCase()}. Closest`; }
@@ -641,6 +707,10 @@ function analyse(line, parsed) {
     } else if (typed && !prod.size.split("|").includes(typed)) {
       status = "check"; note = `Pricelist ${unit.label} is ${prod.size.replace("|", " / ")}, not ${typed}. Closest`;
     } else if (!typed) size = prod.size;
+  }
+  // If the size check flagged the row after all, don't show a guessed pricelist name: keep what was typed.
+  if (usePricelistName && !(status === "ok" || status === "pick")) {
+    out = baseName.toUpperCase().replace(GRAMS_ALL, m => m.replace(/\s+/g, "").replace(/g.*$/i, "g")).replace(ML_ALL, m => m.replace(/\s+/g, "").toLowerCase());
   }
   // Final shape: NAME [SIZE] TYPE. A size or type word the user typed is moved into place, not doubled, and the
   // type is written the standard way (GUMMY -> PASTILLE). A type word followed only by codes moves to the end
@@ -653,7 +723,8 @@ function analyse(line, parsed) {
     for (let i = words.length - 1; i >= 0; i--) if (TYPE_OF_WORD[words[i].toLowerCase().replace(/[^a-z]/g, "")] === type) { k = i; break; }
     const tailIsCodes = k >= 0 && words.slice(k + 1).every(w => /\d/.test(w));
     if (tailIsCodes) words.splice(k, 1);
-    out = words.join(" ") + (sz ? " " + sz : "") + (!nameType || tailIsCodes ? " " + type : "");
+    const shownType = typeInName(words.join(" "));
+    out = words.join(" ") + (sz ? " " + sz : "") + (!shownType || tailIsCodes ? " " + type : "");
   }
   // A name that only matches the pricelist by a near-spelling is never changed silently: it waits for a yes.
   const chosen = match && matches.find(m => m.p === match);
@@ -674,6 +745,7 @@ function analyse(line, parsed) {
   const options = [];
   if (status === "check" || status === "missing") {
     const add = p => { if (p && TYPES.includes(p.type) && !options.includes(p) && options.length < 4) options.push(p); };
+    tieOptions.forEach(add);
     add(match);
     // Only products sharing a real word with the name (not just a lookalike such as FAKE/CAKE).
     for (const m of matches) if (m.score >= 0.4 && m.fuzzy < m.score * 10 && (m.fuzzy === 0 || m.score >= 0.6)) add(m.p);
@@ -688,9 +760,10 @@ function analyse(line, parsed) {
     out = baseName.toUpperCase()
       .replace(GRAMS_ALL, m => m.replace(/\s+/g, "").replace(/g.*$/i, "g"))
       .replace(ML_ALL, m => m.replace(/\s+/g, "").toLowerCase());
-  } else if (disc) {
+  } else if (disc && !tieOptions.length && !(status === "check" && best && best.score >= 0.75)) {
+    // (A row that matches several pricelist products, or a real product with a size question, isn't "discontinued".)
     const exactPricelist = (status === "ok" || status === "pick") && chosen && chosen.fuzzy === 0;
-    if (exactPricelist) discNote = disc.name;
+    if (exactPricelist) { if (disc.score >= 0.95 && !disc.fuzzy) discNote = disc.name; } // only a near-certain same product
     else {
       status = "disc"; discName = disc.name; type = nameType;
       out = baseName.toUpperCase()
@@ -853,7 +926,7 @@ document.getElementById("groups").addEventListener("click", e => {
     const it = current.items[i];
     const p = it.options[k];
     // The type comes from the product itself, so it's added once at the end (and Rosa Oil stays an oil).
-    overrides[it.line] = { name: cleanProductName(p.name), type: p.type };
+    overrides[it.line] = { name: cleanProductName(p.name), type: p.type, picked: true };
     render();
     return;
   }
