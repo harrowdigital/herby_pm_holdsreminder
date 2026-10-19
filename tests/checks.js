@@ -65,3 +65,7 @@ console.log("DEMO copy disabled:",els.copy.disabled,"|",els.copyNote.textContent
 for(const t of ["C100 oral liquid","Tasbot C100","Medicabilis T25:C25","Cannatrek C12T12 Ruby Oil","Antg Juno Cart 1g","Green Weekend Dry Flower Blue Cheese","Aura Live Cola Gummies","Elysian Aria Vape","Medcan GLU01-V","Kind Rosa Oil (dis)"]){const r=run(t);console.log("EXTRA",r.status.padEnd(7),t.padEnd(36),"=>",r.out);}
 // TBC100 = Tasmanian Botanics CBD100 oil.
 for(const t of ["TBC100","tbc100","TBC100 Oil","TB C100","TB T50","C100 Oil","Aura C200","ANTG Elan CBD100","Alfie CBD100"]){const r=run(t);console.log("TBC",r.status.padEnd(7),t.padEnd(18),"=>",r.out,"·",r.match&&r.match.name);}
+// Date typos that can only mean one thing are read; real problems still aren't.
+input.value=["CYMRA SUPERBLY ROSEY\t1\t2\t21//03/2027","A\t1\t1\t21 / 03 / 2027","B\t1\t1\t21/03//2027","C\t1\t1\t21-03-2027","D\t1\t1\t31/02/2027","E\t1\t1\t21/03"].join("\n");render();
+console.log("DATES",els.count.innerHTML.replace(/<[^>]+>/g,""),"|",current.items.map(i=>i.text.split(" - Expiry ")[1]).join(", "));
+console.log("DATES bad:",els.badLines.innerHTML.replace(/<[^>]+>/g," ").replace(/\s+/g," ").slice(0,220));
