@@ -310,7 +310,7 @@ dialog.how::backdrop { background: rgba(10,12,10,.45); }
           <li>Flowers get their <b>tub size</b> and oils their <b>bottle size</b> from the pricelist, e.g. AVANI BLING BLAU 10g FLOWER, AURA CBD200 30ml OIL. If the size is missing, unclear or different from what you typed, the row is flagged.</li>
           <li>Medcan codes that come as a flower and a cart (GLU01, CC01, SC01) ask which one. The cart is written with <b>-V</b>, e.g. GLU01-V CART.</li>
           <li>Scripts marked <b>(dis)</b> on the sheet are labelled <b>Discontinued</b>, and "(dis)" is left out of the message.</li>
-          <li>Shorthand is understood: <b>C200</b> means CBD200 (like the pricelist's own C100), <b>TB</b> means Tasmanian Botanics, <b>TBC100</b> is the Tasmanian Botanics CBD100 oil, <b>Full Spectrum</b> means FS, <b>Australian Natural</b> means ANTG, and GUMMY or GUMMIES is written as <b>PASTILLE</b>.</li>
+          <li>Shorthand is understood: <b>C200</b> means CBD200 (like the pricelist's own C100), <b>TB</b> means Tasmanian Botanics, <b>TBC100</b> is the Tasmanian Botanics CBD100 oil, <b>Full Spectrum</b> means FS, <b>Australian Natural</b> is written as ANTG, and GUMMY or GUMMIES is written as <b>PASTILLE</b>.</li>
           <li>Names on the inventory's <b>discontinued list</b> are kept exactly as typed and labelled <b>Discontinued</b>. If a name has nothing in common with any pricelist product, it's probably discontinued too and is also kept as typed. Neither blocks copying.</li>
           <li><b>Last Repeat</b> becomes <b>0 Repeats</b>.</li>
           <li>Scripts expiring within <b>2 months</b> go under <b>Expiring Soon</b>. If none are, the list has no headings.</li>
@@ -601,6 +601,10 @@ function analyse(line, parsed) {
       const [, letters, digits] = code.match(/^([A-Za-z]+)(\d+)$/);
       fixedName = fixedName.replace(new RegExp(`\\b${letters}\\s+${digits}\\b`, "i"), code.toUpperCase());
     }
+  }
+  // Write AUSTRALIAN NATURAL as ANTG, the way the pricelist names the brand.
+  if (match && (status === "ok" || status === "pick") && /\bantg\b/i.test(match.name + " " + match.supplier)) {
+    fixedName = fixedName.replace(/\baustralian\s+natural(\s+therapeutics?)?(\s+group)?\b/gi, "ANTG");
   }
   // Write FULL SPECTRUM as FS when the pricelist product does (MEDICABILIS 200 CBD FS).
   if (match && (status === "ok" || status === "pick") && /\bFS\b/i.test(match.name)) {
