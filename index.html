@@ -305,7 +305,7 @@ dialog.how::backdrop { background: rgba(10,12,10,.45); }
     <button type="button" class="how-close" id="howClose" aria-label="Close">×</button>
   </div>
   <div class="rules"><ul>
-          <li>Each product is written <b>the way the pricelist names it</b>, in UPPER CASE, with its type (<b>OIL, FLOWER, CART, PASTILLE</b> or <b>CAPS</b>) at the end, e.g. AURA NIGHT BERRY PASTILLE becomes AURA 40:20:20 LIVE NIGHT BERRY PASTILLE. A brand you typed is kept when the pricelist leaves it out (CYMRA SUPERBLY ROSEY), and Cannatrek products always start with <b>CANNATREK</b>.</li>
+          <li>Each product is written as <b>SUPPLIER, NAME, SIZE, TYPE</b>, using the pricelist's name, e.g. CYMRA SUPERBLY ROSEY 10g FLOWER, KIND ROSA CART, AURA 40:20:20 LIVE NIGHT BERRY PASTILLE. Description words like CO2 extraction, biodynamic, live resin, indica or sativa are left out, unless they're needed to tell two products apart (SOUTHERN SKY INDICA / SATIVA). Cannatrek products always start with <b>CANNATREK</b>.</li>
           <li>If more than one pricelist product fits a name equally well (like C100 OIL), Herby asks you to pick instead of guessing.</li>
           <li>If a name is only <b>close</b> to the pricelist spelling (PURPLE RAIN vs PURPLE RAINE), nothing is changed until you tap <b>Yes, use pricelist name</b> or <b>No, keep what I typed</b>. Different products with similar names, like BLUE CHEESE and BLUEBERRY CHEESE, or WALKEN and WALKER, are kept apart.</li>
           <li>Flowers get their <b>tub size</b> and oils their <b>bottle size</b> from the pricelist, e.g. AVANI BLING BLAU 10g FLOWER, AURA CBD200 30ml OIL. If the size is missing, unclear or different from what you typed, the row is flagged.</li>
@@ -472,7 +472,7 @@ function closestByName(name, matches) {
 // Keep the brand typed in front of a name when the pricelist name leaves it out:
 // CYMRA + SUPERBLY ROSEY, BYRON BIO + CRYSTALBROOK CREAM THC 28, TB + T50, MEDCAN + GLU01.
 function withTypedBrand(display, typed, p) {
-  if (isCannatrek(p)) return display;
+  if (supplierName(p)) return display; // SUPPLIER NAME SIZE TYPE: the product's own supplier is already in front
   const t = typed.replace(/\baustralian\s+natural(\s+therapeutics?)?(\s+group)?\b/gi, "ANTG").replace(/\btbc(\d{2,3})\b/gi, "TB C$1");
   const lead = [];
   for (const w of t.split(/\s+/)) {
@@ -487,7 +487,7 @@ function withTypedBrand(display, typed, p) {
 function isCannatrek(p) {
   return /^cannatrek$/i.test(p.supplier.trim()) && !/^entoura\b/i.test(p.name) || /^mcart\b/i.test(p.name) || /^ctrek\b/i.test(p.name);
 }
-function displayName(p) {
+function cleanBase(p) {
   let n = p.name
     .replace(/\b\d+(?:\.\d+)?\s*%[^()]*\)/g, " ")            // "27% Apple Fritter x Grape Cream Cake)" (no opening bracket)
     .replace(/\([^)]*\)?/g, " ").replace(/[()*"]/g, " ")
@@ -503,9 +503,53 @@ function displayName(p) {
   words = words.filter((w, i) => i === 0 || w.toLowerCase() !== words[i - 1].toLowerCase()); // "CBD CBD"
   let out = words.join(" ").replace(/(^|\s)[-\/:+]+(?=\s|$)/g, " ").replace(/[-\/:]+$/g, "")
     .replace(/\bTHC\s+(?=THC\d)/gi, "").replace(/\s+THC$/i, "").replace(/\s+/g, " ").trim().toUpperCase();
-  if (isCannatrek(p) && !/^CANNATREK\b/.test(out)) out = "CANNATREK " + out;
   return out;
 }
+
+// Short supplier names for the front of each product (SUPPLIER NAME SIZE TYPE).
+const SUPPLIER_NAMES = {
+  "aura therapeutics": "AURA", "beacon medical": "BEACON", "byron bioceutiocals": "BYRON BIO", "cymra botanicals": "CYMRA",
+  "cannatrek": "CANNATREK", "curaleaf": "CURALEAF", "elysian botanics": "ELYSIAN", "gamma biomed": "GAMMA BIO",
+  "grandiosa balance": "GRANDIOSA", "grandiosa extracts": "GRANDIOSA", "hana wellness": "HANA", "haiiku": "HAIIKU",
+  "heyday": "HEYDAY", "kind medical": "KIND", "lot420": "LOT420", "lush labs (lgp premium)": "LUSH LABS",
+  "motherplant": "MOTHERPLANT", "mystery mountain": "MYSTERY MOUNTAIN", "peace naturals": "PEACE NATURALS",
+  "pharmacrop": "PHARMACROP", "sativite cerenity": "CERENITY", "southern sky (alfie therapeutics)": "SOUTHERN SKY",
+  "spirit bear": "SPIRIT BEAR", "stanley brothers": "STANLEY BROTHERS", "super seed": "SUPER SEED",
+  "tasmanian botanics (tasbot, tb)": "TASMANIAN BOTANICS", "solara botanics": "SOLARA", "alma / mtl": "MTL",
+  "broken coast": "BROKEN COAST", "cannatrek carts": ""
+};
+function supplierName(p) {
+  if (isCannatrek(p)) return "CANNATREK";
+  const k = p.supplier.trim().toLowerCase();
+  if (k in SUPPLIER_NAMES) return SUPPLIER_NAMES[k];
+  return k ? p.supplier.trim().toUpperCase() : "";
+}
+// Description words left out of names ("CO2 extraction", "biodynamic", "indica"...), unless that would leave
+// two products with the same name (MIDZ INDICA / MIDZ SATIVA) or nothing but numbers (STANLEY BROTHERS INDICA 25).
+const DESCRIPTION_WORDS = /\b(?:LIVE RESIN|CO2|EXTRACTION|BIODYNAMIC|ORGANIC|VEGAN|INDICA|SATIVA|HYBRID|BALANCED|DOMINANT|DOM|IND|AUSTRALIA|AUSTRALIAN|GROWN)\b/g;
+const DISPLAY = new Map();
+(function buildDisplayNames() {
+  const tidy = n => n.replace(/(\S)-(?=\s|$)/g, "$1").replace(/(^|\s)[-\/:+]+(?=\s|$)/g, " ").replace(/\b(\w+)(?:\s+\1\b)+/gi, "$1").replace(/\s+/g, " ").trim();
+  const strip = n => tidy(n.replace(DESCRIPTION_WORDS, " "));
+  const groups = new Map();
+  for (const p of PRODUCTS) {
+    const base = tidy(cleanBase(p)), short = strip(base), brand = supplierName(p);
+    const rest = short.split(" ").filter(w => !brand.split(" ").includes(w));
+    const ok = short && rest.some(w => /[A-Z]{2,}/.test(w) && !/^(THC|CBD)\d*$/.test(w));
+    p._base = base; p._short = ok ? short : base;
+    const key = p.type + "|" + p._short;
+    if (!groups.has(key)) groups.set(key, new Set());
+    groups.get(key).add(base);
+  }
+  for (const p of PRODUCTS) {
+    const name = groups.get(p.type + "|" + p._short).size > 1 ? p._base : p._short;
+    const brand = supplierName(p);
+    const first = name.split(" ")[0], bfirst = brand.split(" ")[0];
+    const hasBrand = !brand || first === bfirst || name.startsWith(brand) || (bfirst === "CANNATREK" && /^CANNATREK\b/.test(name));
+    DISPLAY.set(p, ((hasBrand ? "" : brand + " ") + name).trim());
+  }
+})();
+function displayName(p) { return DISPLAY.get(p) || cleanBase(p); }
 
 // The pricelist name without notes, strengths and sizes: "Superbly Rosey (CBD)**" -> "Superbly Rosey".
 function cleanProductName(n) {
