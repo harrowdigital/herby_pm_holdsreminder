@@ -305,7 +305,7 @@ dialog.how::backdrop { background: rgba(10,12,10,.45); }
     <button type="button" class="how-close" id="howClose" aria-label="Close">×</button>
   </div>
   <div class="rules"><ul>
-          <li>Each product is written as <b>SUPPLIER, NAME, SIZE, TYPE</b>, using the pricelist's name, e.g. CYMRA SUPERBLY ROSEY 10g FLOWER, KIND ROSA CART, AURA 40:20:20 LIVE NIGHT BERRY PASTILLE. Description words like CO2 extraction, biodynamic, live resin, indica or sativa are left out, unless they're needed to tell two products apart (SOUTHERN SKY INDICA / SATIVA). Cannatrek products always start with <b>CANNATREK</b>.</li>
+          <li>Each product is written as <b>SUPPLIER, NAME, SIZE, TYPE</b>, using the pricelist's name, e.g. CYMRA SUPERBLY ROSEY 10g FLOWER, KIND ROSA CART, AURA 40:20:20 LIVE NIGHT BERRY PASTILLE. Description words like CO2 extraction, biodynamic or organic are left out; INDICA, SATIVA, HYBRID and LIVE RESIN are kept. Cannatrek products always start with <b>CANNATREK</b>.</li>
           <li>If more than one pricelist product fits a name equally well (like C100 OIL), Herby asks you to pick instead of guessing.</li>
           <li>If a name is only <b>close</b> to the pricelist spelling (PURPLE RAIN vs PURPLE RAINE), nothing is changed until you tap <b>Yes, use pricelist name</b> or <b>No, keep what I typed</b>. Different products with similar names, like BLUE CHEESE and BLUEBERRY CHEESE, or WALKEN and WALKER, are kept apart.</li>
           <li>Flowers get their <b>tub size</b> and oils their <b>bottle size</b> from the pricelist, e.g. AVANI BLING BLAU 10g FLOWER, AURA CBD200 30ml OIL. If the size is missing, unclear or different from what you typed, the row is flagged.</li>
@@ -526,7 +526,8 @@ function supplierName(p) {
 }
 // Description words left out of names ("CO2 extraction", "biodynamic", "indica"...), unless that would leave
 // two products with the same name (MIDZ INDICA / MIDZ SATIVA) or nothing but numbers (STANLEY BROTHERS INDICA 25).
-const DESCRIPTION_WORDS = /\b(?:LIVE RESIN|CO2|EXTRACTION|BIODYNAMIC|ORGANIC|VEGAN|INDICA|SATIVA|HYBRID|BALANCED|DOMINANT|DOM|IND|AUSTRALIA|AUSTRALIAN|GROWN)\b/g;
+// INDICA, SATIVA, HYBRID and LIVE RESIN are kept: staff want those in the name.
+const DESCRIPTION_WORDS = /\b(?:CO2|EXTRACTION|BIODYNAMIC|ORGANIC|VEGAN|BALANCED|DOMINANT|DOM|IND|AUSTRALIA|AUSTRALIAN|GROWN)\b/g;
 const DISPLAY = new Map();
 (function buildDisplayNames() {
   const tidy = n => n.replace(/(\S)-(?=\s|$)/g, "$1").replace(/(^|\s)[-\/:+]+(?=\s|$)/g, " ").replace(/\b(\w+)(?:\s+\1\b)+/gi, "$1").replace(/\s+/g, " ").trim();
