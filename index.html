@@ -601,6 +601,10 @@ function analyse(line, parsed) {
       fixedName = fixedName.replace(new RegExp(`\\b${letters}\\s+${digits}\\b`, "i"), code.toUpperCase());
     }
   }
+  // Write FULL SPECTRUM as FS when the pricelist product does (MEDICABILIS 200 CBD FS).
+  if (match && (status === "ok" || status === "pick") && /\bFS\b/i.test(match.name)) {
+    fixedName = fixedName.replace(/\bfull[\s-]*spec(trum)?\b/gi, "FS");
+  }
   // Medcan carts use the flower code plus -V (GLU01 flower, GLU01-V cart). Once it's the cart, write the code as GLU01-V.
   let named = fixedName;
   if (match && type === "CART" && match.type === "CART" && (status === "ok" || status === "pick")) {
