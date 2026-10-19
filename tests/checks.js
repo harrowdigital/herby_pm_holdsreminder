@@ -72,3 +72,5 @@ console.log("DATES bad:",els.badLines.innerHTML.replace(/<[^>]+>/g," ").replace(
 // Beacon oil is written THC30.
 for(const t of ["Beacon THC30 GSC Oil","Beacon THC 30 GSC Oil","beacon thc30 gsc","Beacon GSC Oil","Beacon THC30 GSC","Beacon GSC Cart","Beacon Face Mintz THC30"]){const r=run(t);console.log("BEACON",r.status.padEnd(7),t.padEnd(26),"=>",r.out,"·",r.match&&r.match.name);}
 for(const t of ["Medicabilis 200 CBD Full Spectrum","MEDICABILIS 200 CBD FULL SPECTRUM OIL","Medicabilis 200 CBD FS","Med 200 CBD Full Spectrum","Entoura CBD200 Full Spectrum","Entoura CBD200 Broad Spectrum","KIND CBD200 FS","SatiOil CBD 200FS"]){const r=run(t);console.log("FSCHK",r.status.padEnd(7),t.padEnd(38),"=>",r.out,"·",r.match&&r.match.name);}
+// Australian Natural = ANTG.
+for(const t of ["Australian Natural Rocky Oil","Australian Natural Therapeutics Rocky Oil","Australian Natural Rocky","Australian Natural Juno Cart","Australian Natural Elan","Australian Natural Eve #4 CBD Oil","LGP Frosted King","ANTG Rocky Oil"]){const r=run(t);console.log("AUSNAT",r.status.padEnd(7),t.padEnd(42),"=>",r.out,"·",r.match&&r.match.name,"["+r.types+"]");}
