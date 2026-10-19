@@ -12,6 +12,16 @@ Needs openpyxl (pip install openpyxl).
 import openpyxl,sys,json,re
 wb=openpyxl.load_workbook(sys.argv[1],data_only=True)
 SHEETS={'OILS':'OIL','FLOWERS':'FLOWER','CARTS':'CART','GUMMIES + CAPS':'PASTILLE','ECONOMY MEDS':'FLOWER'}
+# Brand labels the pricelist writes on a product's own row (everything else there, like NEW, PREMIUM,
+# olive oil or Portugal, is a note). The brand carries on to the rows below until the next heading.
+SAME_ROW_BRANDS={'cymra':'CYMRA','cymra gummies':'CYMRA','entoura':'ENTOURA','entoura gummies':'ENTOURA',
+  'solara botanics':'SOLARA BOTANICS','somai':'SOMAI','spectrum':'SPECTRUM','spectrum caps':'SPECTRUM',
+  'green weekend':'GREEN WEEKEND','antg carts':'ANTG','aura carts':'AURA','beacon carts':'BEACON',
+  'elysian':'ELYSIAN','grandiosa':'GRANDIOSA','harbour lr':'HARBOUR','kind':'KIND','lgp':'LGP','medcan':'MEDCAN',
+  'phytoca':'PHYTOCA','redecan':'REDECAN','sativite':'SATIVITE','antg gummies':'ANTG','cannatrek gummies':'Cannatrek',
+  'grandiosa gummies':'GRANDIOSA','hey day gummies':'HEYDAY','medcan medichew gummies':'MEDCAN','nova gummies':'NOVA',
+  'phytoca gummies':'PHYTOCA','sativite caps':'SATIVITE','stanley brothers (gummies)':'STANLEY BROTHERS',
+  'superseed (gummies)':'SUPERSEED'}
 def typ(name,cat,default):
   s=(name+' '+cat).lower()
   if re.search(r'\b(cart|vape|pen)\b|satipen',s): return 'CART'
@@ -25,18 +35,21 @@ out={};
 for ws in wb.worksheets:
   sh=ws.title.strip()
   if sh not in SHEETS: continue
-  sup=None; prevprod=False
+  sup=None; prevprod=False; rowbrand=False
   for r in ws.iter_rows(min_row=4,values_only=True):
     a,b,c,d,e=(r+(None,)*5)[:5]
     isprod=bool(c and d and 'categ' in str(d).lower())
+    # Some brands are written on the product's own row (CYMRA next to "Cybis oil"), not on a heading row.
+    label=re.sub(r'\s+',' ',str(a or '')).strip().lower()
+    if isprod and label in SAME_ROW_BRANDS: sup=SAME_ROW_BRANDS[label]; rowbrand=True
     # Brand header: column A filled, not a product, not the description line under a product,
     # and no numbers in column C (CYMRA BOTANICALS has a note there; "non GMO" has "70% indica").
-    if a and not isprod and not prevprod and not re.search(r'\d', str(c or '')): sup=str(a).strip()
+    if a and not isprod and not prevprod and not re.search(r'\d', str(c or '')): sup=str(a).strip(); rowbrand=False
     prevprod=isprod
     if c and d and 'categ' in str(d).lower():
       n=re.sub(r'\s+',' ',str(c)).strip()
       if n.lower() in out: continue
-      s=sup if sh in ('OILS','FLOWERS','ECONOMY MEDS') or (sup or '').upper()=='CANNATREK CARTS' else ''
+      s=sup if sh in ('OILS','FLOWERS','ECONOMY MEDS') or rowbrand or (sup or '').upper()=='CANNATREK CARTS' else ''
       t=typ(n,str(d),SHEETS[sh])
       g=re.match(r'\s*(\d+(?:\.\d+)?)\s*g',str(e or ''),re.I)
       size=(g.group(1)+'g') if (t=='FLOWER' and g) else ''
