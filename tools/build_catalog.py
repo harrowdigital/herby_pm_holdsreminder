@@ -65,7 +65,10 @@ FIXES={'alfie 25:25 sativa oil 30ml* (sativa)':{3:'30ml'},
   'rocky thc 30 pastilles (60 chews)':{1:'ANTG'},
   't50 oral liquid (ind dom)':{1:'Tasmanian Botanics (Tasbot, TB)'},
   'c100 oral liquid':{1:'Tasmanian Botanics (Tasbot, TB)'},
-  'beacon thc 30 gsc oil (girl scout cookies)':{0:'Beacon THC30 GSC oil (girl scout cookies)'}}
+  'beacon thc 30 gsc oil (girl scout cookies)':{0:'Beacon THC30 GSC oil (girl scout cookies)'},
+  # Listed under the "Avani CAPS - MCT oil" heading: capsules, not pastilles.
+  'avani advanced cbd25':{1:'AVANI',2:'CAPS'},
+  'avani advanced 2.5:20':{1:'AVANI',2:'CAPS'}}
 for k,f in FIXES.items():
   for i,v in f.items(): out[k][i]=v
 json.dump(list(out.values()),open('catalog.json','w'),separators=(',',':'))
