@@ -310,7 +310,7 @@ dialog.how::backdrop { background: rgba(10,12,10,.45); }
           <li>Flowers get their <b>tub size</b> and oils their <b>bottle size</b> from the pricelist, e.g. AVANI BLING BLAU 10g FLOWER, AURA CBD200 30ml OIL. If the size is missing, unclear or different from what you typed, the row is flagged.</li>
           <li>Medcan codes that come as a flower and a cart (GLU01, CC01, SC01) ask which one. The cart is written with <b>-V</b>, e.g. GLU01-V CART.</li>
           <li>Scripts marked <b>(dis)</b> on the sheet are labelled <b>Discontinued</b>, and "(dis)" is left out of the message.</li>
-          <li>Shorthand is understood: <b>C200</b> means CBD200 (like the pricelist's own C100), <b>TB</b> means Tasmanian Botanics, <b>TBC100</b> is the Tasmanian Botanics CBD100 oil, and GUMMY or GUMMIES is written as <b>PASTILLE</b>.</li>
+          <li>Shorthand is understood: <b>C200</b> means CBD200 (like the pricelist's own C100), <b>TB</b> means Tasmanian Botanics, <b>TBC100</b> is the Tasmanian Botanics CBD100 oil, <b>Full Spectrum</b> means FS, and GUMMY or GUMMIES is written as <b>PASTILLE</b>.</li>
           <li>Names on the inventory's <b>discontinued list</b> are kept exactly as typed and labelled <b>Discontinued</b>. If a name has nothing in common with any pricelist product, it's probably discontinued too and is also kept as typed. Neither blocks copying.</li>
           <li><b>Last Repeat</b> becomes <b>0 Repeats</b>.</li>
           <li>Scripts expiring within <b>2 months</b> go under <b>Expiring Soon</b>. If none are, the list has no headings.</li>
@@ -343,6 +343,7 @@ function rawWords(s) {
 function tokens(s) {
   const out = [];
   s = s.replace(/['\u2019]/g, ""); // GOD'S GIFT = GODS GIFT
+  s = s.replace(/\bfull[\s-]*spec(trum)?\b/gi, "fs"); // FULL SPECTRUM = FS, as the pricelist writes it
   s = s.replace(/\btbc(\d{2,3})\b/gi, "tb cbd$1"); // TBC100 = Tasmanian Botanics (TB) CBD100 oil
   s = s.replace(/\bc(\d{2,3})\b/gi, "cbd$1"); // C200 = CBD200, like the pricelist's own C100
   const split = s.toLowerCase().replace(/[*#"]/g, " ")
