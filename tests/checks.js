@@ -69,3 +69,5 @@ for(const t of ["TBC100","tbc100","TBC100 Oil","TB C100","TB T50","C100 Oil","Au
 input.value=["CYMRA SUPERBLY ROSEY\t1\t2\t21//03/2027","A\t1\t1\t21 / 03 / 2027","B\t1\t1\t21/03//2027","C\t1\t1\t21-03-2027","D\t1\t1\t31/02/2027","E\t1\t1\t21/03"].join("\n");render();
 console.log("DATES",els.count.innerHTML.replace(/<[^>]+>/g,""),"|",current.items.map(i=>i.text.split(" - Expiry ")[1]).join(", "));
 console.log("DATES bad:",els.badLines.innerHTML.replace(/<[^>]+>/g," ").replace(/\s+/g," ").slice(0,220));
+// Beacon oil is written THC30.
+for(const t of ["Beacon THC30 GSC Oil","Beacon THC 30 GSC Oil","beacon thc30 gsc","Beacon GSC Oil","Beacon THC30 GSC","Beacon GSC Cart","Beacon Face Mintz THC30"]){const r=run(t);console.log("BEACON",r.status.padEnd(7),t.padEnd(26),"=>",r.out,"·",r.match&&r.match.name);}
