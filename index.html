@@ -235,6 +235,8 @@ button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: 
 .menu-btn:hover { border-color: var(--ink); }
 
 /* ---------- CBD calculator ---------- */
+/* The search card must not clip its results list, and the list sits above the cards below it. */
+.panel.cbd-find { overflow: visible; z-index: 3; }
 .cbd-search { position: relative; }
 .cbd-search input { width: 100%; border: 1px solid var(--line); background: var(--chip); border-radius: 16px; padding: 14px 16px 14px 46px; font-size: 16px; font-weight: 600; color: var(--ink); }
 .cbd-search input:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 4px var(--lime-soft); }
