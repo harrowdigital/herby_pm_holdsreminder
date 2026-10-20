@@ -248,7 +248,7 @@ button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: 
 .cbd-results li span { font-size: 12.5px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .cbd-results li[aria-selected="true"], .cbd-results li:hover { background: var(--lime-soft); }
 .cbd-results .none { color: var(--muted); cursor: default; }
-.cbd-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); gap: 20px; }
+.cbd-cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
 .cbd-empty { margin: 0; text-align: center; color: var(--muted); font-size: 14px; padding: 10px; }
 .cbd-card { position: relative; background: var(--card); border-radius: 26px; padding: 22px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow); }
 .cbd-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -460,7 +460,7 @@ button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: 
     </div>
   </section>
   <div id="cbdCards" class="cbd-cards"></div>
-  <p class="cbd-empty" id="cbdEmpty">Pick a product above to start a calculation. You can add more than one.</p>
+  <p class="cbd-empty" id="cbdEmpty">Pick a product above to start a calculation. Searching again swaps the product.</p>
 </div>
 </div><!-- /shell -->
 
@@ -1374,8 +1374,14 @@ const num = v => { const n = parseFloat(String(v).replace(",", ".")); return isF
 const nice = n => (Math.round(n * 10) / 10).toLocaleString("en-AU", { maximumFractionDigits: 1 });
 let cardSeq = 0;
 
+// One product at a time: picking another product replaces the card, keeping the collection date
+// (and the daily dose when switching oil to oil, or capsules/chews to capsules/chews).
 function addCard(c) {
   hideResults(); cbdSearch.value = "";
+  const old = document.querySelector(".cbd-card");
+  const keepDate = old ? old.querySelector(".coll").value : null;
+  const keepDose = old && old._c.kind === c.kind ? old.querySelector(".dose").value : "";
+  if (old) old.remove();
   const id = ++cardSeq, el = document.createElement("article");
   el.className = "cbd-card"; el.dataset.id = id; el._c = c;
   const doseField = c.kind === "oil"
@@ -1403,6 +1409,8 @@ function addCard(c) {
       <button type="button" class="copy-sum" hidden>Copy summary</button></div>`;
   document.getElementById("cbdCards").prepend(el);
   document.getElementById("cbdEmpty").hidden = true;
+  if (keepDate) el.querySelector(".coll").value = keepDate;
+  if (keepDose) el.querySelector(".dose").value = keepDose;
   el.querySelectorAll("input").forEach(i => i.addEventListener("input", () => calc(el)));
   el.querySelector(".cbd-x").addEventListener("click", () => { el.remove(); document.getElementById("cbdEmpty").hidden = !!document.querySelector(".cbd-card"); });
   el.querySelector(".copy-sum").addEventListener("click", e => copySummary(el, e.currentTarget));
