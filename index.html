@@ -196,11 +196,133 @@ dialog.how::backdrop { background: rgba(10,12,10,.45); }
 .how-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--chip); color: var(--ink); font-size: 20px; line-height: 1; cursor: pointer; }
 .how-close:hover { border-color: var(--ink); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/* ---------- home: Herby asks what you need ---------- */
+.glow { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0; transition: opacity .4s ease;
+  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 40%), rgba(182, 234, 123, .42), rgba(182, 234, 123, .12) 38%, transparent 62%); }
+body.glowing .glow { opacity: 1; }
+.home, .shell { position: relative; z-index: 1; }
+.home { min-height: calc(100vh - 48px); display: grid; place-items: center; padding-block: 24px; }
+.home[hidden] { display: none; }
+.home-inner { width: min(760px, 100%); display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; }
+.home-robot { width: min(250px, 58vw); filter: drop-shadow(0 18px 24px rgba(17, 20, 16, .14)); animation: float 4.5s ease-in-out infinite; }
+.home-robot svg { width: 100%; height: auto; display: block; overflow: visible; }
+.home-robot .eye { transform-box: fill-box; transform-origin: center; animation: blink 5s infinite; }
+@keyframes float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-12px) rotate(1deg); } }
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+.home-q { margin: 0; font-size: clamp(28px, 5vw, 44px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance; }
+.home-options { width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 6px; }
+.option { position: relative; overflow: hidden; display: flex; align-items: center; gap: 16px; text-align: left; padding: 22px 22px; border-radius: 24px;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; box-shadow: 0 1px 2px rgba(17,20,16,.05);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+.option::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .25s ease;
+  background: radial-gradient(260px circle at var(--x, 50%) var(--y, 50%), rgba(182, 234, 123, .55), transparent 65%); }
+.option:hover, .option:focus-visible { transform: translateY(-3px); border-color: var(--lime-deep); box-shadow: 0 14px 34px rgba(80, 140, 40, .18); }
+.option:hover::before, .option:focus-visible::before { opacity: 1; }
+.option > * { position: relative; }
+.opt-ico { width: 52px; height: 52px; flex: none; border-radius: 16px; background: var(--lime); color: var(--lime-ink); display: grid; place-items: center; }
+.opt-ico svg { width: 26px; height: 26px; }
+.opt-text { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+.opt-text b { font-size: 16px; font-weight: 800; letter-spacing: .04em; }
+.opt-text span { font-size: 14px; color: var(--muted); line-height: 1.4; }
+.opt-arrow { font-size: 22px; color: var(--muted); transition: transform .18s ease, color .18s ease; }
+.option:hover .opt-arrow { transform: translateX(4px); color: var(--lime-ink); }
+.home-foot { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+.shell[hidden], .view[hidden] { display: none !important; }
+.view { display: flex; flex-direction: column; gap: 20px; }
+button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: pointer; text-align: left; font: inherit; }
+.menu-btn { cursor: pointer; border: 1px solid var(--line); color: var(--ink); font: inherit; font-size: 13px; font-weight: 700; }
+.menu-btn svg { width: 15px; height: 15px; }
+.menu-btn:hover { border-color: var(--ink); }
+
+/* ---------- CBD calculator ---------- */
+.cbd-search { position: relative; }
+.cbd-search input { width: 100%; border: 1px solid var(--line); background: var(--chip); border-radius: 16px; padding: 14px 16px 14px 46px; font-size: 16px; font-weight: 600; color: var(--ink); }
+.cbd-search input:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 4px var(--lime-soft); }
+.cbd-search-ico { position: absolute; left: 16px; top: 50%; width: 20px; height: 20px; transform: translateY(-50%); color: var(--muted); }
+.cbd-results { position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 5; margin: 0; padding: 6px; list-style: none; background: var(--card);
+  border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 18px 40px rgba(17, 20, 16, .14); max-height: 320px; overflow-y: auto; }
+.cbd-results li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; cursor: pointer; }
+.cbd-results li b { font-size: 14px; font-weight: 700; }
+.cbd-results li span { font-size: 12.5px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cbd-results li[aria-selected="true"], .cbd-results li:hover { background: var(--lime-soft); }
+.cbd-results .none { color: var(--muted); cursor: default; }
+.cbd-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); gap: 20px; }
+.cbd-empty { margin: 0; text-align: center; color: var(--muted); font-size: 14px; padding: 10px; }
+.cbd-card { position: relative; background: var(--card); border-radius: 26px; padding: 22px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow); }
+.cbd-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.cbd-card-head h3 { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: .01em; line-height: 1.3; }
+.cbd-card-head .kind { display: inline-block; margin-top: 4px; font-size: 12px; font-weight: 700; color: var(--lime-ink); background: var(--lime); border-radius: 999px; padding: 2px 10px; }
+.cbd-x { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--chip); color: var(--ink); font-size: 18px; line-height: 1; cursor: pointer; }
+.cbd-x:hover { border-color: var(--ink); }
+.cbd-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.cbd-field { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 16px; background: var(--chip); }
+.cbd-field label, .cbd-field .lbl { font-size: 12px; font-weight: 700; color: var(--muted); }
+.cbd-field .auto { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cbd-field .auto small { font-size: 12px; font-weight: 600; color: var(--muted); margin-left: 4px; }
+.cbd-field input { width: 100%; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 10px; font-size: 17px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cbd-field input:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 3px var(--lime-soft); }
+.cbd-field.edit { background: var(--lime-soft); }
+.cbd-out { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.cbd-out .cbd-field { background: transparent; border: 1px solid var(--line); }
+.cbd-due { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 16px 18px; border-radius: 18px; background: var(--lime); color: var(--lime-ink); }
+.cbd-due .lbl { font-size: 13px; font-weight: 700; opacity: .75; }
+.cbd-due .val { font-size: 24px; font-weight: 800; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.cbd-due .copy-sum { border: 0; background: var(--lime-ink); color: var(--lime); font-weight: 700; font-size: 13px; padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+.cbd-due .copy-sum.done { background: var(--good); color: #fff; }
+@media (max-width: 560px) { .cbd-out { grid-template-columns: minmax(0, 1fr); } .cbd-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .home-robot, .home-robot .eye { animation: none; } .glow { display: none; } }
+
 </style>
 
-<div class="shell">
+<div class="glow" aria-hidden="true"></div>
+<section class="home" id="viewHome" aria-labelledby="homeQ">
+  <div class="home-inner">
+    <div class="home-robot" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none" class="robot-svg">
+      <!-- Herby robot: colours as in the reference picture -->
+      <path d="M248 182 Q247 166 251 152" stroke="#4E7F4B" stroke-width="7" stroke-linecap="round"/>
+      <ellipse cx="228" cy="150" rx="25" ry="13" transform="rotate(22 228 150)" fill="#5E8E5A"/>
+      <ellipse cx="274" cy="143" rx="30" ry="14" transform="rotate(-24 274 143)" fill="#5E8E5A"/>
+      <path d="M168 268 Q150 292 147 314" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/>
+      <path d="M328 262 Q350 262 356 278" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/>
+      <path d="M218 298 Q208 314 202 330" stroke="#2A2D2A" stroke-width="6" stroke-linecap="round"/>
+      <path d="M264 298 Q268 314 262 332" stroke="#2A2D2A" stroke-width="6" stroke-linecap="round"/>
+      <rect x="120" y="325" width="12" height="20" rx="5" transform="rotate(20 126 335)" fill="#2A2D2A"/>
+      <rect x="134" y="330" width="12" height="20" rx="5" transform="rotate(20 140 340)" fill="#2A2D2A"/>
+      <circle cx="140" cy="318" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
+      <rect x="372" y="268" width="20" height="11" rx="5" transform="rotate(-18 382 273)" fill="#2A2D2A"/>
+      <rect x="372" y="283" width="20" height="11" rx="5" transform="rotate(-18 382 288)" fill="#2A2D2A"/>
+      <circle cx="357" cy="284" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
+      <g transform="rotate(10 192 342)"><rect x="172" y="322" width="40" height="40" rx="12" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/><path d="M178 360 L206 366" stroke="#5E8E5A" stroke-width="7" stroke-linecap="round"/></g>
+      <g transform="rotate(4 258 342)"><rect x="238" y="322" width="40" height="40" rx="12" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/><path d="M244 362 L272 364" stroke="#5E8E5A" stroke-width="7" stroke-linecap="round"/></g>
+      <ellipse cx="160" cy="245" rx="18" ry="24" fill="#D9DAD6" stroke="#D3D5D0" stroke-width="2"/>
+      <ellipse cx="340" cy="240" rx="13" ry="20" fill="#D9DAD6" stroke="#D3D5D0" stroke-width="2"/>
+      <rect x="150" y="178" width="192" height="126" rx="56" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
+      <ellipse cx="248" cy="183" rx="24" ry="7" fill="#D9DAD6"/>
+      <rect x="200" y="206" width="106" height="72" rx="15" fill="#232523"/>
+      <ellipse class="eye" cx="231" cy="244" rx="8" ry="10.5" fill="#ECECE8"/>
+      <ellipse class="eye" cx="276" cy="244" rx="8" ry="10.5" fill="#ECECE8"/>
+      <path d="M247 257 Q253 266 259 257 Z" fill="#ECECE8"/>
+    </svg></div>
+    <h1 class="home-q" id="homeQ">Hey! What do you need help with?</h1>
+    <div class="home-options">
+      <button type="button" class="option" data-go="hold">
+        <span class="opt-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg></span>
+        <span class="opt-text"><b>HOLD SCRIPTS REMINDER</b><span>Turn the hold scripts sheet into a ready-to-send SMS or email reminder.</span></span>
+        <span class="opt-arrow" aria-hidden="true">&rarr;</span>
+      </button>
+      <button type="button" class="option" data-go="cbd">
+        <span class="opt-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v4.5L6.5 12A5 5 0 0 0 10.5 20h3a5 5 0 0 0 4-8L14 7.5V3"/><path d="M7.5 14h9"/></svg></span>
+        <span class="opt-text"><b>CBD CALCULATOR</b><span>See how long a CBD bottle or pack lasts and when the next one is due.</span></span>
+        <span class="opt-arrow" aria-hidden="true">&rarr;</span>
+      </button>
+    </div>
+    <p class="home-foot"><span id="homeToday"></span> · Created by <b>JCIHB</b></p>
+  </div>
+</section>
+
+<div class="shell" id="shell" hidden>
 <header class="top">
-  <div class="brand">
+  <button type="button" class="brand" id="brandHome" aria-label="Herby home">
     <div class="mark" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none">
       <!-- Herby robot: colours as in the reference picture -->
       <path d="M248 182 Q247 166 251 152" stroke="#4E7F4B" stroke-width="7" stroke-linecap="round"/>
@@ -229,15 +351,17 @@ dialog.how::backdrop { background: rgba(10,12,10,.45); }
     </svg></div>
     <div>
       <div class="wordmark">Herby</div>
-      <div class="sub">PlantMed Dispensary hold reminders</div>
+      <div class="sub" id="toolName">PlantMed Dispensary hold reminders</div>
     </div>
-  </div>
+  </button>
   <div class="dates">
+    <button type="button" class="date-pill menu-btn" id="toMenu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Menu</button>
     <span class="date-pill"><span>Today</span><b id="today"></b></span>
     <span class="date-pill lime credit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-8" stroke="#2F5E2C" stroke-width="2.2" stroke-linecap="round"/><path d="M12 13c-.6-3.6-3.3-5.6-7.2-5.4.1 3.8 2.9 5.9 7.2 5.4Z" fill="#4E8A49"/><path d="M12 11.5c.8-4 3.8-6.2 8-5.9-.2 4.2-3.3 6.5-8 5.9Z" fill="#3F7A3B"/></svg><span>Created by:</span><b>JCIHB</b></span>
   </div>
 </header>
 
+<div class="view" id="viewHold" hidden>
 <main>
     <section class="panel paste-card" aria-labelledby="t-paste">
       <div class="panel-head">
@@ -319,7 +443,24 @@ dialog.how::backdrop { background: rgba(10,12,10,.45); }
           <li>Everything stays in your browser. Nothing you paste is saved or sent anywhere.</li>
         </ul></div>
 </dialog>
+</div><!-- /viewHold -->
+
+<div class="view" id="viewCbd" hidden>
+  <section class="panel cbd-find" aria-labelledby="t-cbd">
+    <div class="panel-head">
+      <h2 class="panel-title" id="t-cbd"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v4.5L6.5 12A5 5 0 0 0 10.5 20h3a5 5 0 0 0 4-8L14 7.5V3"/><path d="M7.5 14h9"/></svg></span>CBD Calculator</h2>
+    </div>
+    <p class="hint">Search a CBD oil, capsule or chew from the pricelist. Its bottle size and strength fill in by themselves; you only enter the daily dose and the collection date.</p>
+    <div class="cbd-search">
+      <svg class="cbd-search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="cbdSearch" type="text" autocomplete="off" spellcheck="false" placeholder="Search, e.g. Aura CBD200" role="combobox" aria-expanded="false" aria-controls="cbdResults" aria-autocomplete="list" aria-label="Search CBD products">
+      <ul id="cbdResults" class="cbd-results" role="listbox" hidden></ul>
+    </div>
+  </section>
+  <div id="cbdCards" class="cbd-cards"></div>
+  <p class="cbd-empty" id="cbdEmpty">Pick a product above to start a calculation. You can add more than one.</p>
 </div>
+</div><!-- /shell -->
 
 <script>
 const CATALOG = [["Alfie CBD100 complete 30mL( NOTE 5mg THC/mL)","ALFIE","OIL","30ml"],["Alfie 25:25 Sativa Oil 30mL* (SATIVA)","ALFIE","OIL","30ml"],["ANTG Elan CBD100","ANTG","OIL","30ml"],["ANTG Rocky THC oil* (indica)","ANTG","OIL","50ml"],["ANTG Eve CBD oil (full spec)","ANTG","OIL","50ml"],["ANTG Luna Oil* (10:10) 50mL","ANTG","OIL","50ml"],["ANTG Luna Oil* (25:25) 50mL","ANTG","OIL","50ml"],["ANTG Elan Oil (0% THC - isolated CBD)","ANTG","OIL","30ml"],["ANTG Eve #4 CBD oil (100mg/mL)","ANTG","OIL","50ml"],["Aura CBD200** (indica)","AURA THERAPEUTICS","OIL","30ml"],["Aura THC50 (INDICA)","AURA THERAPEUTICS","OIL","50ml"],["Beacon THC30 GSC oil (girl scout cookies)","BEACON","OIL","30ml"],["C12T12 Ruby Balanced oil","Cannatrek","OIL","30ml"],["C25T25 Ruby Balanced oil*","Cannatrek","OIL","30ml"],["T25 Ruby oil (sativa dom)","Cannatrek","OIL","30ml"],["T50 Ruby oil*(sativa dom)","Cannatrek","OIL","30ml"],["T25 Topaz oil (indica)","Cannatrek","OIL","30ml"],["T50 Topaz oil (indica)*","Cannatrek","OIL","30ml"],["Cybis oil 30mL (organic)","CYMRA","OIL","30ml"],["Entoura CBD200 Full Spectrum","ENTOURA","OIL","30ml"],["Entoura CBD200 Broad Spectrum (30mL) 200mg CBD/mL","ENTOURA","OIL","30ml"],["Entoura EMC 10:15 (30mL)","ENTOURA","OIL","30ml"],["Entoura EMC THC30 (30mL)","ENTOURA","OIL","30ml"],["Entoura THCV 25 OIL (30mL)","ENTOURA","OIL","30ml"],["Entoura ULTRA spectrum 350 oil (CBD240 Broad Spectrum (30mL)","ENTOURA","OIL","30ml"],["Grandiosa Water Soluble CBD","Grandiosa Balance","OIL","10ml"],["Grandiosa Balance- THC/CBD oil 25mg/25mg 30mL*","Grandiosa Balance","OIL","30ml"],["Grandiosa CBD200 30mL/ thirty","Grandiosa Balance","OIL","30ml"],["Heyday CBD:CBDv OIL","Heyday","OIL","30ml"],["KIND Rosa Oil (50:1)- INDICA*","KIND","OIL","30ml"],["KIND Libra Oil (25:25)- THC: CBD balanced*","KIND","OIL","30ml"],["KIND CBD200 FS","KIND","OIL","60ml"],["LGP 20:5 50mL","LGP","OIL","50ml"],["LGP CBD50 50mL","LGP","OIL","50ml"],["Medcan FX01","Medcan","OIL","30ml"],["Medcan FX05","Medcan","OIL","30ml"],["Medcan FX06*","Medcan","OIL","30ml"],["Medcan FX200","Medcan","OIL","30ml"],["Medicabilis 200 CBD FS","MEDICABILIS","OIL","30ml"],["Medicabilis T25:C25 30mL***","MEDICABILIS","OIL","30ml"],["SatiOil CBD 200FS","SATIVITE","OIL","60ml"],["Solara THC 35 sunset oil (50mL)","SOLARA BOTANICS","OIL","50ml"],["Solara 2:250:30 Femme CBD oil (50mL)","SOLARA BOTANICS","OIL","50ml"],["Somai 25:25 balanced Oil Indica**","SOMAI","OIL","30ml"],["Spectrum Blue Oil 50mL (sativa dom hybrid)","SPECTRUM","OIL","50ml"],["Spectrum Red Oil 50mL (indica)","SPECTRUM","OIL","50ml"],["T50 oral liquid (ind dom)","Tasmanian Botanics (Tasbot, TB)","OIL","30ml"],["C100 oral liquid","Tasmanian Botanics (Tasbot, TB)","OIL","30ml"],["Alfie Coastal Kush 22% (Kurpel Fantasy x Sherbert)","ALFIE","FLOWER","10g"],["Alfie GT Haze (Ghost OG x Nevilles Wreck)","ALFIE","FLOWER","10g"],["Alfie Queen Sangria 27%","ALFIE","FLOWER","10g"],["Alfie Orion Kush 29% (ind dom)","ALFIE","FLOWER","10g"],["Alfie K MINTS 22% (ind dom)","ALFIE","FLOWER","10g"],["Alfie SKY WALKER OG 28% (ind dom)","ALFIE","FLOWER","10g"],["Grape Galena 25% (OG Kush x Lost Sailor x Platinum Kush)*","ALMA","FLOWER","10g"],["Flawless Victory 26% (Ice Cream Cake x Cherry Cheesecake)*","ALMA","FLOWER","10g"],["Pink Zugar 27% (Skittlez x Strawberry Guava)*","ALMA","FLOWER","10g"],["Cream Fritter 27% Apple Fritter x Grape Cream Cake)*","ALMA","FLOWER","10g"],["Eve CBD FLOWER","ANTG","FLOWER","10g"],["JUNO (balanced)**","ANTG","FLOWER","10g"],["Mariposa**","ANTG","FLOWER","10g"],["ANTG Rocky Flower **","ANTG","FLOWER","10g"],["Aura Apples and Bananas*","Aura Therapeutics","FLOWER","10g"],["Aura Key Lime Kush*","Aura Therapeutics","FLOWER","10g"],["Aura Purple Raine*","Aura Therapeutics","FLOWER","15g"],["Aura Snowman**","Aura Therapeutics","FLOWER","10g"],["Aura Base+ Mocha Truffle T27 (INDICA)","Aura Therapeutics","FLOWER","15g"],["Aura Base+ Zupa T27 (SATIVA)","Aura Therapeutics","FLOWER","15g"],["Aura Base AB smalls T24","Aura Therapeutics","FLOWER","15g"],["Aura Base KINGS TART T27","Aura Therapeutics","FLOWER","15g"],["Aura Base Jokerz Candy T24","Aura Therapeutics","FLOWER","15g"],["Aussie Budz Outback diesel 26 (Aussie Budz) 10g","AUSSIE BUDZ","FLOWER","10g"],["Aussie Budz Brissy Berry 26 (Aussie Budz) 10g","AUSSIE BUDZ","FLOWER","10g"],["Aussie Budz Velvet Thunder 25 (Aussie Budz) 10g","AUSSIE BUDZ","FLOWER","10g"],["AVANI LIME HAZE T23 SATIVA **","AVANI","FLOWER","10g"],["AVANI MANGO PASSION T25 INDICA**","AVANI","FLOWER","10g"],["AVANI BLING BLAU T30 INDICA***","AVANI","FLOWER","10g"],["BAKERY Rotation 25 Sativa","BAKERY","FLOWER","15g"],["BAKERY Rotation 25 Indica","BAKERY","FLOWER","15g"],["Bathera 28 Facetz *** (2.2% terps)- 30G","BATHERA","FLOWER","30g"],["Bathera 25 Blue Z *** (3% terps)- 30G","BATHERA","FLOWER","30g"],["Girl Scout Cookies","BEACON MEDICAL","FLOWER","10g"],["Pink Kush (Beacon) 22%","BEACON MEDICAL","FLOWER","10g"],["Sensi Star","BEACON MEDICAL","FLOWER","10g"],["Wappa","BEACON MEDICAL","FLOWER","10g"],["Black Dolato","BEACON MEDICAL","FLOWER","10g"],["Ventura Dawg","BEACON MEDICAL","FLOWER","10g"],["Beacon Face Mintz THC30","BEACON MEDICAL","FLOWER","10g"],["Beacon Select THC30*","BEACON MEDICAL","FLOWER","10g"],["Broken Coast AH THC 26 (AMNESIA HAZE)***","Broken Coast","FLOWER","10g"],["Broken CCC THC 24 (CHERRY CHEESE CAKE)***","Broken Coast","FLOWER","10g"],["Broken Coast EMZ THC 26 (EMERGENZ)***","Broken Coast","FLOWER","10g"],["Broken Coast PP THC 28 (PLATINUM PAVE)***","Broken Coast","FLOWER","10g"],["Broken Coast OGKB THC 25 (OG Kush Breath)***","Broken Coast","FLOWER","10g"],["Crystalbrook Cream THC 28 (PROJECT 33)*","Byron Bioceutiocals","FLOWER","10g"],["Daybreak Don Green THC 28 (DON GREEN)*","Byron Bioceutiocals","FLOWER","10g"],["Bubba Moonshade THC 25 *","Byron Bioceutiocals","FLOWER","10g"],["Candied Pine Cinderella THC 22 *","Byron Bioceutiocals","FLOWER","10g"],["Twighlight Glow Cake THC 28 *","Byron Bioceutiocals","FLOWER","10g"],["T25 Topaz Flower ** (Kush cookies)","Cannatrek","FLOWER","10g"],["C9T7 Argaman (White Widow x CBD critical mass)","Cannatrek","FLOWER","10g"],["T27 Narooma (GSC + Chemdawg)","Cannatrek","FLOWER","10g"],["T25 Golden Bay (Ultra Sour)","Cannatrek","FLOWER","10g"],["T26 Sorrento (Sour Diesel X Sage)","Cannatrek","FLOWER","10g"],["T28 Eden (Medelin = Wedding cake X Chemdawg)","Cannatrek","FLOWER","10g"],["Cannatrek Gold T28 Jet Fuel Gelato 10g **","Cannatrek","FLOWER","10g"],["T55 Topaz Bubble Hash (Kush Cookies)*","EXTRACTS","EXTRACT",""],["Curaleaf Daybreak THC22%- Huckleberry","Curaleaf","FLOWER","10g"],["Curaleaf Nightfall THC THC25% - Fire OG","Curaleaf","FLOWER","10g"],["Superbly Rosey (CBD)**","CYMRA BOTANICALS","FLOWER","10g"],["Superbly Blissy (22% THC Banana OG)**","CYMRA BOTANICALS","FLOWER","10g"],["Superbly Sunny (25% THC Super lemon Haze)**","CYMRA BOTANICALS","FLOWER","10g"],["Superbly Buzzy (22% THC Sativa, Durban Poison)**","CYMRA BOTANICALS","FLOWER","10g"],["Superbly Dusky (25% THC Vanilla cream cookies)**","CYMRA BOTANICALS","FLOWER","10g"],["Rainbow Region Moonlight 25% LSO","CYMRA BOTANICALS","FLOWER","15g"],["Rainbow Region Rainbow Roots 28% LSO","CYMRA BOTANICALS","FLOWER","15g"],["Elysian Harmony 16% CBD 10g*","Elysian Botanics","FLOWER","10g"],["Entoura Varaski T26 15g*","ENTOURA","FLOWER","15g"],["Entoura Tropicana Cookies T26","ENTOURA","FLOWER","10g"],["Entoura GSD THCv 12% THC 5% (10g/ten g)","ENTOURA","FLOWER","10g"],["Sol Northern lights 10g (heritage chemovar)","Gamma Biomed","FLOWER","10g"],["Grandiosa Gorilla Glue***","GRANDIOSA BALANCE","FLOWER","10g"],["Grandiosa Bubba Jungle Pie***","GRANDIOSA BALANCE","FLOWER","10g"],["Grandiosa Original Blitz ***","GRANDIOSA BALANCE","FLOWER","10g"],["Grandiosa Limoncello Daydream**","GRANDIOSA BALANCE","FLOWER","10g"],["Grandiosa Golden Kief 50% THC** (blue cheese)","GRANDIOSA EXTRACTS","EXTRACT",""],["Grandiosa HASH- BUENAS NOCHES ** T48 \"GSC = \"Durban poison x OG kush\"","GRANDIOSA EXTRACTS","EXTRACT",""],["Grandiosa HASH-N BUENOS DIAS HASH** T48 \"Sour Diesel\"","GRANDIOSA EXTRACTS","EXTRACT",""],["Green weekend Jungle Cake","GREEN WEEKEND","FLOWER","15g"],["Green weekend Mandarin Sunset","GREEN WEEKEND","FLOWER","15g"],["Green weekend Blue Cheese (Baby Buds) 15g","GREEN WEEKEND","FLOWER","15g"],["Green weekend BLUEBERRY Cheese (Baby Buds) 15g","GREEN WEEKEND","FLOWER","15g"],["Haiiku White Hot Guava","Haiiku","FLOWER","10g"],["Hana Blue Tango 25% (Sativa Dom Hybrid)","HANA wellness","FLOWER","10g"],["Hana Lemon Skunk (Sativa Dom Hybrid)","HANA wellness","FLOWER","10g"],["Hana Gelato 30% (Balance Hybrid)","HANA wellness","FLOWER","10g"],["Hana Sugar baby 25% (Indica Dom Hybrid)","HANA wellness","FLOWER","10g"],["KIND Libra","KIND medical","FLOWER","10g"],["KIND Azure","KIND medical","FLOWER","10g"],["KIND Iris","KIND medical","FLOWER","10g"],["KIND Sol- CBD ONLY FLOWER","KIND medical","FLOWER","10g"],["KIND Rosa","KIND medical","FLOWER","10g"],["KIND Dulce","KIND medical","FLOWER","10g"],["KIND Thea","KIND medical","FLOWER","10g"],["KIND Deus","KIND medical","FLOWER","10g"],["Kind permanent marker (indica)","KIND medical","FLOWER","10g"],["KIND Payton Pie (Gary Payton x georgia pie) 29% THC*","KIND medical","FLOWER","10g"],["Desert Flame - sativa (Australian grown)","LGP","FLOWER","10g"],["Moonlight THC 22 - indica","LGP","FLOWER","10g"],["Lemon Glow THC 20 - sativa","LGP","FLOWER","10g"],["Bush Lantern THC25- indica","LGP","FLOWER","10g"],["Silver Mist CBD flower - CBD","LGP","FLOWER","10g"],["LGP Frosted King THC26 - Sativa (Australian grown)","LGP","FLOWER","10g"],["LGP Wild Sunset THC26 - Indica (Australian grown)","LGP","FLOWER","10g"],["Lot420 Gelato #33*","Lot420","FLOWER","10g"],["Lush Labs GastroPop 28% Indica","Lush Labs (LGP premium)","FLOWER","10g"],["Lush Labs Black BiscottiI 25% Indica","Lush Labs (LGP premium)","FLOWER","10g"],["Lush Labs Mac Powdered Donuts 22% Indica","Lush Labs (LGP premium)","FLOWER","10g"],["Lush Labs Lemon Mac 25% Sativa","Lush Labs (LGP premium)","FLOWER","10g"],["Lush Labs Royal mac 20% Hybrid","Lush Labs (LGP premium)","FLOWER","10g"],["CC01 (Cold Creek Kush/ Afghan Kush) 10g","MEDCAN","FLOWER","10g"],["SC01 (Strawberry Cake) 10g","MEDCAN","FLOWER","10g"],["ULTRA01 (Ultra Sour) 10g","MEDCAN","FLOWER","10g"],["GLU01 (Sherbert Glu) 10g*","MEDCAN","FLOWER","10g"],["STT01 (Scotties Cake) 10g","MEDCAN","FLOWER","10g"],["HGH01 (Human Growth Hormone) 10g","MEDCAN","FLOWER","10g"],["SAC01 (Space Age Cake) 10g*","MEDCAN","FLOWER","10g"],["Medcan LAK01 (L.A. Kush Cake)","MEDCAN","FLOWER","10g"],["FGW smalls T25 indica Green dragon","MEDICABILIS","FLOWER","15g"],["FGW smalls T20 Sativa Super Lemon Haze 15g","MEDICABILIS","FLOWER","15g"],["Mediquest Bazookas THC 10g**","MEDIQUEST","FLOWER","10g"],["Mediquest Gas Cake THC 10g**","MEDIQUEST","FLOWER","10g"],["Mediquest Dirty Taxi THC 10g ***","MEDIQUEST","FLOWER","10g"],["Mediquest Long Valley Legend THC 10g**","MEDIQUEST","FLOWER","10g"],["Mediquest Grape Stank THC 10g**","MEDIQUEST","FLOWER","10g"],["Motherplant CCN(Critical Condition)","Motherplant","FLOWER","10g"],["Motherplant MPC (Forum GSC)","Motherplant","FLOWER","10g"],["Afghan Layer Cake THC 30","Mystery Mountain","FLOWER","15g"],["Kimbo Gelato THC 25","Mystery Mountain","FLOWER","15g"],["Sunset Soap THC 25","Mystery Mountain","FLOWER","15g"],["The Big Mango THC8 CBD 11","Mystery Mountain","FLOWER","15g"],["Stone Fruit Cake THC 30","Mystery Mountain","FLOWER","15g"],["Jealous Pop THC 30 (gastro pop x jealousy)","Mystery Mountain","FLOWER","15g"],["Candy Blast THC 25","Mystery Mountain","FLOWER","15g"],["Cookies n Chem THC 25","Mystery Mountain","FLOWER","15g"],["Coco-Bamba THC 27","Mystery Mountain","FLOWER","15g"],["NOOSA SELECTS T23 SATIVA (15G/FIFTEEN)","PHARMACROP","FLOWER","15g"],["NOOSA SELECTS T25 SATIVA (15G/FIFTEEN)","PHARMACROP","FLOWER","15g"],["NOOSA SELECTS T26 INDICA (15G/FIFTEEN)","PHARMACROP","FLOWER","15g"],["Wedding Cake THC27 10g***","PEACE NATURALS","FLOWER","10g"],["Phytoca Monkey Business THC23 (LSO)10g***","PHYTOCA","FLOWER","10g"],["Phytoca Zurple Punch THC21 (LSO)10g***","PHYTOCA","FLOWER","10g"],["Phytoca Cherry Skunk 10g*","PHYTOCA","FLOWER","10g"],["Bunyipp 31 10g (Titanimal- heavy indica 31 %)***","Sativite","FLOWER","10g"],["DIRRAG LSO 27 10g ( 27 %)***","Sativite","FLOWER","10g"],["Eurroka 29 10g (Mango Sour - stimulating sativa 29%)","Sativite","FLOWER","10g"],["Moorok 21 LSO (balanced hybrid)- MAC 1","Sativite","FLOWER","10g"],["Walken 26% 10g (Gastropop- heavy indica 26%)**","Sativite","FLOWER","10g"],["Pankinna 25% 10g (Zurple Sunset - Zurple x citradelic sunset)**","Sativite","FLOWER","10g"],["Sativite Azsend HBx 22% (Heladosa x Randylosa Cherry) AUSTRALIA","Sativite","FLOWER","10g"],["Sativite PACT SW01 THC","Sativite","FLOWER","15g"],["Sativite PACT SW02 THC (Huckleberry)","Sativite","FLOWER","15g"],["Sativite PACT (GMO animal cookies- Chem D X animal cookies)***","Sativite","FLOWER","10g"],["Cerenity Marlin THC26 (GMO animal cookies - Chem D x animal cookies 26%)","Sativite Cerenity","FLOWER","10g"],["Cerenity Pink Cusk THC26 (Pink Gas (bubba kush x pink kush- indica 26%)","Sativite Cerenity","FLOWER","10g"],["Southern Sky - INDICA 26% (10g)","SOUTHERN SKY (Alfie Therapeutics)","FLOWER","10g"],["Southern Sky - HYBRID 26% (10g)","SOUTHERN SKY (Alfie Therapeutics)","FLOWER","10g"],["Southern Sky - SATIVA 24% (10g)","SOUTHERN SKY (Alfie Therapeutics)","FLOWER","10g"],["Spectrum Red No1 flower 15g***","SPECTRUM","FLOWER","15g"],["Tweed Krypton Kush25 15g***","SPECTRUM","FLOWER","15g"],["Canopy Hindu Kush 23 15g","SPECTRUM","FLOWER","15g"],["Canopy OGD 27 15g","SPECTRUM","FLOWER","15g"],["Canopy FZ 30 15g*","SPECTRUM","FLOWER","15g"],["Canopy KMI 28 15g**","SPECTRUM","FLOWER","15g"],["TWEED Orange Chemsicle 28 15g***","SPECTRUM","FLOWER","15g"],["Canopy VALLEY 12:14 10g *** (CBD:THC BALANCED )","SPECTRUM","FLOWER","10g"],["7 Acres Jack Frost 10g SATIVA","SPECTRUM","FLOWER","10g"],["7 Acres Ultra Jack 10g SATIVA","SPECTRUM","FLOWER","10g"],["7 Acres GPS 22 10g *** INDICA","SPECTRUM","FLOWER","10g"],["Jungle Driver THC26","SPIRIT BEAR","FLOWER","10g"],["Frosted Guava THC25","SPIRIT BEAR","FLOWER","10g"],["Citrus Temple THC25","SPIRIT BEAR","FLOWER","10g"],["Strawberry Meltshake THC28","SPIRIT BEAR","FLOWER","10g"],["Fruit Sundae THC30","SPIRIT BEAR","FLOWER","10g"],["Stanley Brothers INDICA 25 flower 15g","STANLEY BROTHERS","FLOWER","15g"],["Stanley Brothers SATIVA 22 flower 15g","STANLEY BROTHERS","FLOWER","15g"],["Stanley Brothers INDICA 28 15g","STANLEY BROTHERS","FLOWER","15g"],["Super Seed Blueberry Purps 10g LSO","SUPER SEED","FLOWER","10g"],["Herb Pave (Paris OG x The Menthol)","TREEHOUSE","FLOWER","10g"],["Delta Tetra (Orange Cake)","TREEHOUSE","FLOWER","10g"],["MIDZ INDICA (rotating curation)","TREEHOUSE","FLOWER","15g"],["MIDZ SATIVA (rotating curation)","TREEHOUSE","FLOWER","15g"],["Zaari GMO Cookies Live Rosin 2g","ZAARI (supplied Entoura)","EXTRACT",""],["Zaari Strawnana Live Rosin 2g","ZAARI (supplied Entoura)","EXTRACT",""],["Zaari Gorilla DieselLive Rosin 2g","ZAARI (supplied Entoura)","EXTRACT",""],["ANTG Rocky cart 1g INDICA**","ANTG","CART",""],["ANTG Juno cart 1g (CBD: THC balanced)**","ANTG","CART",""],["Aura Dymond Jealosy LR cart 1g (LIVE RESIN)","AURA","CART",""],["ALFIE GT Haze Vape 1g (SATIVA DOMINANT)","","CART",""],["ALFIE Balanced GTH/CBD 1g (balanced hybrid day + CBD balanced)","","CART",""],["ALFIE Crescendo Kush Vape 1g (INDICA)","","CART",""],["ALFIE EVO LIVE RESIN Vape 1g (BALANCED HYBRID)","","CART",""],["Beacon GSC cart 850mg Indica (LIVE RESIN)","BEACON","CART",""],["Beacon PK Cart 850mg Indica (LIVE RESIN)","BEACON","CART",""],["Beacon CBB Cart 850mg Sativa (LIVE RESIN)","BEACON","CART",""],["Beacon Pineapple Haze Cart CBD (LIVE RESIN)","BEACON","CART",""],["mCART THC NIGHT 1g (INDICA) (Kush Cookies= TOPAZ)","CANNATREK CARTS","CART",""],["mCART THC DAY 1g (SATIVA) (Blueberry Indica x super silver haze)","CANNATREK CARTS","CART",""],["mCART BLEND S 1g (CBD:THC BALANCED) (Cherry blossom x Blue dream)","CANNATREK CARTS","CART",""],["mCart Petra 1.0g BALANCED HYBRID (Creamy Kees, karels haze x cookies and cream)","CANNATREK CARTS","CART",""],["mCart Sheba 1.0g SATIVA HYBRID (Bafokens Choice, white lemon x marala bay)","CANNATREK CARTS","CART",""],["mCart Babylon 1.0g INDICA (Critical Kush)","CANNATREK CARTS","CART",""],["Elysian Aria FS CBD vape 1g","ELYSIAN","CART",""],["ELYSIAN Aria FS CBD Vape 1g STARTER (includes battery)","ELYSIAN","CART",""],["Cymra Zingy Cart sativa 1g (Organic)","CYMRA","CART",""],["Cymra Zenny Cart indica 1g (Organic)","CYMRA","CART",""],["Buenos Diaz Cart 1g (DAY) (Jack Herer)","GRANDIOSA","CART",""],["Buenos Noches Cart 1g (night ) (wedding cake)","GRANDIOSA","CART",""],["Buenos Diaz Cart 1g (DAY) + Battery (STARTER KIT) (Jack Herer)","GRANDIOSA","CART",""],["Buenos Noches Cart 1g (NIGHT) + Battery (STARTER KIT) (wedding cake)","GRANDIOSA","CART",""],["Harbour LR Day Cart 2g- LIVE RESIN- biodynamic","HARBOUR","CART",""],["Harbour LR NIGHT Cart 2g- LIVE RESIN-biodynamic","HARBOUR","CART",""],["KIND libra cart 1G (indica)- CO2 extraction","KIND","CART",""],["KIND Azure cart 1G (Sativa dominant)- CO2 extraction","KIND","CART",""],["KIND Rosa cart 1G- (Indica) CO2 extraction","KIND","CART",""],["KIND LUNA cart 1G- (Indica) CO2 extraction","KIND","CART",""],["LGP Cart Night 1G (indica)","LGP","CART",""],["LGP Cart Day 1G (sativa)","LGP","CART",""],["LGP Live resin Day Cart 1G (sativa)** (LIVE RESIN)","LGP","CART",""],["LGP Live resin Night Cart 1G (indica)** (LIVE RESIN)","LGP","CART",""],["Medcan CC01-V (cart)","MEDCAN","CART",""],["Medcan SC01-V (cart)","MEDCAN","CART",""],["Medcan GLU01-V (cart)","MEDCAN","CART",""],["Edison Black Cherry Punch 1g/one g (cart) INDICA","","CART",""],["Edison LIMELIGHT 1g/one g (cart) SATIVA","","CART",""],["BoxHot Strawberry Diesel THC:CBD:CBG 1.2g/one point two g (cart) SATIVA","","CART",""],["BoxHot Cherry KushTHC + CBN 1.2g/one point two g (cart) INDICA","","CART",""],["Phytoca BK Cart (BlueBerry Kush)","PHYTOCA","CART",""],["Phytoca BCP Cart (Black Cherry Punch)**","PHYTOCA","CART",""],["Phytoca Sour Tangie LR (Sativa)** (LIVE RESIN)","PHYTOCA","CART",""],["REDECAN Live Rosin Daytime THC pen 1g","REDECAN","CART",""],["REDECAN Live Rosin THCv Skinny Vape 1g","REDECAN","CART",""],["Satipen PC01 (Peach Chem) 1g (LIVE RESIN)","SATIVITE","CART",""],["7 Acres Fondant LR vape 1g/ one g - INDICA","SPECTRUM","CART",""],["Spectrum Reserve Berea LR vape 1g/ one g - SATIVA","SPECTRUM","CART",""],["ALMA Revive Pastilles SATIVA pastilles (60 chews) Pineapple (THC/ CBD/CBG/CBC)","","PASTILLE",""],["ALMA Mellow Pastilles INDICA pastilles (60 chews) Mixed Berry (THC/ CBD/CBN/CBC)","","PASTILLE",""],["ALMA Calma Pastilles INDICA pastilles (60 chews) Sour Cola (THC/ CBD/CBN/CBC)","","PASTILLE",""],["JUNO 20:20 balanced pastilles (60 chews)","ANTG","PASTILLE",""],["Rocky THC 30 pastilles (60 chews)","ANTG","PASTILLE",""],["Aura Blood Orange 10:10 Gummies- VEGAN","","PASTILLE",""],["Aura Live Cola Pastilles VEGAN***","","PASTILLE",""],["Aura 40:20:20 LIVE NIGHT BERRY Pastilles VEGAN***","","PASTILLE",""],["Avani THC10 caps","","CAPS",""],["Avani Balanced 5:5 caps","","CAPS",""],["Avani Advanced 2.5:20","AVANI","CAPS",""],["Avani Advanced 2.5:20","AVANI","PASTILLE",""],["Avani Advanced CBD25","AVANI","CAPS",""],["Avani Advanced CBD25","AVANI","PASTILLE",""],["Ctrek C10T10 Medibles- Strawberry 60 chews)","Cannatrek","PASTILLE",""],["Cymra Aurelius DAY Pastilles C100 (60 chews)","CYMRA","PASTILLE",""],["Cymra Cylin NIGHT Pastilles C100 (60 chews)","CYMRA","PASTILLE",""],["Entoura THC10 soft chew (90 chews)*","ENTOURA","PASTILLE",""],["Entoura 15:15 soft chews (90 chews)*","ENTOURA","PASTILLE",""],["Grandiosa CBD100 patilles 60/sixty","GRANDIOSA","PASTILLE",""],["Heyday Tangerine Threes (60 chews)","HEYDAY","PASTILLE",""],["MediChew Lime 50 CBD (60 chews)","MEDCAN","PASTILLE",""],["MediChew 10:25 (60 chew)","MEDCAN","PASTILLE",""],["EclipX Mango Square Bears CBD50:CBG20:CBC3 (SATIVA)","NOVA","PASTILLE",""],["EclipX Blueberry Square Bears CBD50:CBN20:CBG5 (INDICA)","NOVA","PASTILLE",""],["Phytoca Indica 30 rosin pastilles*","PHYTOCA","PASTILLE",""],["Saticap CBD50 softgel (60 caps)","SATIVITE","CAPS",""],["SPECTRUM BLUE 2.5/3.75 soft gels SOFT GELS (60 )*","SPECTRUM","CAPS",""],["Stanley 40:40:40 PASTILLES (60pack)","STANLEY BROTHERS","PASTILLE",""],["Superseed CBD100 PASTILLES (60pack)","SUPERSEED","PASTILLE",""],["MTL Frosted Flakes 30% (Cereal Milk xd MAC 1)**","ALMA / MTL","FLOWER","15g"],["MTL Larry Black 22% (Biscotti x Scotty 2 Hotty)**","ALMA / MTL","FLOWER","15g"],["Aura Base KINGS TART T24","Aura Therapeutics","FLOWER","15g"],["AVANI BLING BLAU T30 INDICA**","AVANI","FLOWER","10g"],["Green weekend Dry Flower Blue Cheese (Baby Buds) 15g","GREEN WEEKEND","FLOWER","15g"],["FGW smalls T25 indica Green dragon***","MEDICABILIS","FLOWER","15g"],["FGWsmalls T20 Sativa Super Lemon Haze 15g***","MEDICABILIS","FLOWER","15g"]];
@@ -1126,6 +1267,170 @@ function checkNewDay() {
 }
 setInterval(checkNewDay, 30000);
 document.addEventListener("visibilitychange", () => { if (!document.hidden) checkNewDay(); });
+</script>
+<script>
+// ---------- screens: home menu, hold scripts, CBD calculator ----------
+const VIEWS = { hold: "viewHold", cbd: "viewCbd" };
+const TOOL_NAMES = { hold: "Hold scripts reminder", cbd: "CBD calculator" };
+function go(view) {
+  const tool = VIEWS[view] ? view : "";
+  document.getElementById("viewHome").hidden = !!tool;
+  document.getElementById("shell").hidden = !tool;
+  for (const k in VIEWS) document.getElementById(VIEWS[k]).hidden = k !== tool;
+  if (tool) document.getElementById("toolName").textContent = TOOL_NAMES[tool];
+  if (location.hash.slice(1) !== tool) history.replaceState(null, "", tool ? "#" + tool : location.pathname + location.search);
+  window.scrollTo(0, 0);
+  if (tool === "cbd") setTimeout(() => document.getElementById("cbdSearch").focus(), 50);
+  if (typeof fitNames === "function") fitNames();
+}
+document.querySelectorAll(".option").forEach(b => b.addEventListener("click", () => go(b.dataset.go)));
+document.getElementById("toMenu").addEventListener("click", () => go(""));
+document.getElementById("brandHome").addEventListener("click", () => go(""));
+window.addEventListener("hashchange", () => go(location.hash.slice(1)));
+document.getElementById("homeToday").textContent = "Today " + fmtDate(today);
+go(location.hash.slice(1));
+
+// ---------- the green glow that follows the mouse ----------
+const root = document.documentElement;
+window.addEventListener("pointermove", e => {
+  if (e.pointerType === "touch") return;
+  root.style.setProperty("--mx", e.clientX + "px");
+  root.style.setProperty("--my", e.clientY + "px");
+  document.body.classList.add("glowing");
+  const opt = e.target.closest && e.target.closest(".option");
+  if (opt) {
+    const r = opt.getBoundingClientRect();
+    opt.style.setProperty("--x", (e.clientX - r.left) + "px");
+    opt.style.setProperty("--y", (e.clientY - r.top) + "px");
+  }
+}, { passive: true });
+document.addEventListener("pointerleave", () => document.body.classList.remove("glowing"));
+
+// ---------- CBD calculator ----------
+// CBD products from the pricelist, with the CBD strength from the line under each product.
+// Oils: [pricelist name, mg CBD per mL]. Capsules/chews: [pricelist name, mg CBD each, count per pack].
+const CBD_OILS = [
+  ["Aura CBD200** (indica)", 200], ["Entoura CBD200 Full Spectrum", 200], ["Entoura CBD200 Broad Spectrum (30mL) 200mg CBD/mL", 200],
+  ["Entoura ULTRA spectrum 350 oil (CBD240 Broad Spectrum (30mL)", 240], ["Grandiosa CBD200 30mL/ thirty", 200], ["KIND CBD200 FS", 200],
+  ["Medcan FX200", 200], ["Medicabilis 200 CBD FS", 200], ["SatiOil CBD 200FS", 200], ["Solara 2:250:30 Femme CBD oil (50mL)", 250],
+  ["Heyday CBD:CBDv OIL", 135], ["ANTG Elan CBD100", 100], ["ANTG Elan Oil (0% THC - isolated CBD)", 100], ["ANTG Eve #4 CBD oil (100mg/mL)", 100],
+  ["ANTG Eve CBD oil (full spec)", 50], ["Alfie CBD100 complete 30mL( NOTE 5mg THC/mL)", 100], ["Medcan FX05", 100], ["C100 oral liquid", 100],
+  ["LGP CBD50 50mL", 50], ["Grandiosa Water Soluble CBD", 80]
+];
+const CBD_PACKS = [
+  ["Avani Advanced CBD25", 25, 60], ["Saticap CBD50 softgel (60 caps)", 50, 60], ["Cymra Aurelius DAY Pastilles C100 (60 chews)", 100, 60],
+  ["Cymra Cylin NIGHT Pastilles C100 (60 chews)", 100, 60], ["Grandiosa CBD100 patilles 60/sixty", 100, 60], ["MediChew Lime 50 CBD (60 chews)", 50, 60],
+  ["Superseed CBD100 PASTILLES (60pack)", 100, 60], ["EclipX Mango Square Bears CBD50:CBG20:CBC3 (SATIVA)", 50, 60],
+  ["EclipX Blueberry Square Bears CBD50:CBN20:CBG5 (INDICA)", 50, 60]
+];
+const CBD = [];
+for (const [n, mg] of CBD_OILS) {
+  const p = PRODUCTS.find(x => x.name === n);
+  if (p) CBD.push({ p, kind: "oil", mg, ml: parseFloat(p.size) || 30, label: `${displayName(p)} ${p.size} OIL` });
+}
+for (const [n, mg, count] of CBD_PACKS) {
+  const p = PRODUCTS.find(x => x.name === n && (x.type === "CAPS" || x.type === "PASTILLE"));
+  if (p) CBD.push({ p, kind: "pack", mg, count, label: `${displayName(p)} ${p.type === "CAPS" ? "CAPS" : "PASTILLE"}` });
+}
+for (const c of CBD) c.toks = [...new Set([...tokens(c.label), ...c.p.all])];
+
+function searchCbd(q) {
+  const qt = [...new Set(tokens(q))];
+  if (!qt.length) return CBD.slice();
+  return CBD.map(c => {
+    let hit = 0;
+    for (const t of qt) if (c.toks.includes(t)) hit += 1; else if (c.toks.some(x => tokMatch(t, x) || (t.length >= 2 && x.startsWith(t)))) hit += 0.8;
+    return { c, s: hit / qt.length };
+  }).filter(x => x.s >= 0.99 || (x.s >= 0.6 && qt.length > 1)).sort((a, b) => b.s - a.s).map(x => x.c);
+}
+
+const cbdSearch = document.getElementById("cbdSearch"), cbdResults = document.getElementById("cbdResults");
+let cbdList = [], cbdActive = 0;
+function showResults() {
+  cbdList = searchCbd(cbdSearch.value).slice(0, 10);
+  cbdActive = 0;
+  cbdResults.innerHTML = cbdList.length
+    ? cbdList.map((c, i) => `<li role="option" id="cbdopt-${i}" data-i="${i}" aria-selected="${i === 0}"><b>${esc(c.label)}</b><span>${c.kind === "oil" ? c.mg + " mg/mL" : c.mg + " mg each · " + c.count}</span></li>`).join("")
+    : `<li class="none">No CBD product matches "${esc(cbdSearch.value)}"</li>`;
+  cbdResults.hidden = false; cbdSearch.setAttribute("aria-expanded", "true");
+}
+function hideResults() { cbdResults.hidden = true; cbdSearch.setAttribute("aria-expanded", "false"); }
+function markActive() { cbdResults.querySelectorAll("li[data-i]").forEach(li => li.setAttribute("aria-selected", String(+li.dataset.i === cbdActive))); }
+cbdSearch.addEventListener("input", showResults);
+cbdSearch.addEventListener("focus", showResults);
+cbdSearch.addEventListener("keydown", e => {
+  if (cbdResults.hidden && (e.key === "ArrowDown" || e.key === "Enter")) showResults();
+  if (e.key === "ArrowDown") { e.preventDefault(); cbdActive = Math.min(cbdActive + 1, cbdList.length - 1); markActive(); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); cbdActive = Math.max(cbdActive - 1, 0); markActive(); }
+  else if (e.key === "Enter") { e.preventDefault(); if (cbdList[cbdActive]) addCard(cbdList[cbdActive]); }
+  else if (e.key === "Escape") hideResults();
+});
+cbdResults.addEventListener("mousedown", e => { const li = e.target.closest("li[data-i]"); if (li) { e.preventDefault(); addCard(cbdList[+li.dataset.i]); } });
+document.addEventListener("click", e => { if (!e.target.closest(".cbd-search")) hideResults(); });
+
+const num = v => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) && n > 0 ? n : null; };
+const nice = n => (Math.round(n * 10) / 10).toLocaleString("en-AU", { maximumFractionDigits: 1 });
+let cardSeq = 0;
+
+function addCard(c) {
+  hideResults(); cbdSearch.value = "";
+  const id = ++cardSeq, el = document.createElement("article");
+  el.className = "cbd-card"; el.dataset.id = id; el._c = c;
+  const doseField = c.kind === "oil"
+    ? `<div class="cbd-field edit"><label for="dose-${id}">Total daily dose (mL)</label><input id="dose-${id}" class="dose" type="number" inputmode="decimal" min="0" step="0.1" placeholder="e.g. 0.5"></div>`
+    : `<div class="cbd-field edit"><label for="dose-${id}">Taken per day</label><input id="dose-${id}" class="dose" type="number" inputmode="decimal" min="0" step="0.5" placeholder="e.g. 2"></div>`;
+  const autos = c.kind === "oil"
+    ? `<div class="cbd-field"><span class="lbl">Volume of bottle</span><span class="auto">${c.ml}<small>mL</small></span></div>
+       <div class="cbd-field"><span class="lbl">Concentration</span><span class="auto">${c.mg}<small>mg/mL</small></span></div>`
+    : `<div class="cbd-field"><span class="lbl">Total count per pack</span><span class="auto">${c.count}</span></div>
+       <div class="cbd-field"><span class="lbl">CBD in each</span><span class="auto">${c.mg}<small>mg</small></span></div>`;
+  const outs = c.kind === "oil"
+    ? `<div class="cbd-field"><span class="lbl">Total mg in bottle</span><span class="auto o-total">${(c.ml * c.mg).toLocaleString("en-AU")}<small>mg</small></span></div>
+       <div class="cbd-field"><span class="lbl">Daily dose in mg</span><span class="auto o-daily">–</span></div>
+       <div class="cbd-field"><span class="lbl">Days bottle will last</span><span class="auto o-days">–</span></div>`
+    : `<div class="cbd-field"><span class="lbl">Total mg in pack</span><span class="auto o-total">${(c.count * c.mg).toLocaleString("en-AU")}<small>mg</small></span></div>
+       <div class="cbd-field"><span class="lbl">Daily dose in mg</span><span class="auto o-daily">–</span></div>
+       <div class="cbd-field"><span class="lbl">Days pack will last</span><span class="auto o-days">–</span></div>`;
+  el.innerHTML = `
+    <div class="cbd-card-head"><div><h3>${esc(c.label)}</h3><span class="kind">${c.kind === "oil" ? "CBD oil" : "CBD capsules / chews"}</span></div>
+      <button type="button" class="cbd-x" aria-label="Remove ${esc(c.label)}">&times;</button></div>
+    <div class="cbd-grid">${autos}${doseField}
+      <div class="cbd-field edit"><label for="date-${id}">Collection date</label><input id="date-${id}" class="coll" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" value="${fmtDate(today)}"></div></div>
+    <div class="cbd-out">${outs}</div>
+    <div class="cbd-due"><div><div class="lbl">Next ${c.kind === "oil" ? "bottle" : "pack"} due date</div><div class="val o-due">Enter the daily dose</div></div>
+      <button type="button" class="copy-sum" hidden>Copy summary</button></div>`;
+  document.getElementById("cbdCards").prepend(el);
+  document.getElementById("cbdEmpty").hidden = true;
+  el.querySelectorAll("input").forEach(i => i.addEventListener("input", () => calc(el)));
+  el.querySelector(".cbd-x").addEventListener("click", () => { el.remove(); document.getElementById("cbdEmpty").hidden = !!document.querySelector(".cbd-card"); });
+  el.querySelector(".copy-sum").addEventListener("click", e => copySummary(el, e.currentTarget));
+  calc(el);
+  el.querySelector(".dose").focus();
+}
+
+// The same formulas as the QUICK CBD CALCULATION sheet.
+function calc(el) {
+  const c = el._c, dose = num(el.querySelector(".dose").value), coll0 = parseDate(el.querySelector(".coll").value); // dd/mm/yyyy, the same reader as hold scripts
+  const daily = el.querySelector(".o-daily"), days = el.querySelector(".o-days"), due = el.querySelector(".o-due"), copy = el.querySelector(".copy-sum");
+  el._sum = "";
+  if (!dose) { daily.innerHTML = days.innerHTML = "–"; due.textContent = "Enter the daily dose"; copy.hidden = true; return; }
+  const dailyMg = c.mg * dose;                                   // concentration × daily dose (or mg each × count per day)
+  const lasts = (c.kind === "oil" ? c.ml : c.count) / dose;      // volume ÷ daily dose (or count ÷ per day)
+  daily.innerHTML = `${nice(dailyMg)}<small>mg</small>`;
+  days.innerHTML = `${nice(lasts)}<small>days</small>`;
+  if (!coll0) { due.textContent = "Enter the collection date as dd/mm/yyyy"; copy.hidden = true; return; }
+  const d = new Date(coll0.getFullYear(), coll0.getMonth(), coll0.getDate() + Math.floor(lasts)); // collection date + days (whole days, as the sheet shows)
+  due.textContent = fmtDate(d);
+  const coll = fmtDate(coll0);
+  el._sum = c.kind === "oil"
+    ? `${c.label}: ${nice(dose)} mL/day (${nice(dailyMg)} mg/day). Collected ${coll}, lasts ${nice(lasts)} days, next bottle due ${fmtDate(d)}.`
+    : `${c.label}: ${nice(dose)} per day (${nice(dailyMg)} mg/day). Collected ${coll}, lasts ${nice(lasts)} days, next pack due ${fmtDate(d)}.`;
+  copy.hidden = false;
+}
+function copySummary(el, btn) {
+  const done = () => { btn.textContent = "Copied"; btn.classList.add("done"); setTimeout(() => { btn.textContent = "Copy summary"; btn.classList.remove("done"); }, 1600); };
+  try { navigator.clipboard.writeText(el._sum).then(done, () => { btn.textContent = "Copy blocked"; }); } catch (e) { btn.textContent = "Copy blocked"; }
+}
 </script>
 
 </body>
