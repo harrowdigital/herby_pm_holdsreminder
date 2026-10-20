@@ -80,3 +80,5 @@ for(const t of ["Cybis Oil","Cymra Cybis Oil","Cannatrek Cybis Oil","Entoura CBD
 for(const t of ["avani 25 cbd capsule","Avani Advanced CBD25","Avani CBD25 Caps","Avani 2.5:20 Capsule","Avani THC10 Caps","Avani 5:5 Caps","avani 25 cbd"]){const r=run(t);console.log("AVANI",r.status.padEnd(7),t.padEnd(24),"=>",r.out,"|",r.options.map(p=>displayName(p)).join(" / "));}
 for(const t of ["avani 25 cbd capsule","avani 25 cbd gummy","avani 25 cbd","Avani Advanced CBD25","Avani 2.5:20 Pastille","Avani 2.5:20"]){const r=run(t);console.log("AVANI2",r.status.padEnd(7),t.padEnd(24),"=>",r.out,"["+r.types+"]");}
 overrides["avani 25 cbd"]={type:"PASTILLE"};console.log("AVANI2 picked PASTILLE =>",run("avani 25 cbd").out);overrides["avani 25 cbd"]={type:"CAPS"};console.log("AVANI2 picked CAPS =>",run("avani 25 cbd").out);delete overrides["avani 25 cbd"];
+// GSC = Girl Scout Cookies.
+for(const t of ["Beacon GSC Flower","Beacon GSC","Beacon Girl Scout Cookies","Beacon GSC Cart","Beacon THC30 GSC Oil","Beacon GSC Oil"]){const r=run(t);console.log("GSC",r.status.padEnd(7),t.padEnd(28),"=>",r.out,"["+r.types+"]");}
