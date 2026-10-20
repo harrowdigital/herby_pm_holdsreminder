@@ -82,3 +82,5 @@ for(const t of ["avani 25 cbd capsule","avani 25 cbd gummy","avani 25 cbd","Avan
 overrides["avani 25 cbd"]={type:"PASTILLE"};console.log("AVANI2 picked PASTILLE =>",run("avani 25 cbd").out);overrides["avani 25 cbd"]={type:"CAPS"};console.log("AVANI2 picked CAPS =>",run("avani 25 cbd").out);delete overrides["avani 25 cbd"];
 // GSC = Girl Scout Cookies.
 for(const t of ["Beacon GSC Flower","Beacon GSC","Beacon Girl Scout Cookies","Beacon GSC Cart","Beacon THC30 GSC Oil","Beacon GSC Oil"]){const r=run(t);console.log("GSC",r.status.padEnd(7),t.padEnd(28),"=>",r.out,"["+r.types+"]");}
+// FS200 = CBD200 FS.
+for(const t of ["kind fs200","KIND FS200 Oil","Medicabilis FS200","KIND CBD200 FS","SatiOil CBD 200FS","Entoura CBD200 Full Spectrum"]){const r=run(t);console.log("FS200",r.status.padEnd(7),t.padEnd(30),"=>",r.out);}

@@ -338,6 +338,7 @@ function tokens(s) {
   s = s.replace(/\bgirl\s+scout\s+cookies?\b/gi, "$& gsc"); // GSC = Girl Scout Cookies (BEACON GSC FLOWER)
   s = s.replace(/\baustralian\s+natural(\s+therapeutics?)?(\s+group)?\b/gi, "antg"); // AUSTRALIAN NATURAL = ANTG
   s = s.replace(/\bfull[\s-]*spec(trum)?\b/gi, "fs"); // FULL SPECTRUM = FS, as the pricelist writes it
+  s = s.replace(/\bfs(\d{2,3})\b/gi, "fs cbd$1"); // FS200 = CBD200 FS (KIND FS200 = KIND CBD200 FS)
   s = s.replace(/\btbc(\d{2,3})\b/gi, "tb cbd$1"); // TBC100 = Tasmanian Botanics (TB) CBD100 oil
   s = s.replace(/\b([a-z]{3,})c(\d{2,3})\b/gi, "$1 cbd$2"); // AURAC200 = AURA CBD200
   s = s.replace(/\bc(\d{2,3})\b/gi, "cbd$1"); // C200 = CBD200, like the pricelist's own C100
