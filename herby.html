@@ -366,6 +366,8 @@ dialog.lock::backdrop { background: rgba(250, 251, 248, .6); backdrop-filter: bl
 .lock-eye { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; display: grid; place-items: center; }
 .lock-eye:hover { color: #0E0F0D; background: var(--chip); }
 .lock-eye svg { width: 19px; height: 19px; }
+.lock-user { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; border: 0; padding: 0; }
+.lock-tip { margin: 0; color: #8A8E86; font-size: 12.5px; line-height: 1.45; }
 .lock-error { margin: 0; color: var(--red); font-size: 13.5px; font-weight: 600; }
 .lock-actions { display: flex; gap: 10px; width: 100%; margin-top: 6px; }
 .lock-actions .cta { flex: 1; padding: 12px 18px; }
@@ -444,15 +446,18 @@ dialog.lock::backdrop { background: rgba(250, 251, 248, .6); backdrop-filter: bl
 </section>
 
 <dialog class="lock" id="lock" aria-labelledby="lockTitle">
-  <form method="dialog" id="lockForm" class="lock-inner">
+  <form method="post" action="#" id="lockForm" class="lock-inner" autocomplete="on">
     <span class="lock-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
     <h2 id="lockTitle">Hold Scripts Reminder</h2>
     <p>This tool is for the hold scripts team. Enter the password to continue.</p>
+    <!-- Password managers (Google Password Manager, iCloud Keychain) need a username to save the login under. -->
+    <input class="lock-user" type="text" name="username" id="lockUser" autocomplete="username" value="PlantMed Hold Scripts" readonly tabindex="-1" aria-hidden="true">
     <div class="lock-field">
-      <input id="lockInput" type="password" autocomplete="off" placeholder="Password" aria-label="Password" aria-describedby="lockError">
+      <input id="lockInput" type="password" name="password" autocomplete="current-password" placeholder="Password" aria-label="Password" aria-describedby="lockError">
       <button type="button" class="lock-eye" id="lockEye" aria-label="Show password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </div>
     <p class="lock-error" id="lockError" role="alert" hidden>That password isn't right. Try again.</p>
+    <p class="lock-tip">Tip: let your browser save this password. Next time it can fill it for you, with Touch ID on a Mac.</p>
     <div class="lock-actions">
       <button type="button" class="cta" id="lockCancel">Cancel</button>
       <button type="submit" class="cta primary" id="lockOk">Unlock</button>
@@ -1474,7 +1479,11 @@ function askPassword() {
 document.getElementById("lockForm").addEventListener("submit", async e => {
   e.preventDefault();
   if (await sha256Hex(lockInput.value) === HOLD_PASS_HASH) {
-    rememberUnlock(); lock.close(); go("hold");
+    rememberUnlock();
+    try { // Chrome: offer to save it in Google Password Manager (other browsers save from the form on their own)
+      if (window.PasswordCredential && navigator.credentials) await navigator.credentials.store(new PasswordCredential({ id: "PlantMed Hold Scripts", password: lockInput.value, name: "Herby · Hold Scripts" }));
+    } catch (err) {}
+    lock.close(); go("hold");
   } else {
     const f = lockInput.parentElement; f.classList.remove("bad"); void f.offsetWidth; f.classList.add("bad");
     document.getElementById("lockError").hidden = false; lockInput.select();
