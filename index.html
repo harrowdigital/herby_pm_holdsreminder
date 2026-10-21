@@ -258,6 +258,7 @@ button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: 
 .cbd-results li span { font-size: 12.5px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .cbd-results li[aria-selected="true"], .cbd-results li:hover { background: var(--lime-soft); }
 .cbd-results .none { color: var(--muted); cursor: default; }
+.cbd-results .grp { cursor: default; padding: 10px 12px 4px; font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: none !important; }
 .cbd-cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
 .cbd-empty { margin: 0; text-align: center; color: var(--muted); font-size: 14px; padding: 10px; }
 .cbd-card { position: relative; background: var(--card); border-radius: 26px; padding: 22px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow); }
@@ -1456,16 +1457,24 @@ function searchCbd(q) {
 
 const cbdSearch = document.getElementById("cbdSearch"), cbdResults = document.getElementById("cbdResults");
 let cbdList = [], cbdActive = 0;
+// Every matching product is listed (the list scrolls), grouped into oils and capsules/chews.
 function showResults() {
-  cbdList = searchCbd(cbdSearch.value).slice(0, 10);
+  const found = searchCbd(cbdSearch.value);
+  cbdList = [...found.filter(c => c.kind === "oil"), ...found.filter(c => c.kind === "pack")];
   cbdActive = 0;
+  const item = (c, i) => `<li role="option" id="cbdopt-${i}" data-i="${i}" aria-selected="${i === 0}"><b>${esc(c.label)}</b><span>${c.kind === "oil" ? c.mg + " mg/mL" : c.mg + " mg each · " + c.count}</span></li>`;
+  const oils = cbdList.filter(c => c.kind === "oil").length;
   cbdResults.innerHTML = cbdList.length
-    ? cbdList.map((c, i) => `<li role="option" id="cbdopt-${i}" data-i="${i}" aria-selected="${i === 0}"><b>${esc(c.label)}</b><span>${c.kind === "oil" ? c.mg + " mg/mL" : c.mg + " mg each · " + c.count}</span></li>`).join("")
+    ? (oils ? `<li class="grp" role="presentation">CBD oils</li>` : "") + cbdList.slice(0, oils).map((c, i) => item(c, i)).join("") +
+      (oils < cbdList.length ? `<li class="grp" role="presentation">CBD capsules &amp; chews</li>` : "") + cbdList.slice(oils).map((c, i) => item(c, oils + i)).join("")
     : `<li class="none">No CBD product matches "${esc(cbdSearch.value)}"</li>`;
   cbdResults.hidden = false; cbdSearch.setAttribute("aria-expanded", "true");
 }
 function hideResults() { cbdResults.hidden = true; cbdSearch.setAttribute("aria-expanded", "false"); }
-function markActive() { cbdResults.querySelectorAll("li[data-i]").forEach(li => li.setAttribute("aria-selected", String(+li.dataset.i === cbdActive))); }
+function markActive() {
+  cbdResults.querySelectorAll("li[data-i]").forEach(li => li.setAttribute("aria-selected", String(+li.dataset.i === cbdActive)));
+  const on = cbdResults.querySelector(`li[data-i="${cbdActive}"]`); if (on) on.scrollIntoView({ block: "nearest" });
+}
 cbdSearch.addEventListener("input", showResults);
 cbdSearch.addEventListener("focus", showResults);
 cbdSearch.addEventListener("keydown", e => {
