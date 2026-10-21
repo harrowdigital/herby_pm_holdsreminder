@@ -1431,7 +1431,7 @@ function addCard(c, quiet) {
       <div class="cbd-field edit"><label for="date-${id}">Collection date</label><div class="cal-wrap"><input id="date-${id}" class="coll" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" value="${fmtDate(today)}" autocomplete="off" aria-haspopup="dialog"><button type="button" class="cal-btn" aria-label="Open calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button></div></div></div>
     <div class="cbd-out">${outs}</div>
     <div class="cbd-due"><div><div class="lbl">Next ${c.kind === "oil" ? "bottle" : "pack"} due date</div><div class="val o-due">Enter the daily dose</div></div>
-      <button type="button" class="copy-sum" hidden>Copy summary</button></div>`;
+      <button type="button" class="copy-sum" hidden>Copy date</button></div>`;
   document.getElementById("cbdCards").prepend(el);
   document.getElementById("cbdEmpty").hidden = true;
   if (keepDate) el.querySelector(".coll").value = keepDate;
@@ -1499,15 +1499,12 @@ function calc(el) {
   if (!coll0) { due.textContent = "Enter the collection date as dd/mm/yyyy"; copy.hidden = true; return; }
   const d = new Date(coll0.getFullYear(), coll0.getMonth(), coll0.getDate() + Math.floor(lasts)); // collection date + days (whole days, as the sheet shows)
   due.textContent = fmtDate(d);
-  const coll = fmtDate(coll0);
-  el._sum = c.kind === "oil"
-    ? `${c.label}: ${nice(dose)} mL/day (${nice(dailyMg)} mg/day). Collected ${coll}, lasts ${nice(lasts)} days, next bottle due ${fmtDate(d)}.`
-    : `${c.label}: ${nice(dose)} per day (${nice(dailyMg)} mg/day). Collected ${coll}, lasts ${nice(lasts)} days, next pack due ${fmtDate(d)}.`;
+  el._sum = fmtDate(d); // the copy button copies only the due date, e.g. 18/08/2026
   copy.hidden = false;
 }
 addCard(null, true); // the empty calculator, until a product is searched
 function copySummary(el, btn) {
-  const done = () => { btn.textContent = "Copied"; btn.classList.add("done"); setTimeout(() => { btn.textContent = "Copy summary"; btn.classList.remove("done"); }, 1600); };
+  const done = () => { btn.textContent = "Copied"; btn.classList.add("done"); setTimeout(() => { btn.textContent = "Copy date"; btn.classList.remove("done"); }, 1600); };
   try { navigator.clipboard.writeText(el._sum).then(done, () => { btn.textContent = "Copy blocked"; }); } catch (e) { btn.textContent = "Copy blocked"; }
 }
 </script>
