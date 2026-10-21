@@ -1443,14 +1443,24 @@ for (const [n, mg, count] of CBD_PUMPS) {
 }
 for (const c of CBD) c.toks = [...new Set([...tokens(c.label), ...c.p.all])];
 
+// Search as you type: every word typed must be the start of a word in the product (AU -> AURA, GRA -> GRANDIOSA),
+// or a known shorthand (AURAC200 -> AURA CBD200). Products whose name starts with the search come first.
 function searchCbd(q) {
+  const words = q.toLowerCase().split(/[^a-z0-9.:#+]+/).filter(Boolean);
+  if (!words.length) return CBD.slice();
   const qt = [...new Set(tokens(q))];
-  if (!qt.length) return CBD.slice();
-  return CBD.map(c => {
-    let hit = 0;
-    for (const t of qt) if (c.toks.includes(t)) hit += 1; else if (c.toks.some(x => tokMatch(t, x) || (t.length >= 2 && x.startsWith(t)))) hit += 0.8;
-    return { c, s: hit / qt.length };
-  }).filter(x => x.s >= 0.99 || (x.s >= 0.6 && qt.length > 1)).sort((a, b) => b.s - a.s).map(x => x.c);
+  const scored = [];
+  for (const c of CBD) {
+    const hay = (c.label + " " + c.p.name.replace(/\([^)]*\)?/g, " ") + " " + c.p.supplier).toLowerCase(); // pricelist notes in brackets (SATIVA) aren't searched
+    const hayWords = hay.split(/[^a-z0-9.:#+]+/).filter(Boolean);
+    const prefixOk = words.every(w => hayWords.some(h => h.startsWith(w)) || (w.length >= 3 && hay.includes(w)));
+    const tokenOk = qt.length && qt.every(t => c.toks.includes(t) || c.toks.some(x => tokMatch(t, x)));
+    if (!prefixOk && !tokenOk) continue;
+    const label = c.label.toLowerCase();
+    const rank = (label.startsWith(words[0]) ? 0 : label.split(" ").some(w => w.startsWith(words[0])) ? 1 : 2);
+    scored.push({ c, rank });
+  }
+  return scored.sort((x, y) => x.rank - y.rank).map(x => x.c);
 }
 
 const cbdSearch = document.getElementById("cbdSearch"), cbdResults = document.getElementById("cbdResults");
