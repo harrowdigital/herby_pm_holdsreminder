@@ -272,6 +272,29 @@ button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: 
 .cbd-due .copy-sum { border: 0; background: var(--lime-ink); color: var(--lime); font-weight: 700; font-size: 13px; padding: 8px 14px; border-radius: 999px; cursor: pointer; }
 .cbd-due .copy-sum.done { background: var(--good); color: #fff; }
 @media (max-width: 560px) { .cbd-out { grid-template-columns: minmax(0, 1fr); } .cbd-grid { grid-template-columns: minmax(0, 1fr); } }
+/* Pop-up calendar for the collection date (Monday first, like Google Sheets). */
+.cal-wrap { position: relative; }
+.cal-wrap input { padding-right: 40px; cursor: pointer; }
+.cal-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; display: grid; place-items: center; }
+.cal-btn:hover { background: var(--chip); color: var(--ink); }
+.cal-btn svg { width: 18px; height: 18px; }
+.cal { position: absolute; z-index: 20; top: calc(100% + 6px); right: 0; width: 280px; padding: 14px; border-radius: 18px; background: var(--card);
+  border: 1px solid var(--line); box-shadow: 0 18px 40px rgba(17, 20, 16, .18); }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cal-head b { font-size: 15px; font-weight: 700; }
+.cal-nav { display: flex; gap: 2px; }
+.cal-nav button { width: 30px; height: 30px; border: 0; border-radius: 50%; background: transparent; color: var(--ink); font-size: 18px; cursor: pointer; }
+.cal-nav button:hover { background: var(--chip); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+.cal-grid .dow { font-size: 12px; font-weight: 700; color: var(--muted); padding: 4px 0; }
+.cal-grid button { height: 34px; border: 0; border-radius: 50%; background: transparent; color: var(--ink); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; font-variant-numeric: tabular-nums; }
+.cal-grid button.out { color: var(--muted); opacity: .55; }
+.cal-grid button:hover { background: var(--lime-soft); }
+.cal-grid button.is-today { box-shadow: inset 0 0 0 1.5px var(--lime-deep); }
+.cal-grid button.sel { background: var(--lime-ink); color: var(--lime); }
+.cal-today { margin-top: 8px; border: 0; background: transparent; color: var(--lime-ink); font-weight: 800; font-size: 14px; padding: 6px 4px; cursor: pointer; }
+.cal-today:hover { text-decoration: underline; }
+
 @media (prefers-reduced-motion: reduce) { .home-robot, .home-robot .eye { animation: none; } .glow { display: none; } }
 
 </style>
@@ -1403,13 +1426,14 @@ function addCard(c) {
     <div class="cbd-card-head"><div><h3>${esc(c.label)}</h3><span class="kind">${c.kind === "oil" ? "CBD oil" : "CBD capsules / chews"}</span></div>
       <button type="button" class="cbd-x" aria-label="Remove ${esc(c.label)}">&times;</button></div>
     <div class="cbd-grid">${autos}${doseField}
-      <div class="cbd-field edit"><label for="date-${id}">Collection date</label><input id="date-${id}" class="coll" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" value="${fmtDate(today)}"></div></div>
+      <div class="cbd-field edit"><label for="date-${id}">Collection date</label><div class="cal-wrap"><input id="date-${id}" class="coll" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" value="${fmtDate(today)}" autocomplete="off" aria-haspopup="dialog"><button type="button" class="cal-btn" aria-label="Open calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button></div></div></div>
     <div class="cbd-out">${outs}</div>
     <div class="cbd-due"><div><div class="lbl">Next ${c.kind === "oil" ? "bottle" : "pack"} due date</div><div class="val o-due">Enter the daily dose</div></div>
       <button type="button" class="copy-sum" hidden>Copy summary</button></div>`;
   document.getElementById("cbdCards").prepend(el);
   document.getElementById("cbdEmpty").hidden = true;
   if (keepDate) el.querySelector(".coll").value = keepDate;
+  attachCalendar(el.querySelector(".coll"), () => calc(el));
   if (keepDose) el.querySelector(".dose").value = keepDose;
   el.querySelectorAll("input").forEach(i => i.addEventListener("input", () => calc(el)));
   el.querySelector(".cbd-x").addEventListener("click", () => { el.remove(); document.getElementById("cbdEmpty").hidden = !!document.querySelector(".cbd-card"); });
@@ -1418,6 +1442,47 @@ function addCard(c) {
   el.querySelector(".dose").focus();
 }
 
+
+// ---------- pop-up calendar (Monday first, dd/mm/yyyy) ----------
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+function attachCalendar(input, onPick) {
+  const wrap = input.parentElement, btn = wrap.querySelector(".cal-btn");
+  let cal = null, view = null;
+  const close = () => { if (cal) { cal.remove(); cal = null; document.removeEventListener("mousedown", outside, true); } };
+  const outside = e => { if (!wrap.contains(e.target)) close(); };
+  const pick = d => { input.value = fmtDate(d); onPick(); close(); input.focus(); };
+  function draw() {
+    const sel = parseDate(input.value), y = view.getFullYear(), m = view.getMonth();
+    const first = new Date(y, m, 1), start = new Date(y, m, 1 - ((first.getDay() + 6) % 7)); // back to Monday
+    let cells = "";
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      const cls = [d.getMonth() !== m ? "out" : "", sel && +d === +sel ? "sel" : "", +d === +today ? "is-today" : ""].join(" ").trim();
+      cells += `<button type="button" class="${cls}" data-t="${+d}" aria-label="${fmtDate(d)}">${d.getDate()}</button>`;
+    }
+    cal.innerHTML = `<div class="cal-head"><b>${MONTHS[m]} ${y}</b><div class="cal-nav"><button type="button" data-step="-1" aria-label="Previous month">&lsaquo;</button><button type="button" data-step="1" aria-label="Next month">&rsaquo;</button></div></div>
+      <div class="cal-grid">${["M", "T", "W", "T", "F", "S", "S"].map(d => `<span class="dow">${d}</span>`).join("")}${cells}</div>
+      <button type="button" class="cal-today">Today</button>`;
+  }
+  function open() {
+    if (cal) return;
+    const sel = parseDate(input.value) || today;
+    view = new Date(sel.getFullYear(), sel.getMonth(), 1);
+    cal = document.createElement("div"); cal.className = "cal"; cal.setAttribute("role", "dialog"); cal.setAttribute("aria-label", "Choose collection date");
+    wrap.appendChild(cal); draw();
+    cal.addEventListener("click", e => {
+      const step = e.target.closest("[data-step]"), day = e.target.closest("[data-t]");
+      if (step) { view = new Date(view.getFullYear(), view.getMonth() + +step.dataset.step, 1); draw(); }
+      else if (day) pick(new Date(+day.dataset.t));
+      else if (e.target.closest(".cal-today")) pick(today);
+    });
+    document.addEventListener("mousedown", outside, true);
+  }
+  input.addEventListener("click", open);
+  btn.addEventListener("click", () => cal ? close() : open());
+  input.addEventListener("keydown", e => { if (e.key === "Escape") close(); if (e.key === "ArrowDown" && e.altKey) open(); });
+  input.addEventListener("input", () => { if (cal) { const d = parseDate(input.value); if (d) { view = new Date(d.getFullYear(), d.getMonth(), 1); draw(); } } });
+}
 // The same formulas as the QUICK CBD CALCULATION sheet.
 function calc(el) {
   const c = el._c, dose = num(el.querySelector(".dose").value), coll0 = parseDate(el.querySelector(".coll").value); // dd/mm/yyyy, the same reader as hold scripts
