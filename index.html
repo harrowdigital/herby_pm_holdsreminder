@@ -382,6 +382,26 @@ dialog.lock::backdrop { background: rgba(250, 251, 248, .6); backdrop-filter: bl
 .lock-actions .cta { flex: 1; padding: 12px 18px; }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 .lock-field.bad { animation: shake .25s ease 2; }
+
+/* ---------- home: chat bubble above a bigger Herby, who waves when you hover over him ---------- */
+.hero { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bubble { position: relative; background: #FFFFFF; border: 1px solid #E3E6DF; border-radius: 28px; padding: 18px 26px 20px; max-width: min(620px, 92vw);
+  box-shadow: 0 1px 2px rgba(14, 15, 13, .05), 0 18px 40px rgba(14, 15, 13, .08); animation: pop .5s cubic-bezier(.2, 1.4, .4, 1) both .15s; transform-origin: 50% 100%; }
+.bubble::after { content: ""; position: absolute; left: 50%; bottom: -11px; width: 22px; height: 22px; background: #FFFFFF;
+  border-right: 1px solid #E3E6DF; border-bottom: 1px solid #E3E6DF; transform: translateX(-50%) rotate(45deg); border-bottom-right-radius: 5px; }
+.bubble .home-q { font-size: clamp(30px, 5.2vw, 60px); line-height: 1; max-width: 13ch; margin: 0 auto; }
+@keyframes pop { 0% { transform: translateY(10px) scale(.85); } 100% { transform: none; } } /* no fade: the question stays readable even if animations are paused */
+button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; width: min(260px, 60vw); margin-top: 6px; }
+.home-robot:focus-visible { outline: 3px solid var(--lime-deep); outline-offset: 8px; border-radius: 24px; }
+.home-robot .arm-r { transform-box: view-box; transform-origin: 328px 262px; }
+.home-robot.waving { animation: hop .9s ease-in-out both; }
+.home-robot.waving .arm-r { animation: wave .9s ease-in-out both; }
+.bubble.popped { animation: none; } /* the pop-in plays once; after that only the wiggle runs */
+.bubble.popped.wiggle { animation: wiggle .6s ease-in-out; }
+@keyframes wave { 0% { transform: rotate(0); } 15% { transform: rotate(-38deg); } 30% { transform: rotate(-12deg); } 45% { transform: rotate(-38deg); } 60% { transform: rotate(-12deg); } 75% { transform: rotate(-32deg); } 100% { transform: rotate(0); } }
+@keyframes hop { 0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-14px) rotate(-3deg); } 50% { transform: translateY(0) rotate(2deg); } 70% { transform: translateY(-6px) rotate(-1deg); } }
+@keyframes wiggle { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-2deg) scale(1.02); } 75% { transform: rotate(2deg) scale(1.02); } }
+@media (prefers-reduced-motion: reduce) { .bubble, .home-robot.waving, .home-robot.waving .arm-r, .bubble.wiggle { animation: none; } }
 </style>
 
 <div class="glow" aria-hidden="true"></div>
@@ -418,23 +438,26 @@ dialog.lock::backdrop { background: rgba(250, 251, 248, .6); backdrop-filter: bl
     <span class="home-pill">Created by JCIHB</span>
   </nav>
   <div class="home-inner">
-    <div class="home-robot" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none" class="robot-svg">
+    <div class="hero">
+      <div class="bubble" id="herbyBubble"><h1 class="home-q" id="homeQ">Hey! What do you need help with?</h1></div>
+      <button type="button" class="home-robot" id="herbyBot" aria-label="Say hi to Herby"><svg viewBox="100 110 300 270" fill="none" class="robot-svg">
       <!-- Herby robot: colours as in the reference picture -->
       <path d="M248 182 Q247 166 251 152" stroke="#4E7F4B" stroke-width="7" stroke-linecap="round"/>
       <ellipse cx="228" cy="150" rx="25" ry="13" transform="rotate(22 228 150)" fill="#5E8E5A"/>
       <ellipse cx="274" cy="143" rx="30" ry="14" transform="rotate(-24 274 143)" fill="#5E8E5A"/>
       <path d="M168 268 Q150 292 147 314" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/>
-      <path d="M328 262 Q350 262 356 278" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/>
+      
       <path d="M218 298 Q208 314 202 330" stroke="#2A2D2A" stroke-width="6" stroke-linecap="round"/>
       <path d="M264 298 Q268 314 262 332" stroke="#2A2D2A" stroke-width="6" stroke-linecap="round"/>
       <rect x="120" y="325" width="12" height="20" rx="5" transform="rotate(20 126 335)" fill="#2A2D2A"/>
       <rect x="134" y="330" width="12" height="20" rx="5" transform="rotate(20 140 340)" fill="#2A2D2A"/>
       <circle cx="140" cy="318" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
-      <rect x="372" y="268" width="20" height="11" rx="5" transform="rotate(-18 382 273)" fill="#2A2D2A"/>
-      <rect x="372" y="283" width="20" height="11" rx="5" transform="rotate(-18 382 288)" fill="#2A2D2A"/>
-      <circle cx="357" cy="284" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
+      
+      
+      
       <g transform="rotate(10 192 342)"><rect x="172" y="322" width="40" height="40" rx="12" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/><path d="M178 360 L206 366" stroke="#5E8E5A" stroke-width="7" stroke-linecap="round"/></g>
       <g transform="rotate(4 258 342)"><rect x="238" y="322" width="40" height="40" rx="12" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/><path d="M244 362 L272 364" stroke="#5E8E5A" stroke-width="7" stroke-linecap="round"/></g>
+      <g class="arm-r"><path d="M328 262 Q350 262 356 278" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/><rect x="372" y="268" width="20" height="11" rx="5" transform="rotate(-18 382 273)" fill="#2A2D2A"/><rect x="372" y="283" width="20" height="11" rx="5" transform="rotate(-18 382 288)" fill="#2A2D2A"/><circle cx="357" cy="284" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/></g>
       <ellipse cx="160" cy="245" rx="18" ry="24" fill="#D9DAD6" stroke="#D3D5D0" stroke-width="2"/>
       <ellipse cx="340" cy="240" rx="13" ry="20" fill="#D9DAD6" stroke="#D3D5D0" stroke-width="2"/>
       <rect x="150" y="178" width="192" height="126" rx="56" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
@@ -443,8 +466,8 @@ dialog.lock::backdrop { background: rgba(250, 251, 248, .6); backdrop-filter: bl
       <ellipse class="eye" cx="231" cy="244" rx="8" ry="10.5" fill="#ECECE8"/>
       <ellipse class="eye" cx="276" cy="244" rx="8" ry="10.5" fill="#ECECE8"/>
       <path d="M247 257 Q253 266 259 257 Z" fill="#ECECE8"/>
-    </svg></div>
-    <h1 class="home-q" id="homeQ">Hey! What do you need help with?</h1>
+    </svg></button>
+    </div>
     <p class="home-sub">Your PlantMed assistant for hold script reminders and CBD calculations, <span class="hl">done in seconds</span>.</p>
     <div class="home-ctas">
       <button type="button" class="cta primary" data-go="hold">Hold Scripts Reminder</button>
@@ -1529,6 +1552,21 @@ window.addEventListener("hashchange", () => go(location.hash.slice(1)));
 document.getElementById("homeToday").textContent = "Today · " + fmtDate(today);
 go(location.hash.slice(1));
 
+
+// ---------- Herby waves hi when you hover over him (or tap him) ----------
+(function () {
+  const bot = document.getElementById("herbyBot"), bubble = document.getElementById("herbyBubble");
+  if (!bot) return;
+  const wave = () => {
+    if (bot.classList.contains("waving")) return;
+    bot.classList.add("waving"); bubble.classList.add("wiggle");
+    setTimeout(() => { bot.classList.remove("waving"); bubble.classList.remove("wiggle"); }, 950);
+  };
+  bubble.addEventListener("animationend", e => { if (e.animationName === "pop") bubble.classList.add("popped"); });
+  bot.addEventListener("pointerenter", wave);
+  bot.addEventListener("click", wave);
+  setTimeout(wave, 750); // a hello wave when the page opens
+})();
 // ---------- the green glow that follows the mouse ----------
 const root = document.documentElement;
 window.addEventListener("pointermove", e => {
