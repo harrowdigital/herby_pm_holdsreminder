@@ -252,6 +252,7 @@ button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: 
 .cbd-empty { margin: 0; text-align: center; color: var(--muted); font-size: 14px; padding: 10px; }
 .cbd-card { position: relative; background: var(--card); border-radius: 26px; padding: 22px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow); }
 .cbd-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.cbd-card-head h3.muted-title { color: var(--muted); }
 .cbd-card-head h3 { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: .01em; line-height: 1.3; }
 .cbd-card-head .kind { display: inline-block; margin-top: 4px; font-size: 12px; font-weight: 700; color: var(--lime-ink); background: var(--lime); border-radius: 999px; padding: 2px 10px; }
 .cbd-x { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--chip); color: var(--ink); font-size: 18px; line-height: 1; cursor: pointer; }
@@ -483,7 +484,7 @@ button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: 
     </div>
   </section>
   <div id="cbdCards" class="cbd-cards"></div>
-  <p class="cbd-empty" id="cbdEmpty">Pick a product above to start a calculation. Searching again swaps the product.</p>
+  <p class="cbd-empty" id="cbdEmpty" hidden></p>
 </div>
 </div><!-- /shell -->
 
@@ -1399,7 +1400,10 @@ let cardSeq = 0;
 
 // One product at a time: picking another product replaces the card, keeping the collection date
 // (and the daily dose when switching oil to oil, or capsules/chews to capsules/chews).
-function addCard(c) {
+// Before a product is picked, an empty calculator is shown so staff can see what it does.
+const BLANK = { blank: true, kind: "oil", label: "No product selected yet", mg: null, ml: null };
+function addCard(c, quiet) {
+  c = c || BLANK;
   hideResults(); cbdSearch.value = "";
   const old = document.querySelector(".cbd-card");
   const keepDate = old ? old.querySelector(".coll").value : null;
@@ -1410,12 +1414,19 @@ function addCard(c) {
   const doseField = c.kind === "oil"
     ? `<div class="cbd-field edit"><label for="dose-${id}">Total daily dose (mL)</label><input id="dose-${id}" class="dose" type="number" inputmode="decimal" min="0" step="0.1" placeholder="e.g. 0.5"></div>`
     : `<div class="cbd-field edit"><label for="dose-${id}">Taken per day</label><input id="dose-${id}" class="dose" type="number" inputmode="decimal" min="0" step="0.5" placeholder="e.g. 2"></div>`;
-  const autos = c.kind === "oil"
+  const autos = c.blank
+    ? `<div class="cbd-field"><span class="lbl">Volume of bottle</span><span class="auto">–</span></div>
+       <div class="cbd-field"><span class="lbl">Concentration</span><span class="auto">–</span></div>`
+    : c.kind === "oil"
     ? `<div class="cbd-field"><span class="lbl">Volume of bottle</span><span class="auto">${c.ml}<small>mL</small></span></div>
        <div class="cbd-field"><span class="lbl">Concentration</span><span class="auto">${c.mg}<small>mg/mL</small></span></div>`
     : `<div class="cbd-field"><span class="lbl">Total count per pack</span><span class="auto">${c.count}</span></div>
        <div class="cbd-field"><span class="lbl">CBD in each</span><span class="auto">${c.mg}<small>mg</small></span></div>`;
-  const outs = c.kind === "oil"
+  const outs = c.blank
+    ? `<div class="cbd-field"><span class="lbl">Total mg in bottle</span><span class="auto o-total">–</span></div>
+       <div class="cbd-field"><span class="lbl">Daily dose in mg</span><span class="auto o-daily">–</span></div>
+       <div class="cbd-field"><span class="lbl">Days bottle will last</span><span class="auto o-days">–</span></div>`
+    : c.kind === "oil"
     ? `<div class="cbd-field"><span class="lbl">Total mg in bottle</span><span class="auto o-total">${(c.ml * c.mg).toLocaleString("en-AU")}<small>mg</small></span></div>
        <div class="cbd-field"><span class="lbl">Daily dose in mg</span><span class="auto o-daily">–</span></div>
        <div class="cbd-field"><span class="lbl">Days bottle will last</span><span class="auto o-days">–</span></div>`
@@ -1423,8 +1434,8 @@ function addCard(c) {
        <div class="cbd-field"><span class="lbl">Daily dose in mg</span><span class="auto o-daily">–</span></div>
        <div class="cbd-field"><span class="lbl">Days pack will last</span><span class="auto o-days">–</span></div>`;
   el.innerHTML = `
-    <div class="cbd-card-head"><div><h3>${esc(c.label)}</h3><span class="kind">${c.kind === "oil" ? "CBD oil" : "CBD capsules / chews"}</span></div>
-      <button type="button" class="cbd-x" aria-label="Remove ${esc(c.label)}">&times;</button></div>
+    <div class="cbd-card-head"><div><h3${c.blank ? ' class="muted-title"' : ""}>${esc(c.label)}</h3><span class="kind"${c.blank ? " hidden" : ""}>${c.kind === "oil" ? "CBD oil" : "CBD capsules / chews"}</span></div>
+      <button type="button" class="cbd-x" aria-label="Clear ${esc(c.label)}"${c.blank ? " hidden" : ""}>&times;</button></div>
     <div class="cbd-grid">${autos}${doseField}
       <div class="cbd-field edit"><label for="date-${id}">Collection date</label><div class="cal-wrap"><input id="date-${id}" class="coll" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" value="${fmtDate(today)}" autocomplete="off" aria-haspopup="dialog"><button type="button" class="cal-btn" aria-label="Open calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button></div></div></div>
     <div class="cbd-out">${outs}</div>
@@ -1436,10 +1447,10 @@ function addCard(c) {
   attachCalendar(el.querySelector(".coll"), () => calc(el));
   if (keepDose) el.querySelector(".dose").value = keepDose;
   el.querySelectorAll("input").forEach(i => i.addEventListener("input", () => calc(el)));
-  el.querySelector(".cbd-x").addEventListener("click", () => { el.remove(); document.getElementById("cbdEmpty").hidden = !!document.querySelector(".cbd-card"); });
+  el.querySelector(".cbd-x").addEventListener("click", () => addCard(null, true)); // back to the empty calculator
   el.querySelector(".copy-sum").addEventListener("click", e => copySummary(el, e.currentTarget));
   calc(el);
-  el.querySelector(".dose").focus();
+  if (!quiet && !c.blank) el.querySelector(".dose").focus();
 }
 
 
@@ -1488,6 +1499,7 @@ function calc(el) {
   const c = el._c, dose = num(el.querySelector(".dose").value), coll0 = parseDate(el.querySelector(".coll").value); // dd/mm/yyyy, the same reader as hold scripts
   const daily = el.querySelector(".o-daily"), days = el.querySelector(".o-days"), due = el.querySelector(".o-due"), copy = el.querySelector(".copy-sum");
   el._sum = "";
+  if (c.blank) { daily.innerHTML = days.innerHTML = "–"; due.textContent = "Search a product above"; copy.hidden = true; return; }
   if (!dose) { daily.innerHTML = days.innerHTML = "–"; due.textContent = "Enter the daily dose"; copy.hidden = true; return; }
   const dailyMg = c.mg * dose;                                   // concentration × daily dose (or mg each × count per day)
   const lasts = (c.kind === "oil" ? c.ml : c.count) / dose;      // volume ÷ daily dose (or count ÷ per day)
@@ -1502,6 +1514,7 @@ function calc(el) {
     : `${c.label}: ${nice(dose)} per day (${nice(dailyMg)} mg/day). Collected ${coll}, lasts ${nice(lasts)} days, next pack due ${fmtDate(d)}.`;
   copy.hidden = false;
 }
+addCard(null, true); // the empty calculator, until a product is searched
 function copySummary(el, btn) {
   const done = () => { btn.textContent = "Copied"; btn.classList.add("done"); setTimeout(() => { btn.textContent = "Copy summary"; btn.classList.remove("done"); }, 1600); };
   try { navigator.clipboard.writeText(el._sum).then(done, () => { btn.textContent = "Copy blocked"; }); } catch (e) { btn.textContent = "Copy blocked"; }
