@@ -1417,7 +1417,7 @@ const CBD_OILS = [
   ["Medcan FX200", 200], ["Medicabilis 200 CBD FS", 200], ["SatiOil CBD 200FS", 200], ["Solara 2:250:30 Femme CBD oil (50mL)", 250],
   ["Heyday CBD:CBDv OIL", 135], ["ANTG Elan CBD100", 100], ["ANTG Elan Oil (0% THC - isolated CBD)", 100], ["ANTG Eve #4 CBD oil (100mg/mL)", 100],
   ["ANTG Eve CBD oil (full spec)", 50], ["Alfie CBD100 complete 30mL( NOTE 5mg THC/mL)", 100], ["Medcan FX05", 100], ["C100 oral liquid", 100],
-  ["LGP CBD50 50mL", 50], ["Grandiosa Water Soluble CBD", 80]
+  ["LGP CBD50 50mL", 50]
 ];
 const CBD_PACKS = [
   ["Avani Advanced CBD25", 25, 60], ["Saticap CBD50 softgel (60 caps)", 50, 60], ["Cymra Aurelius DAY Pastilles C100 (60 chews)", 100, 60],
@@ -1425,6 +1425,9 @@ const CBD_PACKS = [
   ["Superseed CBD100 PASTILLES (60pack)", 100, 60], ["EclipX Mango Square Bears CBD50:CBG20:CBC3 (SATIVA)", 50, 60],
   ["EclipX Blueberry Square Bears CBD50:CBN20:CBG5 (INDICA)", 50, 60]
 ];
+// Pump bottles: [pricelist name, mg CBD per pump, pumps per bottle]. Grandiosa Water Soluble: 800mg in 10ml,
+// about 40 pumps (pricelist note), so about 20mg CBD per pump (0.25ml each).
+const CBD_PUMPS = [["Grandiosa Water Soluble CBD", 20, 40]];
 const CBD = [];
 for (const [n, mg] of CBD_OILS) {
   const p = PRODUCTS.find(x => x.name === n);
@@ -1433,6 +1436,10 @@ for (const [n, mg] of CBD_OILS) {
 for (const [n, mg, count] of CBD_PACKS) {
   const p = PRODUCTS.find(x => x.name === n && (x.type === "CAPS" || x.type === "PASTILLE"));
   if (p) CBD.push({ p, kind: "pack", mg, count, label: `${displayName(p)} ${p.type === "CAPS" ? "CAPS" : "PASTILLE"}` });
+}
+for (const [n, mg, count] of CBD_PUMPS) {
+  const p = PRODUCTS.find(x => x.name === n);
+  if (p) CBD.push({ p, kind: "pack", unit: "pump", mg, count, label: `${displayName(p)} ${p.size} PUMP` });
 }
 for (const c of CBD) c.toks = [...new Set([...tokens(c.label), ...c.p.all])];
 
@@ -1453,11 +1460,11 @@ function showResults() {
   const found = searchCbd(cbdSearch.value);
   cbdList = [...found.filter(c => c.kind === "oil"), ...found.filter(c => c.kind === "pack")];
   cbdActive = 0;
-  const item = (c, i) => `<li role="option" id="cbdopt-${i}" data-i="${i}" aria-selected="${i === 0}"><b>${esc(c.label)}</b><span>${c.kind === "oil" ? c.mg + " mg/mL" : c.mg + " mg each · " + c.count}</span></li>`;
+  const item = (c, i) => `<li role="option" id="cbdopt-${i}" data-i="${i}" aria-selected="${i === 0}"><b>${esc(c.label)}</b><span>${c.kind === "oil" ? c.mg + " mg/mL" : c.unit === "pump" ? "~" + c.mg + " mg per pump · " + c.count + " pumps" : c.mg + " mg each · " + c.count}</span></li>`;
   const oils = cbdList.filter(c => c.kind === "oil").length;
   cbdResults.innerHTML = cbdList.length
     ? (oils ? `<li class="grp" role="presentation">CBD oils</li>` : "") + cbdList.slice(0, oils).map((c, i) => item(c, i)).join("") +
-      (oils < cbdList.length ? `<li class="grp" role="presentation">CBD capsules &amp; chews</li>` : "") + cbdList.slice(oils).map((c, i) => item(c, oils + i)).join("")
+      cbdList.slice(oils).map((c, i) => (i === 0 || (c.unit === "pump") !== (cbdList[oils + i - 1].unit === "pump") ? `<li class="grp" role="presentation">${c.unit === "pump" ? "CBD pump sprays" : "CBD capsules &amp; chews"}</li>` : "") + item(c, oils + i)).join("")
     : `<li class="none">No CBD product matches "${esc(cbdSearch.value)}"</li>`;
   cbdResults.hidden = false; cbdSearch.setAttribute("aria-expanded", "true");
 }
@@ -1497,13 +1504,16 @@ function addCard(c, quiet) {
   el.className = "cbd-card"; el.dataset.id = id; el._c = c;
   const doseField = c.kind === "oil"
     ? `<div class="cbd-field edit"><label for="dose-${id}">Total daily dose (mL)</label><input id="dose-${id}" class="dose" type="number" inputmode="decimal" min="0" step="0.1" placeholder="e.g. 0.5"></div>`
-    : `<div class="cbd-field edit"><label for="dose-${id}">Taken per day</label><input id="dose-${id}" class="dose" type="number" inputmode="decimal" min="0" step="0.5" placeholder="e.g. 2"></div>`;
+    : `<div class="cbd-field edit"><label for="dose-${id}">${c.unit === "pump" ? "Pumps per day" : "Taken per day"}</label><input id="dose-${id}" class="dose" type="number" inputmode="decimal" min="0" step="0.5" placeholder="e.g. 2"></div>`;
   const autos = c.blank
     ? `<div class="cbd-field"><span class="lbl">Volume of bottle</span><span class="auto">–</span></div>
        <div class="cbd-field"><span class="lbl">Concentration</span><span class="auto">–</span></div>`
     : c.kind === "oil"
     ? `<div class="cbd-field"><span class="lbl">Volume of bottle</span><span class="auto">${c.ml}<small>mL</small></span></div>
        <div class="cbd-field"><span class="lbl">Concentration</span><span class="auto">${c.mg}<small>mg/mL</small></span></div>`
+    : c.unit === "pump"
+    ? `<div class="cbd-field"><span class="lbl">Pumps per bottle</span><span class="auto">~${c.count}</span></div>
+       <div class="cbd-field"><span class="lbl">CBD per pump</span><span class="auto">~${c.mg}<small>mg</small></span></div>`
     : `<div class="cbd-field"><span class="lbl">Total count per pack</span><span class="auto">${c.count}</span></div>
        <div class="cbd-field"><span class="lbl">CBD in each</span><span class="auto">${c.mg}<small>mg</small></span></div>`;
   const outs = c.blank
@@ -1514,16 +1524,16 @@ function addCard(c, quiet) {
     ? `<div class="cbd-field"><span class="lbl">Total mg in bottle</span><span class="auto o-total">${(c.ml * c.mg).toLocaleString("en-AU")}<small>mg</small></span></div>
        <div class="cbd-field"><span class="lbl">Daily dose in mg</span><span class="auto o-daily">–</span></div>
        <div class="cbd-field"><span class="lbl">Days bottle will last</span><span class="auto o-days">–</span></div>`
-    : `<div class="cbd-field"><span class="lbl">Total mg in pack</span><span class="auto o-total">${(c.count * c.mg).toLocaleString("en-AU")}<small>mg</small></span></div>
+    : `<div class="cbd-field"><span class="lbl">Total mg in ${c.unit === "pump" ? "bottle" : "pack"}</span><span class="auto o-total">${(c.count * c.mg).toLocaleString("en-AU")}<small>mg</small></span></div>
        <div class="cbd-field"><span class="lbl">Daily dose in mg</span><span class="auto o-daily">–</span></div>
-       <div class="cbd-field"><span class="lbl">Days pack will last</span><span class="auto o-days">–</span></div>`;
+       <div class="cbd-field"><span class="lbl">Days ${c.unit === "pump" ? "bottle" : "pack"} will last</span><span class="auto o-days">–</span></div>`;
   el.innerHTML = `
-    <div class="cbd-card-head"><div><h3${c.blank ? ' class="muted-title"' : ""}>${esc(c.label)}</h3><span class="kind"${c.blank ? " hidden" : ""}>${c.kind === "oil" ? "CBD oil" : "CBD capsules / chews"}</span></div>
+    <div class="cbd-card-head"><div><h3${c.blank ? ' class="muted-title"' : ""}>${esc(c.label)}</h3><span class="kind"${c.blank ? " hidden" : ""}>${c.kind === "oil" ? "CBD oil" : c.unit === "pump" ? "CBD pump spray" : "CBD capsules / chews"}</span></div>
       <button type="button" class="cbd-x" aria-label="Clear ${esc(c.label)}"${c.blank ? " hidden" : ""}>&times;</button></div>
     <div class="cbd-grid">${autos}${doseField}
       <div class="cbd-field edit"><label for="date-${id}">Collection date</label><div class="cal-wrap"><input id="date-${id}" class="coll" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" value="${fmtDate(today)}" autocomplete="off" aria-haspopup="dialog"><button type="button" class="cal-btn" aria-label="Open calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button></div></div></div>
     <div class="cbd-out">${outs}</div>
-    <div class="cbd-due"><div><div class="lbl">Next ${c.kind === "oil" ? "bottle" : "pack"} due date</div><div class="val o-due">Enter the daily dose</div></div>
+    <div class="cbd-due"><div><div class="lbl">Next ${c.kind === "oil" || c.unit === "pump" ? "bottle" : "pack"} due date</div><div class="val o-due">Enter the daily dose</div></div>
       <button type="button" class="copy-sum" hidden>Copy date</button></div>`;
   document.getElementById("cbdCards").prepend(el);
   document.getElementById("cbdEmpty").hidden = true;
