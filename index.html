@@ -15,13 +15,13 @@
 <style>
 /* Layout: one soft rounded app shell on a grey canvas; white cards with big radii, the message card in lime like a rewards tile. */
 :root {
-  --canvas: #D6D9D1;
-  --shell: #E4E7E0;
-  --card: #F3F4EF;
+  --canvas: #FAFBF8;
+  --shell: transparent;
+  --card: #FFFFFF;
   --ink: #111410;
   --muted: #747A70;
-  --line: #DCDFD7;
-  --chip: #E7E9E2;
+  --line: #E5E8E1;
+  --chip: #F4F6F1;
   --lime: #B6EA7B;
   --lime-deep: #A3DE5E;
   --lime-soft: #EEF9E1;
@@ -308,6 +308,55 @@ button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: 
 
 @media (prefers-reduced-motion: reduce) { .home-robot, .home-robot .eye { animation: none; } .glow { display: none; } }
 
+
+/* ---------- tool screens: the same clean look as the home screen ---------- */
+body::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(14, 15, 13, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(14, 15, 13, .05) 1px, transparent 1px);
+  background-size: 96px 96px; background-position: center center;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 25%, transparent 85%); mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 25%, transparent 85%); }
+.home-grid { background-image: none; }
+.shell { background: transparent; border-radius: 0; padding: 0; gap: 22px; }
+body:not(.on-home) { padding-inline: clamp(16px, 4vw, 40px); padding-block: 18px 40px; }
+.top { padding: 4px 0 6px; }
+.mark { width: 46px; height: 42px; }
+.mark svg { width: 46px; height: 42px; }
+.wordmark { font-family: "Inter Tight", var(--f-body); font-weight: 800; font-size: 24px; letter-spacing: -0.04em; }
+.sub { font-size: 13px; }
+.date-pill { background: transparent; border: 1px solid var(--line); box-shadow: none; }
+.date-pill.lime.credit { background: #0E0F0D; color: #FFFFFF; border-color: #0E0F0D; }
+.date-pill.lime.credit span { color: #FFFFFF; opacity: .7; }
+.credit svg path { stroke: #B6EA7B; }
+.credit svg path[fill] { fill: #B6EA7B; }
+.menu-btn { background: #FFFFFF; }
+.panel { background: #FFFFFF; border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 1px 2px rgba(14, 15, 13, .04), 0 12px 32px rgba(14, 15, 13, .04); }
+.panel-title { font-family: "Inter Tight", var(--f-body); font-weight: 700; font-size: 21px; letter-spacing: -0.03em; }
+.ico { background: var(--chip); border-color: var(--line); }
+.panel.lime { background: #FFFFFF; color: var(--ink); }
+.panel.lime .ico { background: var(--lime); border-color: var(--lime); color: var(--lime-ink); }
+.star { display: none; }
+.msg { background: var(--chip); border: 1px solid var(--line); }
+.copy { background: #0E0F0D; color: #FFFFFF; transition: transform .15s ease, box-shadow .2s ease; }
+.copy:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 0 6px rgba(182, 234, 123, .55), 0 14px 30px rgba(62, 142, 31, .22); opacity: 1; }
+.copy:disabled { background: #D8DBD4; color: #8A8E86; opacity: 1; }
+.copy-note { color: var(--muted); }
+.note-row { background: var(--chip); border: 1px solid var(--line); }
+.note-copy { background: #0E0F0D; color: #FFFFFF; }
+.ghost { background: #FFFFFF; border-color: var(--line); }
+.ghost:hover { border-color: #0E0F0D; }
+.count { background: var(--lime); }
+textarea#input, .paste-zone { background: #FFFFFF; }
+.sheet th { background: var(--chip); }
+.keep { background: #0E0F0D; border-color: #0E0F0D; color: #FFFFFF; }
+.keep.undo { background: #FFFFFF; color: var(--muted); border-color: var(--line); }
+.types button { background: #FFFFFF; }
+.row { border-bottom-color: var(--line); }
+.cbd-card { background: #FFFFFF; border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 1px 2px rgba(14, 15, 13, .04), 0 12px 32px rgba(14, 15, 13, .04); }
+.cbd-card-head h3 { font-family: "Inter Tight", var(--f-body); font-weight: 800; letter-spacing: -0.02em; font-size: 19px; }
+.cbd-field { background: var(--chip); }
+.cbd-field.edit { background: #F1F8E8; }
+.cbd-search input { background: #FFFFFF; }
+.cbd-due .copy-sum { background: #0E0F0D; color: #FFFFFF; }
+.how-btn { background: #FFFFFF; }
 </style>
 
 <div class="glow" aria-hidden="true"></div>
