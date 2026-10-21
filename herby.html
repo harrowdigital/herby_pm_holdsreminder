@@ -349,6 +349,28 @@ textarea#input, .paste-zone { background: #FFFFFF; }
 .cbd-search input { background: #FFFFFF; }
 .cbd-due .copy-sum { background: #0E0F0D; color: #FFFFFF; }
 .how-btn { background: #FFFFFF; }
+
+/* ---------- password box for Hold Scripts ---------- */
+dialog.lock { width: min(420px, calc(100vw - 32px)); border: 1px solid var(--line); border-radius: 26px; padding: 0; background: #FFFFFF; color: #0E0F0D;
+  box-shadow: 0 30px 80px rgba(14, 15, 13, .25); }
+dialog.lock::backdrop { background: rgba(250, 251, 248, .6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.lock-inner { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 30px 28px 26px; text-align: center; }
+.lock-ico { width: 54px; height: 54px; border-radius: 50%; background: var(--lime); color: var(--lime-ink); display: grid; place-items: center; }
+.lock-ico svg { width: 26px; height: 26px; }
+.lock-inner h2 { margin: 4px 0 0; font-family: "Inter Tight", var(--f-body); font-weight: 800; font-size: 24px; letter-spacing: -0.03em; }
+.lock-inner > p { margin: 0; color: #5B5F58; font-size: 14px; line-height: 1.5; }
+.lock-field { position: relative; width: 100%; margin-top: 6px; }
+.lock-field input { width: 100%; border: 1px solid var(--line); background: var(--chip); border-radius: 14px; padding: 13px 46px 13px 16px; font: inherit; font-size: 16px; font-weight: 600; color: #0E0F0D; }
+.lock-field input:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 4px var(--lime-soft); background: #FFFFFF; }
+.lock-field.bad input { border-color: var(--red); box-shadow: 0 0 0 4px var(--red-soft); }
+.lock-eye { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; display: grid; place-items: center; }
+.lock-eye:hover { color: #0E0F0D; background: var(--chip); }
+.lock-eye svg { width: 19px; height: 19px; }
+.lock-error { margin: 0; color: var(--red); font-size: 13.5px; font-weight: 600; }
+.lock-actions { display: flex; gap: 10px; width: 100%; margin-top: 6px; }
+.lock-actions .cta { flex: 1; padding: 12px 18px; }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.lock-field.bad { animation: shake .25s ease 2; }
 </style>
 
 <div class="glow" aria-hidden="true"></div>
@@ -420,6 +442,23 @@ textarea#input, .paste-zone { background: #FFFFFF; }
     <p class="home-foot" id="homeToday"></p>
   </div>
 </section>
+
+<dialog class="lock" id="lock" aria-labelledby="lockTitle">
+  <form method="dialog" id="lockForm" class="lock-inner">
+    <span class="lock-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+    <h2 id="lockTitle">Hold Scripts Reminder</h2>
+    <p>This tool is for the hold scripts team. Enter the password to continue.</p>
+    <div class="lock-field">
+      <input id="lockInput" type="password" autocomplete="off" placeholder="Password" aria-label="Password" aria-describedby="lockError">
+      <button type="button" class="lock-eye" id="lockEye" aria-label="Show password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
+    <p class="lock-error" id="lockError" role="alert" hidden>That password isn't right. Try again.</p>
+    <div class="lock-actions">
+      <button type="button" class="cta" id="lockCancel">Cancel</button>
+      <button type="submit" class="cta primary" id="lockOk">Unlock</button>
+    </div>
+  </form>
+</dialog>
 
 <div class="shell" id="shell" hidden>
 <header class="top">
@@ -1373,7 +1412,87 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) chec
 // ---------- screens: home menu, hold scripts, CBD calculator ----------
 const VIEWS = { hold: "viewHold", cbd: "viewCbd" };
 const TOOL_NAMES = { hold: "Hold scripts reminder", cbd: "CBD calculator" };
+// ---------- password for Hold Scripts ----------
+// Only a SHA-256 fingerprint of the password is stored here, never the password itself.
+const HOLD_PASS_HASH = "57991d0f84d501283b39a6754390a47253d356e31edf0d7eb7f3ab2201e7491e";
+const UNLOCK_KEY = "herbyHoldUnlocked";
+function holdUnlocked() {
+  try { if (sessionStorage.getItem(UNLOCK_KEY) === "1") return true; } catch (e) {}
+  return /(?:^|;\s*)herbyHoldUnlocked=1/.test(document.cookie || "");
+}
+function rememberUnlock() {
+  // A cookie with no end date lasts until the browser is closed (across tabs); sessionStorage covers this tab.
+  try { document.cookie = UNLOCK_KEY + "=1; path=/; SameSite=Lax"; } catch (e) {}
+  try { sessionStorage.setItem(UNLOCK_KEY, "1"); } catch (e) {}
+}
+async function sha256Hex(text) {
+  if (window.crypto && crypto.subtle) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+  return sha256Fallback(text);
+}
+// Small SHA-256 for browsers without crypto.subtle (e.g. a page opened from a file).
+function sha256Fallback(text) {
+  const K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,
+    0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,
+    0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,
+    0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  let h = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const bytes = Array.from(unescape(encodeURIComponent(text)), ch => ch.charCodeAt(0));
+  const bitLen = bytes.length * 8;
+  bytes.push(0x80);
+  while (bytes.length % 64 !== 56) bytes.push(0);
+  for (let i = 7; i >= 0; i--) bytes.push(i >= 4 ? 0 : (bitLen >>> (i * 8)) & 0xff);
+  const rot = (x, n) => (x >>> n) | (x << (32 - n));
+  for (let off = 0; off < bytes.length; off += 64) {
+    const w = new Array(64);
+    for (let i = 0; i < 16; i++) w[i] = (bytes[off + i * 4] << 24) | (bytes[off + i * 4 + 1] << 16) | (bytes[off + i * 4 + 2] << 8) | bytes[off + i * 4 + 3];
+    for (let i = 16; i < 64; i++) {
+      const s0 = rot(w[i - 15], 7) ^ rot(w[i - 15], 18) ^ (w[i - 15] >>> 3), s1 = rot(w[i - 2], 17) ^ rot(w[i - 2], 19) ^ (w[i - 2] >>> 10);
+      w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+    }
+    let [a, b, c, d, e, f, g, hh] = h;
+    for (let i = 0; i < 64; i++) {
+      const t1 = (hh + (rot(e, 6) ^ rot(e, 11) ^ rot(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0;
+      const t2 = ((rot(a, 2) ^ rot(a, 13) ^ rot(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      hh = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    h = [h[0] + a, h[1] + b, h[2] + c, h[3] + d, h[4] + e, h[5] + f, h[6] + g, h[7] + hh].map(x => x | 0);
+  }
+  return h.map(x => (x >>> 0).toString(16).padStart(8, "0")).join("");
+}
+const lock = document.getElementById("lock"), lockInput = document.getElementById("lockInput");
+function askPassword() {
+  lockInput.value = ""; lockInput.type = "password";
+  document.getElementById("lockError").hidden = true; lockInput.parentElement.classList.remove("bad");
+  try { lock.showModal(); } catch (e) { lock.setAttribute("open", ""); }
+  setTimeout(() => lockInput.focus(), 30);
+}
+document.getElementById("lockForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (await sha256Hex(lockInput.value) === HOLD_PASS_HASH) {
+    rememberUnlock(); lock.close(); go("hold");
+  } else {
+    const f = lockInput.parentElement; f.classList.remove("bad"); void f.offsetWidth; f.classList.add("bad");
+    document.getElementById("lockError").hidden = false; lockInput.select();
+  }
+});
+document.getElementById("lockCancel").addEventListener("click", () => lock.close());
+document.getElementById("lockEye").addEventListener("click", () => {
+  const show = lockInput.type === "password"; lockInput.type = show ? "text" : "password";
+  document.getElementById("lockEye").setAttribute("aria-label", show ? "Hide password" : "Show password"); lockInput.focus();
+});
+
 function go(view) {
+  if (view === "hold" && !holdUnlocked()) {
+    // Password first: stay on the current screen (home, or the CBD calculator) and ask.
+    if (location.hash === "#hold") history.replaceState(null, "", location.pathname + location.search);
+    askPassword();
+    return;
+  }
   const tool = VIEWS[view] ? view : "";
   document.getElementById("viewHome").hidden = !!tool;
   document.body.classList.toggle("on-home", !tool);
