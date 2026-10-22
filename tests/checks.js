@@ -84,3 +84,35 @@ overrides["avani 25 cbd"]={type:"PASTILLE"};console.log("AVANI2 picked PASTILLE 
 for(const t of ["Beacon GSC Flower","Beacon GSC","Beacon Girl Scout Cookies","Beacon GSC Cart","Beacon THC30 GSC Oil","Beacon GSC Oil"]){const r=run(t);console.log("GSC",r.status.padEnd(7),t.padEnd(28),"=>",r.out,"["+r.types+"]");}
 // FS200 = CBD200 FS.
 for(const t of ["kind fs200","KIND FS200 Oil","Medicabilis FS200","KIND CBD200 FS","SatiOil CBD 200FS","Entoura CBD200 Full Spectrum"]){const r=run(t);console.log("FS200",r.status.padEnd(7),t.padEnd(30),"=>",r.out);}
+console.log("---- CBD dose reader");
+{ let bad = 0;
+  const D = [ // [typed, kind, mg each, expected per day, expect Herby to ask?]
+    ["0.5","oil",200,0.5,false],["1","oil",200,1,false],["0.5ml","oil",200,0.5,false],["0.5ml TDS","oil",200,1.5,false],["0.5 mL t.d.s.","oil",200,1.5,false],
+    ["0.3ml mane + 0.6ml NOCTE","oil",200,0.9,false],["0.3ml mane and 0.6ml nocte","oil",200,0.9,false],["mane 0.3ml, nocte 0.6ml","oil",200,0.9,false],
+    ["0.5ml BD","oil",200,1,false],["0.5mL b.i.d.","oil",200,1,false],["1ml qid","oil",200,4,false],["1ml QDS","oil",200,4,false],
+    ["0.25ml mane, midi and nocte","oil",200,0.75,false],["0.25mL mane midi vesp nocte","oil",200,1,false],
+    ["0.5ml twice daily","oil",200,1,false],["0.5ml twice a day","oil",200,1,false],["0.5ml 2x daily","oil",200,1,false],["0.5ml x2 daily","oil",200,1,false],
+    ["0.5ml x 2","oil",200,1,false],["0.5mL 3 times a day","oil",200,1.5,false],["0.5ml three times daily","oil",200,1.5,false],
+    ["0.5ml 8 hourly","oil",200,1.5,false],["0.5ml q8h","oil",200,1.5,false],["1ml every 12 hours","oil",200,2,false],["0.5ml 4-6 hourly","oil",200,3,true],
+    ["0.5ml daily","oil",200,0.5,false],["0.5ml once daily","oil",200,0.5,false],["1ml nocte","oil",200,1,false],["1ml at night","oil",200,1,false],
+    ["1 ml in the morning","oil",200,1,false],["0.5ml morning and night","oil",200,1,false],["0.5ml mane & nocte","oil",200,1,false],["take 0.5ml sublingually bd","oil",200,1,false],
+    ["0.5ml bd with food","oil",200,1,false],["1ml bd hold under tongue for 60 seconds","oil",200,2,false],["0.5ml BD mane and nocte","oil",200,1,false],
+    ["50mg BD","oil",200,0.5,false],["1ml (200mg) bd","oil",200,2,false],["100mg nocte","oil",100,1,false],
+    ["0.5-1ml bd","oil",200,2,true],["0.5ml to 1ml nocte","oil",200,1,true],["0.5ml prn max 2ml/day","oil",200,2,false],["0.5ml PRN","oil",200,0.5,true],
+    ["1mL TDS PRN","oil",200,3,true],["0.5ml od","oil",200,0.5,true],["10 drops bd","oil",200,1,true],
+    ["0.25ml bd for 1 week then 0.5ml bd","oil",200,1,true],["1ml stat then 0.5ml bd","oil",200,1,false],["0.5ml mane ON","oil",200,1,true],
+    ["1/2 ml bd","oil",200,1,false],["½ml nocte","oil",200,0.5,false],["half a ml nocte","oil",200,0.5,false],["0.5ml tds blah","oil",200,1.5,true],
+    ["1ml weekly","oil",200,1/7,false],["0.5ml alt die","oil",200,0.25,false],["0.5ml tds mane nocte","oil",200,1.5,true],["0.5ml as directed","oil",200,0.5,true],
+    ["0,5ml bd","oil",200,1,false],["0.5ML MANE + 1ML NOCTE","oil",200,1.5,false],["1ml on waking","oil",200,1,false],
+    ["1 cap bd","pack",50,2,false],["2 chews nocte","pack",50,2,false],["100mg daily","pack",50,2,false],["1 tds","pack",50,3,false],["1","pack",50,1,false],
+    ["1 capsule mane, 2 capsules nocte","pack",25,3,false],["1-2 caps nocte","pack",50,2,true],
+    ["2 pumps bd","pump",20,4,false],["40mg daily","pump",20,2,false],["1 spray tds","pump",20,3,false],
+    ["0.5ml bd","",null,1,false],["50mg bd","",null,null,true],["hello","oil",200,null,true],
+  ];
+  for (const [t, k, mg, want, ask] of D) {
+    const r = readDose(t, k || null, mg), got = r && r.perDay, asked = !!(r && r.asks.length);
+    const ok = (want == null ? got == null : got != null && Math.abs(got - want) < 1e-6) && asked === ask;
+    if (!ok) { bad++; console.log(" x", JSON.stringify(t), "=>", got, asked ? "ASKS" : "sure", r && r.how, r && r.asks.join(" | ")); }
+  }
+  console.log("dose cases", D.length, "failures", bad);
+}

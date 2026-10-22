@@ -267,6 +267,21 @@ button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: 
 .cbd-field input { width: 100%; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 10px; font-size: 17px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .cbd-field input:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 3px var(--lime-soft); }
 .cbd-field.edit { background: var(--lime-soft); }
+.cbd-field.wide { grid-column: 1 / -1; }
+.cbd-field .hint { font-weight: 600; color: #8A8E86; margin-left: 4px; }
+.cbd-field input.dose { font-weight: 600; }
+.cbd-field input.dose::placeholder { font-weight: 500; color: #9A9E96; font-size: 15px; }
+.dose-read { margin-top: 10px; border-radius: 16px; padding: 12px 14px; font-size: 14.5px; line-height: 1.45; }
+.dose-read p { margin: 0; }
+.dose-read.ok { background: #F3FBEA; border: 1px solid #D6EFBC; color: var(--lime-ink); }
+.dose-read.ask { background: var(--orange-soft); border: 1px solid var(--orange-line); color: #4A2A12; }
+.dose-read ul { margin: 8px 0 0; padding-left: 18px; }
+.dose-read li { margin: 3px 0; }
+.dose-read .dr-guess { font-weight: 700; }
+.dose-read .dr-note { margin-top: 6px; font-size: 13px; opacity: .8; }
+.dr-btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.dr-btns button { border: 1px solid #0E0F0D; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; background: #FFFFFF; color: #0E0F0D; }
+.dr-btns .dr-yes { background: #0E0F0D; color: #FFFFFF; }
 .cbd-out { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .cbd-out .cbd-field { background: transparent; border: 1px solid var(--line); }
 .cbd-due { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 16px 18px; border-radius: 18px; background: var(--lime); color: var(--lime-ink); }
@@ -1497,6 +1512,193 @@ function checkNewDay() {
 }
 setInterval(checkNewDay, 30000);
 document.addEventListener("visibilitychange", () => { if (!document.hidden) checkNewDay(); });
+// ---------- CBD dose reader: a dose as staff type it, or as the script writes it ----------
+// "0.5" (the total for the day), "0.5mL TDS", "0.3mL mane + 0.6mL nocte", "50mg BD", "1 cap nocte", "0.5mL PRN max 2mL/day".
+// Terms follow the Australian Commission on Safety and Quality in Health Care list (mane, midi, vesp, nocte, daily,
+// bd, tds, qid, prn, stat, n-hourly). Anything Herby is not sure of comes back in `asks` with its best guess.
+const DOSE_N = String.raw`(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.\d+|\d+)`;
+const DOSE_UNIT = String.raw`(ml|mls|millilit(?:re|er)s?|cc|mgs?|milligrams?|drops?|gtts?|caps?|capsules?|soft\s*gels?|gel\s*caps?|chews?|pastilles?|gumm(?:y|ies)|tabs?|tablets?|lozenges?|pieces?|pcs?|bears?|lolly|lollies|sweets?|pumps?|sprays?|squirts?|puffs?|actuations?|doses?)`;
+const doseNum = t => { t = String(t).trim(); let m;
+  if ((m = t.match(/^(\d+)\s+(\d+)\/(\d+)$/))) return +m[1] + m[2] / m[3];
+  if ((m = t.match(/^(\d+)\/(\d+)$/))) return m[1] / m[2];
+  return parseFloat(t); };
+const doseCount = w => ({ once: 1, twice: 2, thrice: 3 })[w] || doseNum(w);
+const doseUnit = u => !u ? "" : /^(ml|mls|milli|cc)/.test(u) ? "ml" : /^(mg|milligram)/.test(u) ? "mg" : /^(drop|gtt)/.test(u) ? "drop"
+  : /^(pump|spray|squirt|puff|actuation)/.test(u) ? "pump" : /^dose/.test(u) ? "dose" : "pc";
+const doseFmt = x => String(+(+x).toFixed(3));
+const timesWord = n => n === 1 ? "once a day" : n === 2 ? "twice a day" : n < 1 ? (n === 0.5 ? "every other day" : doseFmt(n * 7) + "× a week") : doseFmt(n) + " times a day";
+const dF = (n, label, extra) => Object.assign({ t: "freq", n, label }, extra || {});
+const dS = (k, label, extra) => Object.assign({ t: "slot", k, label }, extra || {});
+const DN = DOSE_N, DCNT = String.raw`(once|twice|thrice|${DOSE_N})`;
+const DOSE_RULES = [
+  [String.raw`(?:hold\s+)?(?:for\s+)?\d+\s*(?:s|secs?|seconds?|mins?|minutes?)\b`, () => ({ t: "skip" })],
+  [String.raw`for\s+(?:\d+|a|an)\s*(?:days?|weeks?|wks?|months?)\b`, m => ({ t: "change" })],
+  [String.raw`(?:(?:q|every|each)\s*)?${DN}\s*(?:-|to)\s*${DN}\s*(?:h|hrs?|hours?|hourly|hrly)\b`,
+    m => dF(24 / Math.min(doseNum(m[1]), doseNum(m[2])), `every ${m[1]}–${m[2]} hours`, { range: true })],
+  [String.raw`(?:(?:q|every|each)\s*${DN}\s*(?:h|hrs?|hours?|hourly|hrly)|${DN}\s*-?\s*(?:hourly|hrly))\b`,
+    m => { const h = doseNum(m[1] || m[2]); return dF(24 / h, `every ${doseFmt(h)} hours`); }],
+  [String.raw`${DCNT}\s*(?:x|times?)\s*(?:a|per|each|every|\/)\s*(?:week|wk)\b`, m => dF(doseCount(m[1]) / 7, `${m[1]}× a week`)],
+  [String.raw`(?:once\s+)?(?:weekly|(?:a|per|every|each|\/)\s*week)\b`, () => dF(1 / 7, "weekly")],
+  [String.raw`(?:alt(?:ernate)?\s*(?:die|days?)|every\s+(?:other|second|2nd)\s+day|eod)\b`, () => dF(0.5, "every other day")],
+  [String.raw`qod\b`, () => dF(0.5, "QOD", { ep: `"QOD" is easy to misread, so it's not on the Australian list of safe abbreviations. Herby read it as every other day.` })],
+  [String.raw`${DCNT}\s*(?:x|times?)\s*(?:(?:a|per|each|every|\/|in\s+the|in\s+a)\s*)?(?:day|daily|d|24\s*(?:h|hrs?|hours?))\b`, m => dF(doseCount(m[1]), timesWord(doseCount(m[1])))],
+  [String.raw`(once|twice|thrice)\b`, m => dF(doseCount(m[1]), timesWord(doseCount(m[1])))],
+  [String.raw`x\s*${DN}\b(?:\s*(?:a|per|\/)?\s*(?:day|daily)\b)?`, m => dF(doseNum(m[1]), timesWord(doseNum(m[1])))],
+  [String.raw`${DN}\s*(?:x|times)\b`, m => dF(doseNum(m[1]), timesWord(doseNum(m[1])))],
+  [String.raw`(?:bd|bid|bds)\b`, () => dF(2, "BD")],
+  [String.raw`(?:tds|tid)\b`, () => dF(3, "TDS")],
+  [String.raw`(?:qid|qds)\b`, () => dF(4, "QID")],
+  [String.raw`(?:daily|dly|every\s+day|each\s+day|(?:a|per|\/)\s*day|\/\s*d\b|(?:in|per|\/|every)\s*24\s*(?:h|hrs?|hours?))\b`, () => dF(1, "daily", { perday: true })],
+  [String.raw`(?:od|qd)\b`, m => dF(1, m[0].toUpperCase(), { perday: true, ep: `"${m[0].toUpperCase()}" is easy to misread, so it's not on the Australian list of safe abbreviations. Herby read it as once a day.` })],
+  [String.raw`om\b`, () => dS("m", "OM", { ep: `"OM" is easy to misread. Herby read it as in the morning (mane).` })],
+  [String.raw`qam\b`, () => dS("m", "mane")],
+  [String.raw`qpm\b`, () => dS("e", "vesp")],
+  [String.raw`(?:hs|qhs)\b`, m => dS("n", m[0].toUpperCase(), { ep: `"${m[0].toUpperCase()}" is easy to misread, so it's not on the Australian list of safe abbreviations. Herby read it as at night (nocte).` })],
+  [String.raw`zon\b`, () => dS("n", "ON", { ep: `"ON" is easy to misread. Herby read it as at night (nocte).` })],
+  [String.raw`(?:mane|morning|morn|am|breakfast|brekky|on\s+waking|waking|wake\s+up)\b`, () => dS("m", "mane")],
+  [String.raw`(?:midi|midday|mid\s+day|noon|lunch(?:time)?)\b`, () => dS("d", "midi")],
+  [String.raw`(?:vesp(?:ere|er)?|evening|eve|afternoon|arvo|dinner(?:time)?|tea(?:time)?|pm|supper)\b`, () => dS("e", "vesp")],
+  [String.raw`(?:nocte|noct|night(?:ly|time)?|bed(?:time)?|before\s+sleep)\b`, () => dS("n", "nocte")],
+  [String.raw`(?:prn|as\s+(?:needed|required)|when\s+(?:needed|required)|if\s+(?:needed|required))\b`, () => ({ t: "prn" })],
+  [String.raw`(?:max(?:imum)?|do\s+not\s+exceed|not\s+(?:to\s+)?exceed|no\s+more\s+than|not\s+more\s+than)\b`, () => ({ t: "max" })],
+  [String.raw`up\s+to\b`, () => ({ t: "upto" })],
+  [String.raw`stat\b`, () => ({ t: "stat" })],
+  [String.raw`(?:as\s+directed|ud|mdu|as\s+per\s+(?:dr|doctor)|as\s+advised)\b`, () => ({ t: "asdir" })],
+  [String.raw`(?:then|titrate|titrating|increase|increasing|decrease|decreasing|reduce|reducing|wean|weaning|taper|tapering|thereafter|until)\b`, () => ({ t: "change" })],
+  [String.raw`${DN}(?:\s*(?:-|–|to|or)\s*${DN})?(?:\s*${DOSE_UNIT}\b)?`, m => ({ t: "amt", v: doseNum(m[1]), v2: m[2] ? doseNum(m[2]) : null, unit: doseUnit(m[3]) })],
+  [String.raw`${DOSE_UNIT}\b`, m => ({ t: "unit", unit: doseUnit(m[1]) })],
+  [String.raw`(?:-|–|to|or)(?=\s|\d)`, () => ({ t: "range" })],
+  [String.raw`(?:take|takes|taken|use|give|apply|place|put|administer|squirt|drop|of|the|a|an|at|in|on|under|tongue|sublingual(?:ly)?|sl|po|orally|oral|by|mouth|with|without|food|meals?|after|before|dose|doses|each|per|to|hold|swallow|and|plus|or|into|cheek|buccal|times?|day|days|sleep|oil|cbd|please|pt|patient|then|is|for|every)\b`, () => ({ t: "skip" })],
+  [String.raw`[a-z]+`, m => ({ t: "unknown" })],
+].map(([src, fn]) => [new RegExp(src, "y"), fn]);
+
+function doseTokens(text) {
+  let s = " " + String(text).replace(/\bO\.?N\.?(?![A-Za-z])(?!\s*(?:WAKING|waking|RISING|rising))/g, " zon ").toLowerCase() + " ";
+  s = s.replace(/½/g, " 1/2").replace(/¼/g, " 1/4").replace(/¾/g, " 3/4").replace(/(\d),(\d)/g, "$1.$2")
+    .replace(/([a-z])\.(?=[a-z\s,;)]|$)/g, "$1").replace(/&/g, " and ").replace(/\+/g, " plus ")
+    .replace(/\b(one|two|three|four|five|six|half|quarter)\b/g, w => " " + { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, half: 0.5, quarter: 0.25 }[w] + " ")
+    .replace(/(\d)([a-z])/g, "$1 $2").replace(/([a-z])(\d)/g, "$1 $2");
+  const toks = [], gap = /[\s,;:()=!?"'*.]+/y;
+  for (let i = 0; i < s.length;) {
+    gap.lastIndex = i; if (gap.exec(s)) { i = gap.lastIndex; continue; }
+    let hit = false;
+    for (const [re, fn] of DOSE_RULES) {
+      re.lastIndex = i; const m = re.exec(s);
+      if (m && m[0].length) { const t = fn(m); t.raw = m[0].trim(); if (t.t !== "skip") toks.push(t); i = re.lastIndex; hit = true; break; }
+    }
+    if (!hit) i++;
+  }
+  return toks;
+}
+
+// kind: "oil" (answers in mL), "pack" (capsules/chews), "pump", or null when no product is picked (mL).
+// mgEach: mg CBD per mL (oil), per piece (pack) or per pump.
+// Returns { perDay, how, asks: [...], notes: [...] }; perDay is in the product's own unit.
+function readDose(text, kind, mgEach) {
+  if (!text || !String(text).trim()) return null;
+  const toks = doseTokens(text), asks = [], notes = [];
+  const unitName = n => kind === "pump" ? (n === 1 ? "pump" : "pumps") : kind === "pack" ? (n === 1 ? "cap/chew" : "caps/chews") : "mL";
+  const groups = []; let cur = null, mode = null, pending = [], prev = null, inMax = false, maxAmt = null, prn = false, stat = false, upto = false, cutAt = 0, changed = false;
+  for (const t of toks) {
+    if (t.t === "unknown") asks.push(`Herby didn't recognise "${t.raw}". Check the reading below is what the script means.`);
+    if (t.ep) asks.push(t.ep);
+    if (t.t === "unit") { const g = inMax && maxAmt ? maxAmt : cur && cur.amt; if (g && !g.unit) g.unit = t.unit; }
+    else if (t.t === "max") inMax = true;
+    else if (t.t === "prn") prn = true;
+    else if (t.t === "upto") upto = true;
+    else if (t.t === "asdir") asks.push(`"As directed" has no set amount. Make sure the amount below is what the patient takes each day.`);
+    else if (t.t === "stat") { if (cur && !cur.freqs.length && mode === "amt") cur.stat = true; else stat = true; }
+    else if (t.t === "change") { if (!(prev && prev.t === "stat")) { changed = true; cutAt = groups.length; } } // "1mL stat then ..." is not a change
+    else if (t.t === "amt") {
+      if (inMax && !maxAmt) { maxAmt = Object.assign({}, t); }
+      else if (prev && prev.t === "range" && cur && !cur.freqs.length && cur.amt.v2 == null) { cur.amt.v2 = t.v; cur.amt.unit = cur.amt.unit || t.unit; cur.amt.raw += " to " + t.raw; }
+      else if (cur && !cur.freqs.length && mode === "amt" && same(cur.amt, t)) { notes.push(`${t.raw} matches ${cur.amt.raw}.`); }
+      else {
+        inMax = false; mode = mode || "amt";
+        cur = { amt: t, freqs: mode === "freq" ? pending : [], stat }; stat = false; pending = [];
+        groups.push(cur);
+      }
+    }
+    else if (t.t === "freq" || t.t === "slot") {
+      if (inMax && maxAmt) { maxAmt.per = t; inMax = false; }
+      else { mode = mode || "freq"; if (mode === "freq" || !cur) pending.push(t); else cur.freqs.push(t); }
+    }
+    prev = t;
+  }
+  if (pending.length) { if (groups.length) groups[groups.length - 1].freqs.push(...pending); }
+  if (!groups.length) return { perDay: null, how: "", asks: [...new Set(asks.concat(["Herby couldn't find an amount. Type it like 0.5 or 0.5mL TDS."]))], notes };
+
+  // amounts are written the same way twice, e.g. "1mL (200mg)"
+  function same(a, b) {
+    if (!a.unit || !b.unit || a.unit === b.unit || a.v2 != null || b.v2 != null) return false;
+    const x = toUnit(a, true), y = toUnit(b, true);
+    return x != null && y != null && Math.abs(x - y) <= 0.02 * Math.max(x, y);
+  }
+  // one amount into the product's own unit (mL, caps/chews or pumps)
+  function toUnit(a, quiet, high) {
+    const v = high && a.v2 != null ? a.v2 : a.v, u = a.unit;
+    if (!u || u === "dose") return v;
+    if (u === "mg") {
+      if (!mgEach) { if (!quiet) asks.push(`Pick the product first, so Herby can turn mg into ${kind === "pack" ? "caps/chews" : kind === "pump" ? "pumps" : "mL"}.`); return null; }
+      return v / mgEach;
+    }
+    if (kind === "pack") { if (u !== "pc" && !quiet) asks.push(`${a.raw} isn't a capsule or chew amount. Herby read it as ${doseFmt(v)} each time.`); return v; }
+    if (kind === "pump") {
+      if (u === "pump") return v;
+      if (u === "ml") { if (!quiet) asks.push(`This is a pump spray. Herby took ${a.raw} as ${doseFmt(v * 4)} pumps (about 0.25 mL a pump).`); return v * 4; }
+      if (!quiet) asks.push(`This is a pump spray. Herby read ${a.raw} as ${doseFmt(v)} pumps.`); return v;
+    }
+    if (u === "ml") return v;
+    if (u === "drop") { if (!quiet) asks.push(`Drops vary by dropper. Herby used 20 drops = 1 mL, so ${a.raw} = ${doseFmt(v * 0.05)} mL.`); return v * 0.05; }
+    if (!quiet) asks.push(`This is an oil. Herby read ${a.raw} as ${doseFmt(v)} mL.`);
+    return v;
+  }
+  function timesOf(g) {
+    const slots = new Set(g.freqs.filter(f => f.t === "slot").map(f => f.k));
+    const counts = g.freqs.filter(f => f.t === "freq"), real = counts.filter(f => !f.perday);
+    for (const f of counts) if (f.range) asks.push(`"${f.label}" is a range. Herby used the more often one (${timesWord(f.n)}) so the next bottle date isn't late.`);
+    const ns = [...new Set(real.map(f => f.n))];
+    if (ns.length > 1) asks.push(`${real.map(f => f.label).join(" and ")} don't agree. Herby used the larger (${timesWord(Math.max(...ns))}).`);
+    const n = ns.length ? Math.max(...ns) : counts.length ? 1 : 0;
+    if (n && n < 1) return n * Math.max(1, slots.size);
+    if (slots.size && n > 1 && slots.size !== n) asks.push(`${real.map(f => f.label).join(" ")} is ${timesWord(n)}, but only ${[...slots].map(k => ({ m: "mane", d: "midi", e: "vesp", n: "nocte" })[k]).join(" and ")} ${slots.size > 1 ? "are" : "is"} written. Herby used ${timesWord(Math.max(n, slots.size))}.`);
+    return Math.max(n, slots.size) || null;
+  }
+
+  const use = groups.slice(changed && cutAt < groups.length ? cutAt : 0).filter(g => !g.stat);
+  if (changed) asks.push(`The dose changes over time. Herby used the ${use.length > 1 ? "doses" : "dose"} written last.`);
+  if (groups.some(g => g.stat)) notes.push("The STAT (one-off) dose isn't counted in the daily amount.");
+  if (!use.length) return { perDay: null, how: "", asks: [...new Set(asks.concat(["Only a one-off (STAT) dose is written. Enter the daily dose."]))], notes };
+  let total = 0; const parts = [];
+  for (const g of use) {
+    const a = g.amt;
+    if (a.v2 != null) asks.push(`"${a.raw}" is a range. Herby used the higher amount so the next bottle date isn't late.`);
+    const each = toUnit(a, false, true);
+    if (each == null) return { perDay: null, how: "", asks: [...new Set(asks)], notes };
+    let n = timesOf(g);
+    if (!n && use.length > 1) { asks.push(`No time is written for ${a.raw}. Herby counted it once a day.`); n = 1; }
+    const amtText = (a.unit === "mg" ? `${doseFmt(a.v2 != null ? a.v2 : a.v)} mg (${doseFmt(each)} ${unitName(each)})` : `${doseFmt(each)} ${unitName(each)}`);
+    if (!n) { parts.push(amtText); total += each; continue; }
+    const lab = g.freqs.map(f => f.label).filter((x, i, l) => l.indexOf(x) === i).join(" & ");
+    parts.push(`${amtText} ${lab}`);
+    total += each * n;
+  }
+  let perDay = total;
+  let how = parts.length === 1 && !use[0].freqs.length ? `${parts[0]} a day` : parts.join(" + ") + ` = ${doseFmt(total)} ${unitName(total)} a day`;
+  if (upto) notes.push(`"Up to": Herby used the full amount.`);
+  if (prn) {
+    if (maxAmt) {
+      let m = maxAmt.unit === "dose" ? null : toUnit(maxAmt, false);
+      if (maxAmt.unit === "dose" || (!maxAmt.unit && use.length === 1 && use[0].amt.unit && maxAmt.v >= 2 && Number.isInteger(maxAmt.v) && kind !== "pack" && kind !== "pump")) {
+        const one = toUnit(use[0].amt, true, true); m = one * maxAmt.v;
+        if (maxAmt.unit !== "dose") asks.push(`Herby read "max ${maxAmt.raw}" as ${doseFmt(maxAmt.v)} doses a day.`);
+      }
+      if (maxAmt.per && maxAmt.per.n !== 1) asks.push(`Check the maximum: Herby read it as per day.`);
+      if (m != null) { perDay = m; how = `PRN (as needed), max ${doseFmt(m)} ${unitName(m)} a day`; notes.push("PRN: Herby used the daily maximum, so the next bottle date isn't late."); }
+    } else asks.push(`PRN (as needed) with no daily maximum. Herby counted ${how.replace(/ = .*| a day$/, "")} every day.`);
+  } else if (maxAmt) notes.push(`A maximum is written; Herby used the regular dose.`);
+  return { perDay: perDay > 0 ? perDay : null, how, asks: [...new Set(asks)], notes };
+}
 </script>
 <script>
 // ---------- screens: home menu, hold scripts, CBD calculator ----------
@@ -1736,13 +1938,12 @@ function addCard(c, quiet) {
   hideResults(); cbdSearch.value = "";
   const old = document.querySelector(".cbd-card");
   const keepDate = old ? old.querySelector(".coll").value : null;
-  const keepDose = old && old._c.kind === c.kind ? old.querySelector(".dose").value : "";
+  const keepDose = old && old._c.kind === c.kind && old._c.unit === c.unit ? old.querySelector(".dose").value : "";
   if (old) old.remove();
   const id = ++cardSeq, el = document.createElement("article");
   el.className = "cbd-card"; el.dataset.id = id; el._c = c;
-  const doseField = c.kind === "oil"
-    ? `<div class="cbd-field edit"><label for="dose-${id}">Total daily dose (mL)</label><input id="dose-${id}" class="dose" type="number" inputmode="decimal" min="0" step="0.1" placeholder="e.g. 0.5"></div>`
-    : `<div class="cbd-field edit"><label for="dose-${id}">${c.unit === "pump" ? "Pumps per day" : "Taken per day"}</label><input id="dose-${id}" class="dose" type="number" inputmode="decimal" min="0" step="0.5" placeholder="e.g. 2"></div>`;
+  const doseEg = c.kind === "oil" ? "e.g. 0.5  ·  0.5mL TDS  ·  0.3mL mane + 0.6mL nocte" : c.unit === "pump" ? "e.g. 2  ·  1 pump BD  ·  2 pumps nocte" : "e.g. 2  ·  1 cap BD  ·  1 mane + 2 nocte";
+  const doseField = `<div class="cbd-field edit wide"><label for="dose-${id}">Dose <span class="hint">type the daily amount, or the dose as written on the script</span></label><input id="dose-${id}" class="dose" type="text" autocomplete="off" spellcheck="false" placeholder="${doseEg}"></div>`;
   const autos = c.blank
     ? `<div class="cbd-field"><span class="lbl">Volume of bottle</span><span class="auto">–</span></div>
        <div class="cbd-field"><span class="lbl">Concentration</span><span class="auto">–</span></div>`
@@ -1769,7 +1970,8 @@ function addCard(c, quiet) {
     <div class="cbd-card-head"><div><h3${c.blank ? ' class="muted-title"' : ""}>${esc(c.label)}</h3><span class="kind"${c.blank ? " hidden" : ""}>${c.kind === "oil" ? "CBD oil" : c.unit === "pump" ? "CBD pump spray" : "CBD capsules / chews"}</span></div>
       <button type="button" class="cbd-x" aria-label="Clear ${esc(c.label)}"${c.blank ? " hidden" : ""}>&times;</button></div>
     <div class="cbd-grid">${autos}${doseField}
-      <div class="cbd-field edit"><label for="date-${id}">Collection date</label><div class="cal-wrap"><input id="date-${id}" class="coll" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" value="${fmtDate(today)}" autocomplete="off" aria-haspopup="dialog"><button type="button" class="cal-btn" aria-label="Open calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button></div></div></div>
+      <div class="cbd-field edit wide"><label for="date-${id}">Collection date</label><div class="cal-wrap"><input id="date-${id}" class="coll" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" value="${fmtDate(today)}" autocomplete="off" aria-haspopup="dialog"><button type="button" class="cal-btn" aria-label="Open calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button></div></div></div>
+    <div class="dose-read" aria-live="polite" hidden></div>
     <div class="cbd-out">${outs}</div>
     <div class="cbd-due"><div><div class="lbl">Next ${c.kind === "oil" || c.unit === "pump" ? "bottle" : "pack"} due date</div><div class="val o-due">Enter the daily dose</div></div>
       <button type="button" class="copy-sum" hidden>Copy date</button></div>`;
@@ -1826,13 +2028,37 @@ function attachCalendar(input, onPick) {
   input.addEventListener("keydown", e => { if (e.key === "Escape") close(); if (e.key === "ArrowDown" && e.altKey) open(); });
   input.addEventListener("input", () => { if (cal) { const d = parseDate(input.value); if (d) { view = new Date(d.getFullYear(), d.getMonth(), 1); draw(); } } });
 }
+// Under the dose box: how Herby read it, or its best guess with Yes / No when it isn't sure.
+function showReading(el, r, text, sure) {
+  const box = el.querySelector(".dose-read");
+  if (!text || (sure && /^\d*\.?\d+$/.test(text))) { box.hidden = true; box.innerHTML = ""; return; } // a plain number needs no explaining
+  box.hidden = false;
+  const notes = r && r.notes.length ? `<p class="dr-note">${r.notes.map(esc).join(" ")}</p>` : "";
+  if (sure) {
+    box.className = "dose-read ok";
+    box.innerHTML = `<p><b>${el._okText === text && r.asks.length ? "Confirmed" : "Herby read this as"}:</b> ${esc(r.how)}</p>${notes}`;
+    return;
+  }
+  box.className = "dose-read ask";
+  if (!r || !r.perDay) { box.innerHTML = `<p><b>Herby can't work this dose out.</b></p><ul>${(r ? r.asks : []).map(a => `<li>${esc(a)}</li>`).join("")}</ul><p class="dr-note">Try the daily amount (e.g. 1) or a dose like 0.5mL BD.</p>`; return; }
+  box.innerHTML = `<p><b>Is this right?</b> Herby's best guess: <span class="dr-guess">${esc(r.how)}</span></p>
+    <ul>${r.asks.map(a => `<li>${esc(a)}</li>`).join("")}</ul>${notes}
+    <div class="dr-btns"><button type="button" class="dr-yes">Yes, use this</button><button type="button" class="dr-no">No, I'll fix it</button></div>`;
+  box.querySelector(".dr-yes").addEventListener("click", () => { el._okText = text; calc(el); });
+  box.querySelector(".dr-no").addEventListener("click", () => { const i = el.querySelector(".dose"); i.focus(); i.select(); });
+}
 // The same formulas as the QUICK CBD CALCULATION sheet.
 function calc(el) {
-  const c = el._c, dose = num(el.querySelector(".dose").value), coll0 = parseDate(el.querySelector(".coll").value); // dd/mm/yyyy, the same reader as hold scripts
+  const c = el._c, coll0 = parseDate(el.querySelector(".coll").value); // dd/mm/yyyy, the same reader as hold scripts
   const daily = el.querySelector(".o-daily"), days = el.querySelector(".o-days"), due = el.querySelector(".o-due"), copy = el.querySelector(".copy-sum");
+  const text = el.querySelector(".dose").value.trim();
+  const r = readDose(text, c.blank ? null : c.kind === "oil" ? "oil" : c.unit === "pump" ? "pump" : "pack", c.blank ? null : c.mg);
+  const sure = !!(r && r.perDay && (!r.asks.length || el._okText === text));
+  showReading(el, r, text, sure);
+  const dose = sure ? r.perDay : null;
   el._sum = "";
   if (c.blank) { daily.innerHTML = days.innerHTML = "–"; due.textContent = "Search a product above"; copy.hidden = true; return; }
-  if (!dose) { daily.innerHTML = days.innerHTML = "–"; due.textContent = "Enter the daily dose"; copy.hidden = true; return; }
+  if (!dose) { daily.innerHTML = days.innerHTML = "–"; due.textContent = !text ? "Enter the daily dose" : r && r.perDay ? "Confirm the dose above" : "Check the dose"; copy.hidden = true; return; }
   const dailyMg = c.mg * dose;                                   // concentration × daily dose (or mg each × count per day)
   const lasts = (c.kind === "oil" ? c.ml : c.count) / dose;      // volume ÷ daily dose (or count ÷ per day)
   daily.innerHTML = `${nice(dailyMg)}<small>mg</small>`;
