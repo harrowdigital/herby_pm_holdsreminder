@@ -212,7 +212,7 @@ body.on-home { background: #FAFBF8; padding: 0; }
 .home-links button:hover { background: rgba(182, 234, 123, .35); color: #0E0F0D; }
 .home-pill { background: #0E0F0D; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 9px 16px; border-radius: 999px; white-space: nowrap; }
 .home-inner { flex: 1; width: min(980px, 100%); margin: 0 auto; padding: 4vh 20px 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; text-align: center; }
-.home-robot { width: min(150px, 34vw); filter: drop-shadow(0 16px 20px rgba(14, 15, 13, .12)); animation: float 4.5s ease-in-out infinite; }
+.home-robot { width: min(150px, 34vw); filter: drop-shadow(0 10px 14px rgba(14, 15, 13, .08)); animation: float 4.5s ease-in-out infinite; }
 .home-robot svg { width: 100%; height: auto; display: block; overflow: visible; }
 .home-robot .eye { transform-box: fill-box; transform-origin: center; animation: blink 5s infinite; }
 @keyframes float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-10px) rotate(1deg); } }
@@ -427,38 +427,63 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 .fb-trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 @media (max-width: 560px) { .fb-fab { right: 14px; bottom: 14px; width: 56px; height: 56px; } .fb-card { right: 16px; bottom: 82px; } .fb-tip { display: none; } }
 @media (prefers-reduced-motion: reduce) { .fb-fab:hover .leaf-l, .fb-fab:hover .leaf-r, .fb-card { animation: none; } }
+.herby-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 </style>
 
+<svg class="herby-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
+  <!-- Herby v2: soft 3D shading. Shared by the home robot and the small logos. -->
+  <radialGradient id="hbShell" cx="34%" cy="22%" r="85%"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#F1F3EE"/><stop offset="1" stop-color="#D6DAD2"/></radialGradient>
+  <radialGradient id="hbBall" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#EEF0EB"/><stop offset="1" stop-color="#CDD2C8"/></radialGradient>
+  <linearGradient id="hbPod" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9ECE5"/><stop offset="1" stop-color="#C3C8BD"/></linearGradient>
+  <linearGradient id="hbVisor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E332D"/><stop offset=".55" stop-color="#151814"/><stop offset="1" stop-color="#0B0D0A"/></linearGradient>
+  <linearGradient id="hbGloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".22"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+  <radialGradient id="hbEye" cx="45%" cy="38%" r="70%"><stop offset="0" stop-color="#F4FFE6"/><stop offset=".45" stop-color="#C9F59A"/><stop offset="1" stop-color="#8FD45B"/></radialGradient>
+  <linearGradient id="hbLeafA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9BDB62"/><stop offset="1" stop-color="#4F9A35"/></linearGradient>
+  <linearGradient id="hbLeafB" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B6EA7B"/><stop offset="1" stop-color="#5DA83E"/></linearGradient>
+  <linearGradient id="hbLimb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3A3F38"/><stop offset="1" stop-color="#161915"/></linearGradient>
+  <radialGradient id="hbGround" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#0E0F0D" stop-opacity=".22"/><stop offset="1" stop-color="#0E0F0D" stop-opacity="0"/></radialGradient>
+  <filter id="hbGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <symbol id="hbArt" viewBox="100 110 300 270">
+    <ellipse cx="246" cy="372" rx="98" ry="9" fill="url(#hbGround)"/>
+    <path d="M249 184 Q246 168 251 152" stroke="#3E7F22" stroke-width="6.5" stroke-linecap="round"/>
+    <path d="M249 160 C236 138 214 132 198 141 C208 160 230 168 249 160Z" fill="url(#hbLeafA)"/>
+    <path d="M246 158 C232 150 218 146 206 143" stroke="#FFFFFF" stroke-opacity=".35" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M251 153 C262 126 290 116 310 124 C302 148 274 160 251 153Z" fill="url(#hbLeafB)"/>
+    <path d="M254 150 C270 140 288 132 304 127" stroke="#FFFFFF" stroke-opacity=".4" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M168 268 Q150 292 147 314" stroke="url(#hbLimb)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M218 298 Q208 314 202 330" stroke="url(#hbLimb)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M264 298 Q268 314 262 332" stroke="url(#hbLimb)" stroke-width="7" stroke-linecap="round"/>
+    <rect x="120" y="325" width="12" height="21" rx="6" transform="rotate(20 126 335)" fill="url(#hbLimb)"/>
+    <rect x="134" y="330" width="12" height="21" rx="6" transform="rotate(20 140 340)" fill="url(#hbLimb)"/>
+    <circle cx="140" cy="318" r="20" fill="url(#hbBall)"/>
+    <circle cx="140" cy="318" r="19.5" stroke="#FFFFFF" stroke-opacity=".7" stroke-width="1"/>
+    <g transform="rotate(10 192 342)"><rect x="172" y="322" width="40" height="40" rx="14" fill="url(#hbBall)"/><path d="M178 359 L206 365" stroke="#7CC44E" stroke-width="7" stroke-linecap="round"/></g>
+    <g transform="rotate(4 258 342)"><rect x="238" y="322" width="40" height="40" rx="14" fill="url(#hbBall)"/><path d="M244 361 L272 363" stroke="#7CC44E" stroke-width="7" stroke-linecap="round"/></g>
+    <g><path d="M326 262 Q350 260 356 278" stroke="url(#hbLimb)" stroke-width="8" stroke-linecap="round"/><rect x="372" y="267" width="21" height="11" rx="5.5" transform="rotate(-18 382 273)" fill="url(#hbLimb)"/><rect x="372" y="283" width="21" height="11" rx="5.5" transform="rotate(-18 382 288)" fill="url(#hbLimb)"/><circle cx="357" cy="284" r="20" fill="url(#hbBall)"/><circle cx="357" cy="284" r="19.5" stroke="#FFFFFF" stroke-opacity=".7" stroke-width="1"/></g>
+    <ellipse cx="158" cy="244" rx="17" ry="24" fill="url(#hbPod)"/>
+    <ellipse cx="342" cy="240" rx="14" ry="21" fill="url(#hbPod)"/>
+    <ellipse cx="153" cy="244" rx="4" ry="9" fill="#A3DE5E" opacity=".9"/>
+    <rect x="150" y="178" width="192" height="126" rx="58" fill="url(#hbShell)"/>
+    <rect x="151" y="179" width="190" height="124" rx="57" stroke="#FFFFFF" stroke-width="2" stroke-opacity=".9"/>
+    <rect x="150" y="178" width="192" height="126" rx="58" stroke="#0E0F0D" stroke-opacity=".06" stroke-width="1.5"/>
+    <ellipse cx="249" cy="184" rx="22" ry="6" fill="#DADDD5"/>
+    <rect x="196" y="203" width="114" height="78" rx="22" fill="url(#hbVisor)"/>
+    <rect x="196.5" y="203.5" width="113" height="77" rx="21.5" stroke="#FFFFFF" stroke-opacity=".08"/>
+    <path d="M210 210 H296 Q304 210 304 218 Q262 222 206 240 Q204 214 210 210Z" fill="url(#hbGloss)"/>
+    <g filter="url(#hbGlow)">
+      <ellipse cx="231" cy="244" rx="8.5" ry="11" fill="url(#hbEye)"/>
+      <ellipse cx="276" cy="244" rx="8.5" ry="11" fill="url(#hbEye)"/>
+      <path d="M245 259 Q253.5 267 262 259" stroke="#B6EA7B" stroke-width="3.6" stroke-linecap="round"/>
+    </g>
+    <ellipse cx="214" cy="266" rx="6" ry="3" fill="#B6EA7B" opacity=".18"/>
+    <ellipse cx="293" cy="266" rx="6" ry="3" fill="#B6EA7B" opacity=".18"/>
+    </symbol>
+</defs></svg>
 <div class="glow" aria-hidden="true"></div>
 <section class="home" id="viewHome" aria-labelledby="homeQ">
   <div class="home-grid" aria-hidden="true"><span></span><span></span><span></span></div>
   <nav class="home-nav" aria-label="Herby">
-    <span class="home-logo"><span class="home-logo-mark" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none">
-      <!-- Herby robot: colours as in the reference picture -->
-      <path d="M248 182 Q247 166 251 152" stroke="#4E7F4B" stroke-width="7" stroke-linecap="round"/>
-      <ellipse cx="228" cy="150" rx="25" ry="13" transform="rotate(22 228 150)" fill="#5E8E5A"/>
-      <ellipse cx="274" cy="143" rx="30" ry="14" transform="rotate(-24 274 143)" fill="#5E8E5A"/>
-      <path d="M168 268 Q150 292 147 314" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/>
-      <path d="M328 262 Q350 262 356 278" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/>
-      <path d="M218 298 Q208 314 202 330" stroke="#2A2D2A" stroke-width="6" stroke-linecap="round"/>
-      <path d="M264 298 Q268 314 262 332" stroke="#2A2D2A" stroke-width="6" stroke-linecap="round"/>
-      <rect x="120" y="325" width="12" height="20" rx="5" transform="rotate(20 126 335)" fill="#2A2D2A"/>
-      <rect x="134" y="330" width="12" height="20" rx="5" transform="rotate(20 140 340)" fill="#2A2D2A"/>
-      <circle cx="140" cy="318" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
-      <rect x="372" y="268" width="20" height="11" rx="5" transform="rotate(-18 382 273)" fill="#2A2D2A"/>
-      <rect x="372" y="283" width="20" height="11" rx="5" transform="rotate(-18 382 288)" fill="#2A2D2A"/>
-      <circle cx="357" cy="284" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
-      <g transform="rotate(10 192 342)"><rect x="172" y="322" width="40" height="40" rx="12" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/><path d="M178 360 L206 366" stroke="#5E8E5A" stroke-width="7" stroke-linecap="round"/></g>
-      <g transform="rotate(4 258 342)"><rect x="238" y="322" width="40" height="40" rx="12" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/><path d="M244 362 L272 364" stroke="#5E8E5A" stroke-width="7" stroke-linecap="round"/></g>
-      <ellipse cx="160" cy="245" rx="18" ry="24" fill="#D9DAD6" stroke="#D3D5D0" stroke-width="2"/>
-      <ellipse cx="340" cy="240" rx="13" ry="20" fill="#D9DAD6" stroke="#D3D5D0" stroke-width="2"/>
-      <rect x="150" y="178" width="192" height="126" rx="56" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
-      <ellipse cx="248" cy="183" rx="24" ry="7" fill="#D9DAD6"/>
-      <rect x="200" y="206" width="106" height="72" rx="15" fill="#232523"/>
-      <ellipse cx="231" cy="244" rx="8" ry="10.5" fill="#ECECE8"/>
-      <ellipse cx="276" cy="244" rx="8" ry="10.5" fill="#ECECE8"/>
-      <path d="M247 257 Q253 266 259 257 Z" fill="#ECECE8"/>
-    </svg></span>Herby</span>
+    <span class="home-logo"><span class="home-logo-mark" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none"><use href="#hbArt" x="100" y="110" width="300" height="270"/></svg></span>Herby</span>
     <div class="home-links"><button type="button" data-go="hold">Hold Scripts</button><button type="button" data-go="cbd">CBD Calculator</button></div>
     <span class="home-pill">Created by JCIHB</span>
   </nav>
@@ -466,31 +491,39 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
     <div class="hero">
       <div class="bubble" id="herbyBubble"><h1 class="home-q" id="homeQ">Hey! What do you need help with?</h1></div>
       <button type="button" class="home-robot" id="herbyBot" aria-label="Say hi to Herby"><svg viewBox="100 110 300 270" fill="none" class="robot-svg">
-      <!-- Herby robot: colours as in the reference picture -->
-      <path d="M248 182 Q247 166 251 152" stroke="#4E7F4B" stroke-width="7" stroke-linecap="round"/>
-      <ellipse cx="228" cy="150" rx="25" ry="13" transform="rotate(22 228 150)" fill="#5E8E5A"/>
-      <ellipse cx="274" cy="143" rx="30" ry="14" transform="rotate(-24 274 143)" fill="#5E8E5A"/>
-      <path d="M168 268 Q150 292 147 314" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/>
-      
-      <path d="M218 298 Q208 314 202 330" stroke="#2A2D2A" stroke-width="6" stroke-linecap="round"/>
-      <path d="M264 298 Q268 314 262 332" stroke="#2A2D2A" stroke-width="6" stroke-linecap="round"/>
-      <rect x="120" y="325" width="12" height="20" rx="5" transform="rotate(20 126 335)" fill="#2A2D2A"/>
-      <rect x="134" y="330" width="12" height="20" rx="5" transform="rotate(20 140 340)" fill="#2A2D2A"/>
-      <circle cx="140" cy="318" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
-      
-      
-      
-      <g transform="rotate(10 192 342)"><rect x="172" y="322" width="40" height="40" rx="12" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/><path d="M178 360 L206 366" stroke="#5E8E5A" stroke-width="7" stroke-linecap="round"/></g>
-      <g transform="rotate(4 258 342)"><rect x="238" y="322" width="40" height="40" rx="12" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/><path d="M244 362 L272 364" stroke="#5E8E5A" stroke-width="7" stroke-linecap="round"/></g>
-      <g class="arm-r"><path d="M328 262 Q350 262 356 278" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/><rect x="372" y="268" width="20" height="11" rx="5" transform="rotate(-18 382 273)" fill="#2A2D2A"/><rect x="372" y="283" width="20" height="11" rx="5" transform="rotate(-18 382 288)" fill="#2A2D2A"/><circle cx="357" cy="284" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/></g>
-      <ellipse cx="160" cy="245" rx="18" ry="24" fill="#D9DAD6" stroke="#D3D5D0" stroke-width="2"/>
-      <ellipse cx="340" cy="240" rx="13" ry="20" fill="#D9DAD6" stroke="#D3D5D0" stroke-width="2"/>
-      <rect x="150" y="178" width="192" height="126" rx="56" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
-      <ellipse cx="248" cy="183" rx="24" ry="7" fill="#D9DAD6"/>
-      <rect x="200" y="206" width="106" height="72" rx="15" fill="#232523"/>
-      <ellipse class="eye" cx="231" cy="244" rx="8" ry="10.5" fill="#ECECE8"/>
-      <ellipse class="eye" cx="276" cy="244" rx="8" ry="10.5" fill="#ECECE8"/>
-      <path d="M247 257 Q253 266 259 257 Z" fill="#ECECE8"/>
+    <ellipse cx="246" cy="372" rx="98" ry="9" fill="url(#hbGround)"/>
+    <path d="M249 184 Q246 168 251 152" stroke="#3E7F22" stroke-width="6.5" stroke-linecap="round"/>
+    <path d="M249 160 C236 138 214 132 198 141 C208 160 230 168 249 160Z" fill="url(#hbLeafA)"/>
+    <path d="M246 158 C232 150 218 146 206 143" stroke="#FFFFFF" stroke-opacity=".35" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M251 153 C262 126 290 116 310 124 C302 148 274 160 251 153Z" fill="url(#hbLeafB)"/>
+    <path d="M254 150 C270 140 288 132 304 127" stroke="#FFFFFF" stroke-opacity=".4" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M168 268 Q150 292 147 314" stroke="url(#hbLimb)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M218 298 Q208 314 202 330" stroke="url(#hbLimb)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M264 298 Q268 314 262 332" stroke="url(#hbLimb)" stroke-width="7" stroke-linecap="round"/>
+    <rect x="120" y="325" width="12" height="21" rx="6" transform="rotate(20 126 335)" fill="url(#hbLimb)"/>
+    <rect x="134" y="330" width="12" height="21" rx="6" transform="rotate(20 140 340)" fill="url(#hbLimb)"/>
+    <circle cx="140" cy="318" r="20" fill="url(#hbBall)"/>
+    <circle cx="140" cy="318" r="19.5" stroke="#FFFFFF" stroke-opacity=".7" stroke-width="1"/>
+    <g transform="rotate(10 192 342)"><rect x="172" y="322" width="40" height="40" rx="14" fill="url(#hbBall)"/><path d="M178 359 L206 365" stroke="#7CC44E" stroke-width="7" stroke-linecap="round"/></g>
+    <g transform="rotate(4 258 342)"><rect x="238" y="322" width="40" height="40" rx="14" fill="url(#hbBall)"/><path d="M244 361 L272 363" stroke="#7CC44E" stroke-width="7" stroke-linecap="round"/></g>
+    <g class="arm-r"><path d="M326 262 Q350 260 356 278" stroke="url(#hbLimb)" stroke-width="8" stroke-linecap="round"/><rect x="372" y="267" width="21" height="11" rx="5.5" transform="rotate(-18 382 273)" fill="url(#hbLimb)"/><rect x="372" y="283" width="21" height="11" rx="5.5" transform="rotate(-18 382 288)" fill="url(#hbLimb)"/><circle cx="357" cy="284" r="20" fill="url(#hbBall)"/><circle cx="357" cy="284" r="19.5" stroke="#FFFFFF" stroke-opacity=".7" stroke-width="1"/></g>
+    <ellipse cx="158" cy="244" rx="17" ry="24" fill="url(#hbPod)"/>
+    <ellipse cx="342" cy="240" rx="14" ry="21" fill="url(#hbPod)"/>
+    <ellipse cx="153" cy="244" rx="4" ry="9" fill="#A3DE5E" opacity=".9"/>
+    <rect x="150" y="178" width="192" height="126" rx="58" fill="url(#hbShell)"/>
+    <rect x="151" y="179" width="190" height="124" rx="57" stroke="#FFFFFF" stroke-width="2" stroke-opacity=".9"/>
+    <rect x="150" y="178" width="192" height="126" rx="58" stroke="#0E0F0D" stroke-opacity=".06" stroke-width="1.5"/>
+    <ellipse cx="249" cy="184" rx="22" ry="6" fill="#DADDD5"/>
+    <rect x="196" y="203" width="114" height="78" rx="22" fill="url(#hbVisor)"/>
+    <rect x="196.5" y="203.5" width="113" height="77" rx="21.5" stroke="#FFFFFF" stroke-opacity=".08"/>
+    <path d="M210 210 H296 Q304 210 304 218 Q262 222 206 240 Q204 214 210 210Z" fill="url(#hbGloss)"/>
+    <g filter="url(#hbGlow)">
+      <ellipse class="eye" cx="231" cy="244" rx="8.5" ry="11" fill="url(#hbEye)"/>
+      <ellipse class="eye" cx="276" cy="244" rx="8.5" ry="11" fill="url(#hbEye)"/>
+      <path d="M245 259 Q253.5 267 262 259" stroke="#B6EA7B" stroke-width="3.6" stroke-linecap="round"/>
+    </g>
+    <ellipse cx="214" cy="266" rx="6" ry="3" fill="#B6EA7B" opacity=".18"/>
+    <ellipse cx="293" cy="266" rx="6" ry="3" fill="#B6EA7B" opacity=".18"/>
     </svg></button>
     </div>
     <p class="home-sub">Your PlantMed assistant for hold script reminders and CBD calculations, <span class="hl">done in seconds</span>.</p>
@@ -525,32 +558,7 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 <div class="shell" id="shell" hidden>
 <header class="top">
   <button type="button" class="brand" id="brandHome" aria-label="Herby home">
-    <div class="mark" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none">
-      <!-- Herby robot: colours as in the reference picture -->
-      <path d="M248 182 Q247 166 251 152" stroke="#4E7F4B" stroke-width="7" stroke-linecap="round"/>
-      <ellipse cx="228" cy="150" rx="25" ry="13" transform="rotate(22 228 150)" fill="#5E8E5A"/>
-      <ellipse cx="274" cy="143" rx="30" ry="14" transform="rotate(-24 274 143)" fill="#5E8E5A"/>
-      <path d="M168 268 Q150 292 147 314" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/>
-      <path d="M328 262 Q350 262 356 278" stroke="#2A2D2A" stroke-width="7" stroke-linecap="round"/>
-      <path d="M218 298 Q208 314 202 330" stroke="#2A2D2A" stroke-width="6" stroke-linecap="round"/>
-      <path d="M264 298 Q268 314 262 332" stroke="#2A2D2A" stroke-width="6" stroke-linecap="round"/>
-      <rect x="120" y="325" width="12" height="20" rx="5" transform="rotate(20 126 335)" fill="#2A2D2A"/>
-      <rect x="134" y="330" width="12" height="20" rx="5" transform="rotate(20 140 340)" fill="#2A2D2A"/>
-      <circle cx="140" cy="318" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
-      <rect x="372" y="268" width="20" height="11" rx="5" transform="rotate(-18 382 273)" fill="#2A2D2A"/>
-      <rect x="372" y="283" width="20" height="11" rx="5" transform="rotate(-18 382 288)" fill="#2A2D2A"/>
-      <circle cx="357" cy="284" r="20" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
-      <g transform="rotate(10 192 342)"><rect x="172" y="322" width="40" height="40" rx="12" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/><path d="M178 360 L206 366" stroke="#5E8E5A" stroke-width="7" stroke-linecap="round"/></g>
-      <g transform="rotate(4 258 342)"><rect x="238" y="322" width="40" height="40" rx="12" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/><path d="M244 362 L272 364" stroke="#5E8E5A" stroke-width="7" stroke-linecap="round"/></g>
-      <ellipse cx="160" cy="245" rx="18" ry="24" fill="#D9DAD6" stroke="#D3D5D0" stroke-width="2"/>
-      <ellipse cx="340" cy="240" rx="13" ry="20" fill="#D9DAD6" stroke="#D3D5D0" stroke-width="2"/>
-      <rect x="150" y="178" width="192" height="126" rx="56" fill="#EDEDEA" stroke="#D3D5D0" stroke-width="2"/>
-      <ellipse cx="248" cy="183" rx="24" ry="7" fill="#D9DAD6"/>
-      <rect x="200" y="206" width="106" height="72" rx="15" fill="#232523"/>
-      <ellipse cx="231" cy="244" rx="8" ry="10.5" fill="#ECECE8"/>
-      <ellipse cx="276" cy="244" rx="8" ry="10.5" fill="#ECECE8"/>
-      <path d="M247 257 Q253 266 259 257 Z" fill="#ECECE8"/>
-    </svg></div>
+    <div class="mark" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none"><use href="#hbArt" x="100" y="110" width="300" height="270"/></svg></div>
     <div>
       <div class="wordmark">Herby</div>
       <div class="sub" id="toolName">PlantMed Dispensary hold reminders</div>
