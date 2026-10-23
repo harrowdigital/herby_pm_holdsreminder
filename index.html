@@ -277,6 +277,11 @@ button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: 
 .cbd-field input:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 3px var(--lime-soft); }
 .cbd-field.edit { background: var(--lime-soft); }
 .cbd-field.wide { grid-column: 1 / -1; }
+.qty { display: flex; align-items: center; gap: 6px; }
+.cbd-field .qty .qty-in { flex: 1 1 0; width: auto; min-width: 52px; text-align: center; padding-inline: 4px; }
+.q-btn { width: 38px; height: 38px; flex: none; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; font-size: 20px; font-weight: 700; line-height: 1; cursor: pointer; }
+.q-btn:hover { border-color: var(--lime-deep); box-shadow: 0 0 0 3px var(--lime-soft); }
+.q-total { font-size: 12.5px; font-weight: 700; color: var(--forest); }
 .cbd-field .hint { font-weight: 600; color: #8A8E86; margin-left: 4px; }
 .cbd-field input.dose { font-weight: 600; }
 .cbd-field input.dose::placeholder { font-weight: 500; color: #9A9E96; font-size: 15px; }
@@ -1957,6 +1962,8 @@ function addCard(c, quiet) {
   const id = ++cardSeq, el = document.createElement("article");
   el.className = "cbd-card"; el.dataset.id = id; el._c = c;
   const doseEg = c.kind === "oil" ? "e.g. 0.5  ·  0.5mL TDS  ·  0.3mL mane + 0.6mL nocte" : c.unit === "pump" ? "e.g. 2  ·  1 pump BD  ·  2 pumps nocte" : "e.g. 2  ·  1 cap BD  ·  1 mane + 2 nocte";
+  const what = c.kind === "pack" && c.unit !== "pump" ? "Packs" : "Bottles";
+  const qtyField = `<div class="cbd-field edit"><label for="qty-${id}">${what} collected</label><div class="qty"><button type="button" class="q-btn q-minus" aria-label="One less">&minus;</button><input id="qty-${id}" class="qty-in" type="text" inputmode="numeric" value="1" autocomplete="off"><button type="button" class="q-btn q-plus" aria-label="One more">+</button></div><span class="q-total" hidden></span></div>`;
   const doseField = `<div class="cbd-field edit wide"><label for="dose-${id}">Dose <span class="hint">type the daily amount, or the dose as written on the script</span></label><input id="dose-${id}" class="dose" type="text" autocomplete="off" spellcheck="false" placeholder="${doseEg}"></div>`;
   const autos = c.blank
     ? `<div class="cbd-field"><span class="lbl">Volume of bottle</span><span class="auto">–</span></div>
@@ -1970,21 +1977,21 @@ function addCard(c, quiet) {
     : `<div class="cbd-field"><span class="lbl">Total count per pack</span><span class="auto">${c.count}</span></div>
        <div class="cbd-field"><span class="lbl">CBD in each</span><span class="auto">${c.mg}<small>mg</small></span></div>`;
   const outs = c.blank
-    ? `<div class="cbd-field"><span class="lbl">Total mg in bottle</span><span class="auto o-total">–</span></div>
+    ? `<div class="cbd-field"><span class="lbl o-total-lbl">Total mg in bottle</span><span class="auto o-total">–</span></div>
        <div class="cbd-field"><span class="lbl">Daily dose in mg</span><span class="auto o-daily">–</span></div>
-       <div class="cbd-field"><span class="lbl">Days bottle will last</span><span class="auto o-days">–</span></div>`
+       <div class="cbd-field"><span class="lbl o-days-lbl">Days bottle will last</span><span class="auto o-days">–</span></div>`
     : c.kind === "oil"
-    ? `<div class="cbd-field"><span class="lbl">Total mg in bottle</span><span class="auto o-total">${(c.ml * c.mg).toLocaleString("en-AU")}<small>mg</small></span></div>
+    ? `<div class="cbd-field"><span class="lbl o-total-lbl">Total mg in bottle</span><span class="auto o-total">${(c.ml * c.mg).toLocaleString("en-AU")}<small>mg</small></span></div>
        <div class="cbd-field"><span class="lbl">Daily dose in mg</span><span class="auto o-daily">–</span></div>
-       <div class="cbd-field"><span class="lbl">Days bottle will last</span><span class="auto o-days">–</span></div>`
-    : `<div class="cbd-field"><span class="lbl">Total mg in ${c.unit === "pump" ? "bottle" : "pack"}</span><span class="auto o-total">${(c.count * c.mg).toLocaleString("en-AU")}<small>mg</small></span></div>
+       <div class="cbd-field"><span class="lbl o-days-lbl">Days bottle will last</span><span class="auto o-days">–</span></div>`
+    : `<div class="cbd-field"><span class="lbl o-total-lbl">Total mg in ${c.unit === "pump" ? "bottle" : "pack"}</span><span class="auto o-total">${(c.count * c.mg).toLocaleString("en-AU")}<small>mg</small></span></div>
        <div class="cbd-field"><span class="lbl">Daily dose in mg</span><span class="auto o-daily">–</span></div>
-       <div class="cbd-field"><span class="lbl">Days ${c.unit === "pump" ? "bottle" : "pack"} will last</span><span class="auto o-days">–</span></div>`;
+       <div class="cbd-field"><span class="lbl o-days-lbl">Days ${c.unit === "pump" ? "bottle" : "pack"} will last</span><span class="auto o-days">–</span></div>`;
   el.innerHTML = `
     <div class="cbd-card-head"><div><h3${c.blank ? ' class="muted-title"' : ""}>${esc(c.label)}</h3><span class="kind"${c.blank ? " hidden" : ""}>${c.kind === "oil" ? "CBD oil" : c.unit === "pump" ? "CBD pump spray" : "CBD capsules / chews"}</span></div>
       <button type="button" class="cbd-x" aria-label="Clear ${esc(c.label)}"${c.blank ? " hidden" : ""}>&times;</button></div>
     <div class="cbd-grid">${autos}${doseField}
-      <div class="cbd-field edit wide"><label for="date-${id}">Collection date</label><div class="cal-wrap"><input id="date-${id}" class="coll" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" value="${fmtDate(today)}" autocomplete="off" aria-haspopup="dialog"><button type="button" class="cal-btn" aria-label="Open calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button></div></div></div>
+      ${qtyField}<div class="cbd-field edit"><label for="date-${id}">Collection date</label><div class="cal-wrap"><input id="date-${id}" class="coll" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" value="${fmtDate(today)}" autocomplete="off" aria-haspopup="dialog"><button type="button" class="cal-btn" aria-label="Open calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button></div></div></div>
     <div class="dose-read" aria-live="polite" hidden></div>
     <div class="cbd-out">${outs}</div>
     <div class="cbd-due"><div><div class="lbl">Next ${c.kind === "oil" || c.unit === "pump" ? "bottle" : "pack"} due date</div><div class="val o-due">Enter the daily dose</div></div>
@@ -1995,6 +2002,10 @@ function addCard(c, quiet) {
   attachCalendar(el.querySelector(".coll"), () => calc(el));
   if (keepDose) el.querySelector(".dose").value = keepDose;
   el.querySelectorAll("input").forEach(i => i.addEventListener("input", () => calc(el)));
+  const qIn = el.querySelector(".qty-in");
+  const step = by => { qIn.value = Math.max(1, Math.round(num(qIn.value) || 1) + by); calc(el); };
+  el.querySelector(".q-minus").addEventListener("click", () => step(-1));
+  el.querySelector(".q-plus").addEventListener("click", () => step(1));
   el.querySelector(".cbd-x").addEventListener("click", () => addCard(null, true)); // back to the empty calculator
   el.querySelector(".copy-sum").addEventListener("click", e => copySummary(el, e.currentTarget));
   calc(el);
@@ -2070,11 +2081,22 @@ function calc(el) {
   const sure = !!(r && r.perDay && (!r.asks.length || el._okText === text));
   showReading(el, r, text, sure);
   const dose = sure ? r.perDay : null;
+  // Bottles (or packs) collected: the totals and the days cover all of them.
+  const qty = Math.max(1, Math.round(num(el.querySelector(".qty-in").value) || 1));
+  const one = c.kind === "pack" && c.unit !== "pump" ? "pack" : "bottle", them = qty > 1 ? `the ${qty} ${one}s` : one;
+  el.querySelector(".o-total-lbl").textContent = `Total mg in ${them}`;
+  el.querySelector(".o-days-lbl").textContent = `Days ${them} will last`;
+  const qTotal = el.querySelector(".q-total");
+  qTotal.hidden = c.blank || qty < 2;
+  if (!c.blank) {
+    qTotal.textContent = c.kind === "oil" ? `= ${nice(c.ml * qty)} mL in total` : c.unit === "pump" ? `= ~${c.count * qty} pumps in total` : `= ${c.count * qty} in total`;
+    el.querySelector(".o-total").innerHTML = `${((c.kind === "oil" ? c.ml : c.count) * c.mg * qty).toLocaleString("en-AU")}<small>mg</small>`;
+  }
   el._sum = "";
   if (c.blank) { daily.innerHTML = days.innerHTML = "–"; due.textContent = "Search a product above"; copy.hidden = true; return; }
   if (!dose) { daily.innerHTML = days.innerHTML = "–"; due.textContent = !text ? "Enter the daily dose" : r && r.perDay ? "Confirm the dose above" : "Check the dose"; copy.hidden = true; return; }
   const dailyMg = c.mg * dose;                                   // concentration × daily dose (or mg each × count per day)
-  const lasts = (c.kind === "oil" ? c.ml : c.count) / dose;      // volume ÷ daily dose (or count ÷ per day)
+  const lasts = (c.kind === "oil" ? c.ml : c.count) * qty / dose; // volume ÷ daily dose (or count ÷ per day), for every bottle collected
   daily.innerHTML = `${nice(dailyMg)}<small>mg</small>`;
   days.innerHTML = `${nice(lasts)}<small>days</small>`;
   if (!coll0) { due.textContent = "Enter the collection date as dd/mm/yyyy"; copy.hidden = true; return; }
