@@ -948,6 +948,10 @@ const DISPLAY = new Map();
   }
 })();
 function displayName(p) { return DISPLAY.get(p) || cleanBase(p); }
+// Products staff want written a set way in the message, whatever was typed (keyed by the exact pricelist name).
+const WRITE_AS = {
+  "SPECTRUM BLUE 2.5/3.75 soft gels SOFT GELS (60 )*": "SPECTRUM BLUE SOFTGEL CAPSULES",
+};
 
 // The pricelist name without notes, strengths and sizes: "Superbly Rosey (CBD)**" -> "Superbly Rosey".
 function cleanProductName(n) {
@@ -1177,6 +1181,7 @@ function analyse(line, parsed) {
     const shownType = typeInName(words.join(" "));
     out = words.join(" ") + (sz ? " " + sz : "") + (!shownType || tailIsCodes ? " " + type : "");
   }
+  if (usePricelistName && match && match.type === type && WRITE_AS[match.name] && (status === "ok" || status === "pick")) out = WRITE_AS[match.name];
   // A name that only matches the pricelist by a near-spelling is never changed silently: it waits for a yes.
   const chosen = match && matches.find(m => m.p === match);
   if ((status === "ok" || status === "pick") && chosen && chosen.fuzzy > 0 && ov.confirm !== true) status = "confirm";

@@ -116,3 +116,5 @@ console.log("---- CBD dose reader");
   }
   console.log("dose cases", D.length, "failures", bad);
 }
+console.log("---- written as staff want");
+for (const [t, want] of [["spec blue caps","SPECTRUM BLUE SOFTGEL CAPSULES"],["Spectrum Blue capsules","SPECTRUM BLUE SOFTGEL CAPSULES"],["spec blue soft gels","SPECTRUM BLUE SOFTGEL CAPSULES"],["spectrum blue 2.5/3.75","SPECTRUM BLUE SOFTGEL CAPSULES"],["SPECTRUM BLUE 2.5/3.75 soft gels SOFT GELS (60 )*","SPECTRUM BLUE SOFTGEL CAPSULES"],["spec blue oil","SPECTRUM BLUE 50ml OIL"]]) { const r = run(t); console.log(r.out === want && r.status === "ok" ? "ok  " : "FAIL", t.padEnd(50), "=>", r.out, r.status); }
