@@ -285,7 +285,7 @@ button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: 
 .cbd-field .hint { font-weight: 600; color: #8A8E86; margin-left: 4px; }
 .cbd-field input.dose { font-weight: 600; }
 .cbd-field input.dose::placeholder { font-weight: 500; color: #9A9E96; font-size: 15px; }
-.dose-read { margin-top: 10px; border-radius: 16px; padding: 12px 14px; font-size: 14.5px; line-height: 1.45; }
+.dose-read { margin-top: 4px; border-radius: 14px; padding: 12px 14px; font-size: 14.5px; line-height: 1.45; }
 .dose-read p { margin: 0; }
 .dose-read.ok { background: #F3FBEA; border: 1px solid #D6EFBC; color: var(--lime-ink); }
 .dose-read.ask { background: var(--orange-soft); border: 1px solid var(--orange-line); color: #4A2A12; }
@@ -1964,7 +1964,7 @@ function addCard(c, quiet) {
   const doseEg = c.kind === "oil" ? "e.g. 0.5  ·  0.5mL TDS  ·  0.3mL mane + 0.6mL nocte" : c.unit === "pump" ? "e.g. 2  ·  1 pump BD  ·  2 pumps nocte" : "e.g. 2  ·  1 cap BD  ·  1 mane + 2 nocte";
   const what = c.kind === "pack" && c.unit !== "pump" ? "Packs" : "Bottles";
   const qtyField = `<div class="cbd-field edit"><label for="qty-${id}">${what} collected</label><div class="qty"><button type="button" class="q-btn q-minus" aria-label="One less">&minus;</button><input id="qty-${id}" class="qty-in" type="text" inputmode="numeric" value="1" autocomplete="off"><button type="button" class="q-btn q-plus" aria-label="One more">+</button></div><span class="q-total" hidden></span></div>`;
-  const doseField = `<div class="cbd-field edit wide"><label for="dose-${id}">Dose <span class="hint">type the daily amount, or the dose as written on the script</span></label><input id="dose-${id}" class="dose" type="text" autocomplete="off" spellcheck="false" placeholder="${doseEg}"></div>`;
+  const doseField = `<div class="cbd-field edit wide"><label for="dose-${id}">Dose <span class="hint">type the daily amount, or the dose as written on the script</span></label><input id="dose-${id}" class="dose" type="text" autocomplete="off" spellcheck="false" placeholder="${doseEg}"><div class="dose-read" aria-live="polite" hidden></div></div>`;
   const autos = c.blank
     ? `<div class="cbd-field"><span class="lbl">Volume of bottle</span><span class="auto">–</span></div>
        <div class="cbd-field"><span class="lbl">Concentration</span><span class="auto">–</span></div>`
@@ -1992,7 +1992,6 @@ function addCard(c, quiet) {
       <button type="button" class="cbd-x" aria-label="Clear ${esc(c.label)}"${c.blank ? " hidden" : ""}>&times;</button></div>
     <div class="cbd-grid">${autos}${doseField}
       ${qtyField}<div class="cbd-field edit"><label for="date-${id}">Collection date</label><div class="cal-wrap"><input id="date-${id}" class="coll" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" value="${fmtDate(today)}" autocomplete="off" aria-haspopup="dialog"><button type="button" class="cal-btn" aria-label="Open calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button></div></div></div>
-    <div class="dose-read" aria-live="polite" hidden></div>
     <div class="cbd-out">${outs}</div>
     <div class="cbd-due"><div><div class="lbl">Next ${c.kind === "oil" || c.unit === "pump" ? "bottle" : "pack"} due date</div><div class="val o-due">Enter the daily dose</div></div>
       <button type="button" class="copy-sum" hidden>Copy date</button></div>`;
