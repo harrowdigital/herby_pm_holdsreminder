@@ -1599,7 +1599,7 @@ function doseTokens(text) {
     .replace(/([a-z])\.(?=[a-z\s,;)]|$)/g, "$1").replace(/&/g, " and ").replace(/\+/g, " plus ")
     .replace(/\b(one|two|three|four|five|six|half|quarter)\b/g, w => " " + { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, half: 0.5, quarter: 0.25 }[w] + " ")
     .replace(/(\d)([a-z])/g, "$1 $2").replace(/([a-z])(\d)/g, "$1 $2");
-  const toks = [], gap = /[\s,;:()=!?"'*.]+/y;
+  const toks = [], gap = /(?:[\s,;:()=!?"'*]|\.(?!\d))+/y; // a dot before a digit is a decimal point: ".5" is 0.5
   for (let i = 0; i < s.length;) {
     gap.lastIndex = i; if (gap.exec(s)) { i = gap.lastIndex; continue; }
     let hit = false;
