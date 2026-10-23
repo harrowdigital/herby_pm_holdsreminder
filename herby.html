@@ -1488,19 +1488,23 @@ document.getElementById("copy").addEventListener("click", () => {
 });
 
 // Copy-note buttons: copy the note text; if the clipboard is blocked, select the text so it can be copied by hand.
-document.querySelectorAll(".note-copy").forEach(btn => btn.addEventListener("click", () => {
+// Each button keeps its own label ("Copy note") and always goes back to it: after a moment, or straight away
+// when another copy button is clicked. (Reading the label at click time got stuck on "Copied" after a double click.)
+const noteBtns = [...document.querySelectorAll(".note-copy")];
+const resetNote = b => { clearTimeout(b._t); b.textContent = b.dataset.label; b.classList.remove("done"); };
+noteBtns.forEach(btn => { btn.dataset.label = btn.textContent.trim(); btn.addEventListener("click", () => {
+  noteBtns.forEach(resetNote);
   const text = btn.dataset.note;
-  const label = btn.textContent;
-  const done = () => { btn.textContent = "Copied"; btn.classList.add("done"); setTimeout(() => { btn.textContent = label; btn.classList.remove("done"); }, 1600); };
+  const done = () => { btn.textContent = "Copied"; btn.classList.add("done"); btn._t = setTimeout(() => resetNote(btn), 1600); };
   const fallback = () => {
     // Select only the copyable part (not the From:/Subject: label).
     const target = btn.previousElementSibling.querySelector(".note-value") || btn.previousElementSibling;
     const r = document.createRange(); r.selectNodeContents(target);
     const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
-    btn.textContent = "Press Ctrl/Cmd + C";
+    btn.textContent = "Press Ctrl/Cmd + C"; btn._t = setTimeout(() => resetNote(btn), 4000);
   };
   try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
-}));
+}); });
 
 const how = document.getElementById("how");
 document.getElementById("howOpen").addEventListener("click", () => { try { how.showModal(); } catch (e) { how.setAttribute("open", ""); } });
