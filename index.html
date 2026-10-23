@@ -1588,6 +1588,7 @@ const DOSE_RULES = [
   [String.raw`${DN}(?:\s*(?:-|–|to|or)\s*${DN})?(?:\s*${DOSE_UNIT}\b)?`, m => ({ t: "amt", v: doseNum(m[1]), v2: m[2] ? doseNum(m[2]) : null, unit: doseUnit(m[3]) })],
   [String.raw`${DOSE_UNIT}\b`, m => ({ t: "unit", unit: doseUnit(m[1]) })],
   [String.raw`(?:-|–|to|or)(?=\s|\d)`, () => ({ t: "range" })],
+  [String.raw`(?:plus|and)\b`, () => ({ t: "join" })],
   [String.raw`(?:take|takes|taken|use|give|apply|place|put|administer|squirt|drop|of|the|a|an|at|in|on|under|tongue|sublingual(?:ly)?|sl|po|orally|oral|by|mouth|with|without|food|meals?|after|before|dose|doses|each|per|to|hold|swallow|and|plus|or|into|cheek|buccal|times?|day|days|sleep|oil|cbd|please|pt|patient|then|is|for|every)\b`, () => ({ t: "skip" })],
   [String.raw`[a-z]+`, m => ({ t: "unknown" })],
 ].map(([src, fn]) => [new RegExp(src, "y"), fn]);
@@ -1618,13 +1619,15 @@ function readDose(text, kind, mgEach) {
   if (!text || !String(text).trim()) return null;
   const toks = doseTokens(text), asks = [], notes = [];
   const unitName = n => kind === "pump" ? (n === 1 ? "pump" : "pumps") : kind === "pack" ? (n === 1 ? "cap/chew" : "caps/chews") : "mL";
-  const groups = []; let cur = null, mode = null, pending = [], prev = null, inMax = false, maxAmt = null, prnNext = false, stat = false, upto = false, cutAt = 0, changed = false;
+  const groups = []; let cur = null, mode = null, pending = [], prev = null, inMax = false, maxAmt = null, prnNext = false, joined = false, stat = false, upto = false, cutAt = 0, changed = false;
   for (const t of toks) {
     if (t.t === "unknown") asks.push(`Herby didn't recognise "${t.raw}". Check the reading below is what the script means.`);
     if (t.ep) asks.push(t.ep);
     if (t.t === "unit") { const g = inMax && maxAmt ? maxAmt : cur && cur.amt; if (g && !g.unit) g.unit = t.unit; }
     else if (t.t === "max") inMax = true;
-    else if (t.t === "prn") { if (cur && mode === "amt") cur.prn = true; else prnNext = true; } // "0.5mL PRN" or "PRN 0.5mL"
+    else if (t.t === "join") joined = true;
+    // "0.5mL PRN": that dose is PRN. "0.5mL BD + PRN" or "PRN 0.5mL": the PRN is a separate, extra part.
+    else if (t.t === "prn") { if (cur && mode === "amt" && !joined) cur.prn = true; else prnNext = true; }
     else if (t.t === "upto") upto = true;
     else if (t.t === "asdir") asks.push(`"As directed" has no set amount. Make sure the amount below is what the patient takes each day.`);
     else if (t.t === "stat") { if (cur && !cur.freqs.length && mode === "amt") cur.stat = true; else stat = true; }
@@ -1635,7 +1638,7 @@ function readDose(text, kind, mgEach) {
       else if (cur && !cur.freqs.length && mode === "amt" && same(cur.amt, t)) { notes.push(`${t.raw} matches ${cur.amt.raw}.`); }
       else {
         inMax = false; mode = mode || "amt";
-        cur = { amt: t, freqs: mode === "freq" ? pending : [], stat, prn: prnNext }; stat = false; prnNext = false; pending = [];
+        cur = { amt: t, freqs: mode === "freq" ? pending : [], stat, prn: prnNext }; stat = false; prnNext = false; joined = false; pending = [];
         groups.push(cur);
       }
     }
@@ -1688,7 +1691,7 @@ function readDose(text, kind, mgEach) {
   const latest = groups.slice(changed && cutAt < groups.length ? cutAt : 0), use = latest.filter(g => !g.stat && !g.prn);
   if (changed) asks.push(`The dose changes over time. Herby used the ${use.length > 1 ? "doses" : "dose"} written last.`);
   if (groups.some(g => g.stat)) notes.push("The STAT (one-off) dose isn't counted in the daily amount.");
-  if (latest.some(g => g.prn)) notes.push("The PRN (as needed) dose isn't counted in the daily amount.");
+  if (latest.some(g => g.prn) || prnNext) notes.push("The PRN (as needed) dose isn't counted in the daily amount.");
   if (!use.length) {
     const why = latest.some(g => g.prn) ? "This dose is PRN (as needed) only, so Herby doesn't count it. Type the amount the patient takes each day."
       : "Only a one-off (STAT) dose is written. Enter the daily dose.";
