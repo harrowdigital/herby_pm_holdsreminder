@@ -84,3 +84,5 @@ overrides["avani 25 cbd"]={type:"PASTILLE"};console.log("AVANI2 picked PASTILLE 
 for(const t of ["Beacon GSC Flower","Beacon GSC","Beacon Girl Scout Cookies","Beacon GSC Cart","Beacon THC30 GSC Oil","Beacon GSC Oil"]){const r=run(t);console.log("GSC",r.status.padEnd(7),t.padEnd(28),"=>",r.out,"["+r.types+"]");}
 // FS200 = CBD200 FS.
 for(const t of ["kind fs200","KIND FS200 Oil","Medicabilis FS200","KIND CBD200 FS","SatiOil CBD 200FS","Entoura CBD200 Full Spectrum"]){const r=run(t);console.log("FS200",r.status.padEnd(7),t.padEnd(30),"=>",r.out);}
+console.log("---- written as staff want");
+for (const [t, want] of [["spec blue caps","SPECTRUM BLUE SOFTGEL CAPSULES"],["Spectrum Blue capsules","SPECTRUM BLUE SOFTGEL CAPSULES"],["spec blue soft gels","SPECTRUM BLUE SOFTGEL CAPSULES"],["spectrum blue 2.5/3.75","SPECTRUM BLUE SOFTGEL CAPSULES"],["SPECTRUM BLUE 2.5/3.75 soft gels SOFT GELS (60 )*","SPECTRUM BLUE SOFTGEL CAPSULES"],["spec blue oil","SPECTRUM BLUE 50ml OIL"]]) { const r = run(t); console.log(r.out === want && r.status === "ok" ? "ok  " : "FAIL", t.padEnd(50), "=>", r.out, r.status); }
