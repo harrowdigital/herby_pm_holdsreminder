@@ -1534,7 +1534,8 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) chec
 // ---------- CBD dose reader: a dose as staff type it, or as the script writes it ----------
 // "0.5" (the total for the day), "0.5mL TDS", "0.3mL mane + 0.6mL nocte", "50mg BD", "1 cap nocte", "0.5mL PRN max 2mL/day".
 // Terms follow the Australian Commission on Safety and Quality in Health Care list (mane, midi, vesp, nocte, daily,
-// bd, tds, qid, prn, stat, n-hourly). Anything Herby is not sure of comes back in `asks` with its best guess.
+// bd, tds, qid, prn, stat, n-hourly). PRN (as needed) doses are left out of the daily amount, as staff asked.
+// Anything Herby is not sure of comes back in `asks` with its best guess.
 const DOSE_N = String.raw`(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.\d+|\d+)`;
 const DOSE_UNIT = String.raw`(ml|mls|millilit(?:re|er)s?|cc|mgs?|milligrams?|drops?|gtts?|caps?|capsules?|soft\s*gels?|gel\s*caps?|chews?|pastilles?|gumm(?:y|ies)|tabs?|tablets?|lozenges?|pieces?|pcs?|bears?|lolly|lollies|sweets?|pumps?|sprays?|squirts?|puffs?|actuations?|doses?)`;
 const doseNum = t => { t = String(t).trim(); let m;
@@ -1617,13 +1618,13 @@ function readDose(text, kind, mgEach) {
   if (!text || !String(text).trim()) return null;
   const toks = doseTokens(text), asks = [], notes = [];
   const unitName = n => kind === "pump" ? (n === 1 ? "pump" : "pumps") : kind === "pack" ? (n === 1 ? "cap/chew" : "caps/chews") : "mL";
-  const groups = []; let cur = null, mode = null, pending = [], prev = null, inMax = false, maxAmt = null, prn = false, stat = false, upto = false, cutAt = 0, changed = false;
+  const groups = []; let cur = null, mode = null, pending = [], prev = null, inMax = false, maxAmt = null, prnNext = false, stat = false, upto = false, cutAt = 0, changed = false;
   for (const t of toks) {
     if (t.t === "unknown") asks.push(`Herby didn't recognise "${t.raw}". Check the reading below is what the script means.`);
     if (t.ep) asks.push(t.ep);
     if (t.t === "unit") { const g = inMax && maxAmt ? maxAmt : cur && cur.amt; if (g && !g.unit) g.unit = t.unit; }
     else if (t.t === "max") inMax = true;
-    else if (t.t === "prn") prn = true;
+    else if (t.t === "prn") { if (cur && mode === "amt") cur.prn = true; else prnNext = true; } // "0.5mL PRN" or "PRN 0.5mL"
     else if (t.t === "upto") upto = true;
     else if (t.t === "asdir") asks.push(`"As directed" has no set amount. Make sure the amount below is what the patient takes each day.`);
     else if (t.t === "stat") { if (cur && !cur.freqs.length && mode === "amt") cur.stat = true; else stat = true; }
@@ -1634,7 +1635,7 @@ function readDose(text, kind, mgEach) {
       else if (cur && !cur.freqs.length && mode === "amt" && same(cur.amt, t)) { notes.push(`${t.raw} matches ${cur.amt.raw}.`); }
       else {
         inMax = false; mode = mode || "amt";
-        cur = { amt: t, freqs: mode === "freq" ? pending : [], stat }; stat = false; pending = [];
+        cur = { amt: t, freqs: mode === "freq" ? pending : [], stat, prn: prnNext }; stat = false; prnNext = false; pending = [];
         groups.push(cur);
       }
     }
@@ -1684,10 +1685,15 @@ function readDose(text, kind, mgEach) {
     return Math.max(n, slots.size) || null;
   }
 
-  const use = groups.slice(changed && cutAt < groups.length ? cutAt : 0).filter(g => !g.stat);
+  const latest = groups.slice(changed && cutAt < groups.length ? cutAt : 0), use = latest.filter(g => !g.stat && !g.prn);
   if (changed) asks.push(`The dose changes over time. Herby used the ${use.length > 1 ? "doses" : "dose"} written last.`);
   if (groups.some(g => g.stat)) notes.push("The STAT (one-off) dose isn't counted in the daily amount.");
-  if (!use.length) return { perDay: null, how: "", asks: [...new Set(asks.concat(["Only a one-off (STAT) dose is written. Enter the daily dose."]))], notes };
+  if (latest.some(g => g.prn)) notes.push("The PRN (as needed) dose isn't counted in the daily amount.");
+  if (!use.length) {
+    const why = latest.some(g => g.prn) ? "This dose is PRN (as needed) only, so Herby doesn't count it. Type the amount the patient takes each day."
+      : "Only a one-off (STAT) dose is written. Enter the daily dose.";
+    return { perDay: null, how: "", asks: [...new Set(asks.concat([why]))], notes };
+  }
   let total = 0; const parts = [];
   for (const g of use) {
     const a = g.amt;
@@ -1702,20 +1708,10 @@ function readDose(text, kind, mgEach) {
     parts.push(`${amtText} ${lab}`);
     total += each * n;
   }
-  let perDay = total;
-  let how = parts.length === 1 && !use[0].freqs.length ? `${parts[0]} a day` : parts.join(" + ") + ` = ${doseFmt(total)} ${unitName(total)} a day`;
+  const perDay = total;
+  const how = parts.length === 1 && !use[0].freqs.length ? `${parts[0]} a day` : parts.join(" + ") + ` = ${doseFmt(total)} ${unitName(total)} a day`;
   if (upto) notes.push(`"Up to": Herby used the full amount.`);
-  if (prn) {
-    if (maxAmt) {
-      let m = maxAmt.unit === "dose" ? null : toUnit(maxAmt, false);
-      if (maxAmt.unit === "dose" || (!maxAmt.unit && use.length === 1 && use[0].amt.unit && maxAmt.v >= 2 && Number.isInteger(maxAmt.v) && kind !== "pack" && kind !== "pump")) {
-        const one = toUnit(use[0].amt, true, true); m = one * maxAmt.v;
-        if (maxAmt.unit !== "dose") asks.push(`Herby read "max ${maxAmt.raw}" as ${doseFmt(maxAmt.v)} doses a day.`);
-      }
-      if (maxAmt.per && maxAmt.per.n !== 1) asks.push(`Check the maximum: Herby read it as per day.`);
-      if (m != null) { perDay = m; how = `PRN (as needed), max ${doseFmt(m)} ${unitName(m)} a day`; notes.push("PRN: Herby used the daily maximum, so the next bottle date isn't late."); }
-    } else asks.push(`PRN (as needed) with no daily maximum. Herby counted ${how.replace(/ = .*| a day$/, "")} every day.`);
-  } else if (maxAmt) notes.push(`A maximum is written; Herby used the regular dose.`);
+  if (maxAmt) notes.push(`A maximum is written; Herby used the regular dose.`);
   return { perDay: perDay > 0 ? perDay : null, how, asks: [...new Set(asks)], notes };
 }
 </script>
