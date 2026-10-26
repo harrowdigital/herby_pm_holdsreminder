@@ -2343,7 +2343,7 @@ const KC = [
   const row = a => `<button type="button" class="kc-row" data-a="${a.id}"><span><b>${a.title}</b><small>${a.topic.topic}</small></span><span class="kc-arrow" aria-hidden="true">&rarr;</span></button>`;
   nav.innerHTML = KC.map(t => `<div class="kc-topic" data-t="${t.id}"><button type="button" class="kc-topic-btn" aria-expanded="false">${t.topic}<span class="kc-chev" aria-hidden="true"></span></button>
     <div class="kc-sub">${t.articles.map(a => `<button type="button" data-a="${a.id}">${a.title}</button>`).join("")}</div></div>`).join("");
-  document.getElementById("kcCards").innerHTML = KC.map(t => `<button type="button" class="kc-card" data-topic="${t.id}">${t.art}<h4>${t.topic}</h4><p>${t.desc}</p><span class="kc-pill">View articles</span></button>`).join("");
+  document.getElementById("kcCards").innerHTML = KC.map(t => `<button type="button" class="kc-card" data-topic="${t.id}">${t.art}<h4>${t.topic}</h4><p>${t.desc}</p><span class="kc-pill">${t.articles.length === 1 ? "View article" : "View articles"}</span></button>`).join("");
   document.getElementById("kcQuick").innerHTML = all.map(a => `<button type="button" data-a="${a.id}"># ${a.short}</button>`).join("");
   document.getElementById("kcAll").innerHTML = all.map(row).join("");
   const mark = id => nav.querySelectorAll(".kc-sub button").forEach(b => b.classList.toggle("on", b.dataset.a === id));
@@ -2352,12 +2352,15 @@ const KC = [
   const show = html => { page.innerHTML = html; home.hidden = true; page.hidden = false; window.scrollTo(0, 0); };
   function showHome() { page.hidden = true; home.hidden = false; search.value = ""; results.hidden = true; mark(""); }
   function showTopic(id) {
-    const t = KC.find(x => x.id === id); openNav(id); mark("");
+    const t = KC.find(x => x.id === id);
+    if (t.articles.length === 1) return showArticle(t.articles[0].id); // only one article: open it straight away
+    openNav(id); mark("");
     show(crumb([`<span>${t.topic}</span>`]) + `<div class="kc-topic-head">${t.art}<div><h2>${t.topic}</h2><p>${t.desc}</p></div></div><div class="kc-rows">${t.articles.map(row).join("")}</div>`);
   }
   function showArticle(id) {
     const a = all.find(x => x.id === id); openNav(a.topic.id); mark(id);
-    show(crumb([`<button type="button" data-topic="${a.topic.id}">${a.topic.topic}</button>`, `<span>${a.title}</span>`]) +
+    const topicCrumb = a.topic.articles.length > 1 ? `<button type="button" data-topic="${a.topic.id}">${a.topic.topic}</button>` : `<span>${a.topic.topic}</span>`;
+    show(crumb([topicCrumb, `<span>${a.title}</span>`]) +
       `<article class="kc-article"><h2>${a.title}</h2><p class="kc-meta">${a.topic.topic} · from the Notion Knowledge Center</p><div class="kb-body">${a.body}</div></article>`);
   }
   search.addEventListener("input", () => {
@@ -2375,7 +2378,11 @@ const KC = [
     if (t.matches(".kb-copy")) return copyKb(t);
     if (t.id === "kcNote") return document.getElementById("fbOpen").click();
     if (t.dataset.kcGo) return go(t.dataset.kcGo);
-    if (t.matches(".kc-topic-btn")) { const box = t.parentElement; return openNav(box.dataset.t, !box.classList.contains("open")); }
+    if (t.matches(".kc-topic-btn")) {
+      const box = t.parentElement, topic = KC.find(x => x.id === box.dataset.t);
+      if (topic.articles.length === 1) return showArticle(topic.articles[0].id); // same for the sidebar
+      return openNav(box.dataset.t, !box.classList.contains("open"));
+    }
     if (t.dataset.a) return showArticle(t.dataset.a);
     if (t.dataset.topic) return showTopic(t.dataset.topic);
     if (t.hasAttribute("data-home")) return showHome();
