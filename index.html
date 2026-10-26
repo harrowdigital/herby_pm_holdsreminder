@@ -459,6 +459,42 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 @media (max-width: 560px) { .fb-fab { right: 14px; bottom: 14px; width: 56px; height: 56px; } .fb-card { right: 16px; bottom: 82px; } .fb-tip { display: none; } }
 @media (prefers-reduced-motion: reduce) { .fb-fab:hover .leaf-l, .fb-fab:hover .leaf-r, .fb-card { animation: none; } }
 .herby-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+/* ---------- Knowledge Center ---------- */
+.kb-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.kb-chip { border: 1px solid var(--line); background: #FFFFFF; color: var(--ink); border-radius: 999px; padding: 7px 13px; font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; }
+.kb-chip:hover { border-color: var(--lime-deep); }
+.kb-chip.on { background: #0E0F0D; border-color: #0E0F0D; color: #FFFFFF; }
+.kb-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.kb-cat { margin: 14px 4px 2px; font-family: "Inter Tight", var(--f-body); font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.kb-item { background: #FFFFFF; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 1px 2px rgba(14, 15, 13, .04); overflow: hidden; }
+.kb-item summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 18px; cursor: pointer; font-weight: 700; font-size: 16px; }
+.kb-item summary::-webkit-details-marker { display: none; }
+.kb-item summary:hover { background: var(--chip); }
+.kb-chev { width: 10px; height: 10px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .2s ease; flex: none; margin-top: -4px; }
+.kb-item[open] .kb-chev { transform: rotate(-135deg); margin-top: 4px; }
+.kb-body { padding: 2px 18px 18px; font-size: 14.5px; line-height: 1.55; color: #2A2D27; }
+.kb-body p { margin: 8px 0; }
+.kb-body ul, .kb-body ol { margin: 8px 0; padding-left: 20px; }
+.kb-body li { margin: 5px 0; }
+.kb-h { font-weight: 800; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-top: 14px !important; }
+.kb-say { display: flex; align-items: flex-start; gap: 10px; background: var(--lime-soft); border: 1px solid #D6EFBC; border-radius: 14px; padding: 10px 10px 10px 14px; margin: 8px 0; }
+.kb-say-text { margin: 0 !important; flex: 1; font-style: italic; color: #1C2A15; min-width: 0; overflow-wrap: anywhere; }
+.kb-copy { flex: none; border: 0; border-radius: 999px; background: #0E0F0D; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; padding: 7px 13px; cursor: pointer; }
+.kb-copy.done { background: var(--good); }
+.kb-eg { font-size: 13px; color: var(--muted); }
+.kb-warn { background: var(--orange-soft); border: 1px solid var(--orange-line); border-radius: 12px; padding: 9px 12px; color: #4A2A12; }
+.kb-note { font-size: 13px; color: var(--muted); }
+.kb-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
+.kb-table th, .kb-table td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.kb-table th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.kb-steps li { padding-left: 2px; }
+.kb-empty, .kb-source { color: var(--muted); font-size: 13.5px; padding: 6px 4px; }
+@media (max-width: 560px) {
+  .kb-appts tr { display: grid; grid-template-columns: 1fr; border-bottom: 1px solid var(--line); padding: 6px 0; }
+  .kb-appts th { display: none; }
+  .kb-appts td { border: 0; padding: 3px 4px; }
+  .kb-say { flex-direction: column; }
+}
 </style>
 
 <svg class="herby-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
@@ -515,7 +551,7 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
   <div class="home-grid" aria-hidden="true"><span></span><span></span><span></span></div>
   <nav class="home-nav" aria-label="Herby">
     <span class="home-logo"><span class="home-logo-mark" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none"><use href="#hbArt" x="100" y="110" width="300" height="270"/></svg></span>Herby</span>
-    <div class="home-links"><button type="button" data-go="hold">Hold Scripts</button><button type="button" data-go="cbd">CBD Calculator</button></div>
+    <div class="home-links"><button type="button" data-go="hold">Hold Scripts</button><button type="button" data-go="cbd">CBD Calculator</button><button type="button" data-go="kb">Knowledge Center</button></div>
     <span class="home-pill">Created by JCIHB</span>
   </nav>
   <div class="home-inner">
@@ -557,10 +593,11 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
     <ellipse cx="293" cy="266" rx="6" ry="3" fill="#B6EA7B" opacity=".18"/>
     </svg></button>
     </div>
-    <p class="home-sub">Your PlantMed assistant for hold script reminders and CBD calculations, <span class="hl">done in seconds</span>.</p>
+    <p class="home-sub">Your PlantMed assistant for hold script reminders, CBD calculations and call know-how, <span class="hl">done in seconds</span>.</p>
     <div class="home-ctas">
       <button type="button" class="cta primary" data-go="hold">Hold Scripts Reminder</button>
-      <button type="button" class="cta" data-go="cbd">CBD Calculator <span aria-hidden="true">&rarr;</span></button>
+      <button type="button" class="cta" data-go="cbd">CBD Calculator</button>
+      <button type="button" class="cta" data-go="kb">Knowledge Center <span aria-hidden="true">&rarr;</span></button>
     </div>
     <p class="home-foot" id="homeToday"></p>
   </div>
@@ -700,6 +737,22 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
   </section>
   <div id="cbdCards" class="cbd-cards"></div>
   <p class="cbd-empty" id="cbdEmpty" hidden></p>
+</div>
+
+<div class="view" id="viewKb" hidden>
+  <section class="panel kb-find" aria-labelledby="t-kb">
+    <div class="panel-head">
+      <h2 class="panel-title" id="t-kb"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8 7.5h8M8 11h6"/></svg></span>Knowledge Center</h2>
+    </div>
+    <p class="hint">How we handle calls at PlantMed: spiels, steps, appointment types, templates and payments. Search, or pick a topic.</p>
+    <div class="cbd-search">
+      <svg class="cbd-search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="kbSearch" type="search" autocomplete="off" spellcheck="false" placeholder="Search, e.g. PO Box, voicemail, med review, side effects" aria-label="Search the Knowledge Center">
+    </div>
+    <div class="kb-chips" id="kbChips" role="toolbar" aria-label="Topics"></div>
+  </section>
+  <div id="kbList" class="kb-list"></div>
+  <p class="kb-source" id="kbSource"></p>
 </div>
 </div><!-- /shell -->
 
@@ -1726,8 +1779,8 @@ function readDose(text, kind, mgEach) {
 </script>
 <script>
 // ---------- screens: home menu, hold scripts, CBD calculator ----------
-const VIEWS = { hold: "viewHold", cbd: "viewCbd" };
-const TOOL_NAMES = { hold: "Hold scripts reminder", cbd: "CBD calculator" };
+const VIEWS = { hold: "viewHold", cbd: "viewCbd", kb: "viewKb" };
+const TOOL_NAMES = { hold: "Hold scripts reminder", cbd: "CBD calculator", kb: "Knowledge Center" };
 // ---------- password for Hold Scripts ----------
 // Only a SHA-256 fingerprint of the password is stored here, never the password itself.
 const HOLD_PASS_HASH = "57991d0f84d501283b39a6754390a47253d356e31edf0d7eb7f3ab2201e7491e";
@@ -1822,6 +1875,7 @@ function go(view) {
   if (location.hash.slice(1) !== tool) history.replaceState(null, "", tool ? "#" + tool : location.pathname + location.search);
   window.scrollTo(0, 0);
   if (tool === "cbd") setTimeout(() => document.getElementById("cbdSearch").focus(), 50);
+  if (tool === "kb") setTimeout(() => document.getElementById("kbSearch").focus(), 50);
   if (typeof fitNames === "function") fitNames();
 }
 document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go)));
@@ -2156,6 +2210,253 @@ const FEEDBACK_TO = "jc.hbagaslao@gmail.com";
       location.href = "mailto:" + FEEDBACK_TO + "?subject=" + encodeURIComponent("Herby feedback from " + from) + "&body=" + encodeURIComponent(body);
     } finally { send.disabled = false; send.textContent = "Send to JC"; }
   });
+})();
+// ---------- Knowledge Center: PlantMed call know-how, from the Notion page PlantMed AU › Calls ----------
+// To update: change an entry below (or ask Claude to re-read the Notion page). say() is a spiel staff can copy.
+const KB_SOURCE = "Notion › PlantMed AU › Calls · read 26/10/2026";
+const say = t => `<div class="kb-say"><p class="kb-say-text">${t}</p><button type="button" class="kb-copy">Copy</button></div>`;
+const ul = items => `<ul>${items.map(i => `<li>${i}</li>`).join("")}</ul>`;
+const warn = t => `<p class="kb-warn">${t}</p>`;
+const KB_CATS = ["Call basics", "Orders & dispense", "Hold scripts", "CBD", "Appointments", "Side effects", "Messages & templates", "Payments"];
+const KB = [
+  // ----- Call basics
+  { cat: "Call basics", title: "Call flow", tags: "start verify dob name note template who why resolution helix pop up",
+    body: ul(["Start with <b>DOB</b>, then <b>name</b> (a phone number can also find them). Check who is calling.",
+      "Existing patient: read any pop-up in their Helix notes.",
+      "Ask how we can help.",
+      "Always leave a note in Creator Club: <b>Who, Why, Resolution</b>.",
+      "NCP: email the nurse if they called because they missed their appointment."]) +
+      `<p class="kb-h">Creator Club note template</p>` + say("Call:<br>Reason:<br>Resolution:") },
+  { cat: "Call basics", title: "No DOB on file / new patient", tags: "new patient enquiry onboarding transfer olivia sadaf sash sue welcome pack driving",
+    body: `<p>If the phone number or DOB doesn't come up, it's likely a new patient.</p>` +
+      say("It seems like I don't have any data on file, are you a new patient inquiring about our services? I can transfer you to the onboarding team who will be able to answer questions about our services.") +
+      ul(["Onboarding team: <b>Olivia, Sadaf</b>. Paediatric or complex enquiries: <b>Sash, Sue</b>.",
+        "Always send the patient a welcome pack.",
+        "Cannabis and driving questions: stick to the phone script."]) },
+  { cat: "Call basics", title: "Someone calling on behalf of a patient", tags: "ami authority adobe verbal confirmation carer family",
+    body: ul(["Check whether they are listed on an <b>AMI</b>.",
+      "If the patient is there, ask for a verbal confirmation:" + say("Is the patient there? Can I have a verbal confirmation?"),
+      "If not, send the AMI document in Adobe: Send › Choose files › Templates › AMI › send to the patient's email.",
+      "If the patient can't sign, forward to management."]) },
+  { cat: "Call basics", title: "Police, hospitals and other authorities", tags: "referrer authority police correctional clinic mental health ward hospital practice manager",
+    body: `<p>Calls from police, correctional centres, other clinics, mental health wards or hospitals: <b>notify the practice manager</b>.</p>` },
+  { cat: "Call basics", title: "Timezones", tags: "time zone qld nsw vic act tas sa nt wa",
+    body: say("At [time] QLD time, but for you that would be [time].") +
+      `<table class="kb-table"><tr><th>State</th><th>Compared with QLD</th><th>1pm QLD is</th></tr>
+      <tr><td>NSW, VIC, ACT, TAS</td><td>1 hour ahead</td><td>2pm</td></tr>
+      <tr><td>SA</td><td>½ hour ahead</td><td>1:30pm</td></tr>
+      <tr><td>NT</td><td>½ hour behind</td><td>12:30pm</td></tr>
+      <tr><td>WA</td><td>2 hours behind</td><td>11am</td></tr></table>
+      <p class="kb-note">QLD has no daylight saving. This table is for daylight saving time (first Sunday in October to first Sunday in April). Outside it, NSW, VIC, ACT and TAS are the same time as QLD, and SA is ½ hour behind.</p>` },
+  { cat: "Call basics", title: "Systems and inboxes", tags: "inbox helix creator club clickup xero zeller auspost tracking phone hours",
+    body: ul(["<b>My inbox</b>; <b>Dispense inbox</b> (medication confirmation); <b>Info inbox</b> (generic information, medication complaint forms, approvals).",
+      "<b>Helix</b>; <b>Creator Club</b> (always leave notes); <b>ClickUp</b> (medication confirmation, SMS and note templates, waitlist).",
+      "Parcel tracking: auspost.com.au. Payments: Xero and Zeller.",
+      "Clinic phone: <b>(07) 3193 9280</b>. Phone lines are open Mon–Fri, 8:30–4:00."]) },
+
+  // ----- Orders & dispense
+  { cat: "Orders & dispense", title: "Order confirmation call", tags: "dispense call back confirm order collect courier address medication total invoice",
+    body: `<ol class="kb-steps">
+      <li>If they called in, add a note. Confirm <b>DOB and name</b>.</li>
+      <li>Ask:${say("Would you like to collect this order or have it sent to you via courier?")}</li>
+      <li><b>Collect:</b>${say("Okay, you'll have it collected.")}</li>
+      <li><b>Courier:</b> confirm the address, then the order. If it's going to a different address, strike through the current address. "Same as Helix": no. Add a note if they've moved, it's a work address, etc.</li>
+      <li>Confirm the medications:${say("The medications I have here are…")}
+        <p class="kb-eg">e.g. 1x Mystery Mountain Candy Blast + rpt $195.00 · 1x MM Sunset Soap + rpt $195.00 · 1x Midz Indica + rpt $100.00</p>
+        ${say("The total for those items comes to $490.00.")}
+        Courier (<b>$22, all states</b>):${say("The total amount including the $22 courier fee is $512.00.")}</li>
+      <li>Let them know they have repeats:${say("Just so you know, you have repeats for all of them.")}</li>
+      <li>If they don't want a medication, put it in <b>hold scripts</b>. If they only want some of the medications, delete the others (they stay in the database).</li>
+      <li>Invoice and change fee: see <b>Invoice and payment spiels</b>.</li>
+      <li>Mark the email (see <b>Dispense inbox icons</b>) and add the Creator Club note (template in ClickUp).</li></ol>` +
+      ul(["If it leaves today, it's overnight shipping.",
+        "Supplements and vapes: reception invoices these separately and the patient gets a different email. Email reception."]) },
+  { cat: "Orders & dispense", title: "Out of stock, complex questions, call backs", tags: "oos out of stock swap complex question call back dispense",
+    body: `<p>Out of stock:</p>` + say("Some of the items are out of stock, we'll get that swapped for you and we'll call you back.") +
+      `<p>A complex question:</p>` + say("I will call you back and let you know.") +
+      `<p>Dispense question:</p>` + say("I'll get someone from dispense to call you back.") },
+  { cat: "Orders & dispense", title: "Dispense inbox icons", tags: "inbox icon star tick colour flag after confirmation legend",
+    body: `<table class="kb-table"><tr><th>Icon</th><th>Meaning</th></tr>
+      <tr><td>✅</td><td>Order confirmed for pickup</td></tr>
+      <tr><td>🟦 ❕</td><td>Order confirmed for courier</td></tr>
+      <tr><td>🟣 ❔</td><td>Order confirmed for a specific scheduled date</td></tr>
+      <tr><td>🟨 ❕</td><td>Order needs urgent attention (titration, staff order)</td></tr>
+      <tr><td>🟪 ★</td><td>Order to be prepped</td></tr>
+      <tr><td>🟩 ★</td><td>Order ready for confirmation call</td></tr>
+      <tr><td>🟥 ★</td><td>Patient did not answer the confirmation call</td></tr>
+      <tr><td>🟨 ★</td><td>Awaiting further information; an email has been sent requesting it</td></tr>
+      <tr><td>🟦 ★</td><td>Some or all prescriptions go in the Hold scripts drive</td></tr>
+      <tr><td>🟧 ★</td><td>Updates or information received from management</td></tr>
+      <tr><td>❗️</td><td>Non-urgent information; patient has requested a medication invoice</td></tr>
+      <tr><td>🟧 ˃˃</td><td>A change in the order has been requested (e.g. courier to collection)</td></tr></table>` },
+  { cat: "Orders & dispense", title: "PO Boxes and parcel lockers", tags: "po box parcel locker address residential work s8 startrack australia post sign",
+    body: `<p>S8 medications <b>can't</b> go to PO Boxes, Parcel Lockers or care of a Post Office. Courier orders must go to a residential or work address where the patient can sign. This started around 31 July and patients were emailed, so anything sent to a PO Box was before the change.</p>` +
+      say("As per Australia Post and StarTrack requirements, Schedule 8 (S8) medications cannot be delivered to PO Boxes, Parcel Lockers, or care of a Post Office address. All medication orders must be sent directly to your residential address, and you must be available to personally sign for the delivery. If no one is available to sign, Australia Post will leave a collection card or send an SMS, and your parcel will be redirected to your nearest Post Office for collection with photo ID and signature. If appropriate, you may nominate your workplace as your delivery address, provided it is a valid street address where you will be available to personally receive and sign for the delivery.") },
+  { cat: "Orders & dispense", title: "Portal orders", tags: "portal sku shelf life beacon",
+    body: ul(["<b>Don't</b> proceed with SKUs that have under 3 months shelf life.", "Beacon: don't put an order portal note."]) },
+  { cat: "Orders & dispense", title: "Vapes", tags: "vape vapes reception stock",
+    body: ul(["Send an email to reception.", "Call someone in the office to check stock."]) },
+  { cat: "Orders & dispense", title: "Medication complaint", tags: "complaint form adobe faulty",
+    body: ul(["Send the <b>medication complaint form</b> from Adobe to the patient's email.", "It can take up to 6 weeks.", "If they need a new medication, book them with a doctor."]) },
+
+  // ----- Hold scripts
+  { cat: "Hold scripts", title: "Hold script request (HSR)", tags: "hsr hold scripts request release email subject 24-48 hours valid 6 months",
+    body: ul(["🚨 Check whether they just had an appointment and should be waiting for a call from dispense.",
+      "🚨 Scripts are valid for <b>6 months</b> (check the expiry on the script). Tell them when it's valid until.",
+      "If they need another script, book an appointment.",
+      "When confirmed, send the HSR from your own email to hold scripts, subject <b>[PT NAME – DOB]</b>, saying what they want released. Add a CRM note."]) +
+      say("The hold scripts team will call within 24–48 hours to confirm the order.") +
+      say("You've got a script for one and another repeat.") },
+  { cat: "Hold scripts", title: "Patient says they have a script on hold", tags: "adamant missing script compare helix creator club",
+    body: ul(["Compare Helix and Creator Club, and cross-reference whether scripts were sent.",
+      "If nothing is there, email hold scripts (e.g. \"Hey, there's no scripts in there\")."]) },
+  { cat: "Hold scripts", title: "Outstanding invoice note", tags: "outstanding invoice missing collection courier note paid received",
+    body: say("Patient Name:<br>DOB:<br>Hold Script Request<br>PLEASE NOTE: Outstanding medication invoice from [DATE] / Missing collection / courier notes - patient reports paid / received. Please notify the patient if the information is incorrect, or proceed with the order.") },
+  { cat: "Hold scripts", title: "Holds sheet", tags: "sheet ceased folder owner 1 year 2 years debt write off link",
+    body: `<ol class="kb-steps">
+      <li>Around <b>1 year</b> since the last consult: mark <b>ceased</b>, note "1 year since last consult" and add the folder owner name.</li>
+      <li><b>2 years</b>: mark ceased (no note needed), add the folder owner name.</li>
+      <li>Don't link the hold scripts folder for either of the above.</li>
+      <li>Last consult <b>within 1 year</b>: add the holds folder link, click the tab, don't record the owner file.</li>
+      <li>Debt write-off: check the notes; if yes, tick the checkbox.</li></ol>` },
+  { cat: "Hold scripts", title: "Repeats and paper scripts", tags: "repeat dispensed original paper script",
+    body: ul(["Once a script has been dispensed, the repeat generates a new repeat.", "The original script is the paper script."]) },
+  { cat: "Hold scripts", title: "Hold scripts expiry reminder", tags: "reminder expiry sms email courtesy template",
+    body: `<p>Use Herby's <b>Hold Scripts Reminder</b> to write it. It formats the names, repeats and expiry dates, and has the SMS/email notes, From and Subject ready to copy.</p>` },
+
+  // ----- CBD
+  { cat: "CBD", title: "CBD is mandatory", tags: "cbd mandatory policy thc side effects oils with flowers compliance",
+    body: say("Your prescribing doctor has advised your CBD must be included with your order, for the release of your THC products, in line with your treatment plan.") +
+      say("CBD helps mitigate some of the negative side effects of THC, which is why it's important and part of PlantMed's policies.") +
+      say("It's not just a matter of buying, it's about making sure you're compliant. Otherwise you're spending money without getting the results you want.") +
+      ul(["We always script oils with flowers."]) },
+  { cat: "CBD", title: "CBD is due", tags: "cbd due calculation heads up include order",
+    body: `<p>Before you tell them what they have on hold, check whether their CBD is due (use Herby's <b>CBD Calculator</b>).</p>` +
+      say("Just a heads up, it looks like your CBD is due already, so we have to include that in your order.") +
+      say("The doctor has indicated that you need to get the CBD oil. According to the calculation you are due on [DATE], but for right now you need to get the oil with the flowers.") },
+  { cat: "CBD", title: "Patient isn't CBD compliant", tags: "non compliant cbd steps before call bottles dose",
+    body: `<p class="kb-h">Before the call</p><ol class="kb-steps"><li>Check how many bottles or packs they collected.</li><li>Double-check the CBD due date.</li><li>Check the last dispense date and current dosing.</li></ol>` +
+      `<p class="kb-h">If they don't give a reason, ask</p>` + say("How many mL are you taking per day?") },
+
+  // ----- Appointments
+  { cat: "Appointments", title: "Appointment types and prices", tags: "int tele initial new patient titr titration dr scrpt doctor script major rev major review med rev medication review med review reapp reapplication re-application approvals ncp nurse care nrs scrpt nurse script nurse consult cc cll courtesy admin letter nutritionist price cost fee length how much",
+    body: `<table class="kb-table kb-appts"><tr><th>Type</th><th>Length · price</th><th>When</th></tr>
+      <tr><td><b>INT TELE</b><br>Telehealth / in-clinic</td><td>1 hr · $200</td><td>New patients. Always transfer to the onboarding team (Sash, Olivia, Sue, Sadaf). 🚨 Changing doctor: alert management.</td></tr>
+      <tr><td><b>TITR</b><br>In-clinic / telehealth</td><td>30 min · $170</td><td>Approvals, dosing, medications.</td></tr>
+      <tr><td><b>DR SCRPT</b><br>Telehealth</td><td>15 min · $90</td><td>Script repeat / treatment progress, within 6 months of the last appointment.</td></tr>
+      <tr><td><b>MAJOR REV</b><br>Telehealth</td><td>30 min · $175</td><td><b>Dr Teh only.</b> Once, 4–6 months after starting treatment (after 5 weeks post titration); full check and nurse handover if stable. Nurse handover is valid for 2 years; if older, note "UPDATE NCP HANDOVER".</td></tr>
+      <tr><td><b>MED REV</b><br>Telehealth</td><td>30 min · $140</td><td>12+ months since the last <b>doctor</b> appointment (nurse consults don't count), approvals still valid for a year, or changing/adding medications.</td></tr>
+      <tr><td><b>REAPP</b><br>Telehealth</td><td>30 min · $175</td><td>Approvals expiring in the next months. They get scripts and new approvals (2 years).</td></tr>
+      <tr><td><b>NCP</b><br>Telehealth</td><td>15 min · $90</td><td>Return to nurse care, e.g. after maxing out 5 nurse consults and seeing the doctor.</td></tr>
+      <tr><td><b>NRS SCRPT</b><br>Telehealth</td><td>15 min · $70</td><td><b>5 nurse consults max</b>, then they see the doctor (then NCP).</td></tr>
+      <tr><td><b>CC CLL</b><br>Telehealth</td><td>15 min · free</td><td>Courtesy call with Zac (patient care coordinator) or Sash. See <b>Courtesy calls</b>.</td></tr>
+      <tr><td><b>ADMIN</b><br>Telehealth</td><td>15 min · $65</td><td>Urgent: adverse reactions. No scripts, a call with the doctor.</td></tr>
+      <tr><td><b>LETTER DRAFT</b><br>Telehealth</td><td>30 min · $140</td><td>For legal reasons. If they just need a letter, we can send a MAL for free.</td></tr>
+      <tr><td><b>Nutritionist</b></td><td>$200 initial · $110 follow-up · $180 6 months</td><td>Oksana, Wednesdays only. Transfer to Sue or Sash.</td></tr></table>` },
+  { cat: "Appointments", title: "Booking rules", tags: "book doctor order latif salinas teh prasad morning waitlist reschedule confirm helix cancelled same day missed fee 80 peads",
+    body: ul(["Doctor order: <b>(1) Latif, (2) Salinas, (3) Teh, (4) Prasad</b>. Fill the calendar from the morning first:" + say("I have a 9am available for Dr Latif."),
+      "If they have a preference, note what the patient can only do.",
+      "Day fully booked but they want a specific time: add them to the <b>ClickUp waitlist</b>.",
+      "We can reschedule if they have a later date but want sooner.",
+      "Check whether they should see Dr Teh. A nurse appointment after 6 months needs to be with the doctor.",
+      "Any change to initial, titration or major review: update the appointments in Creator Club (also script repeat and major review dates).",
+      "Initial and titration must be completed; to reschedule, forward to admin.",
+      "Called back to confirm: confirm in Helix and add <b>CONF [your initials] [DATE]</b>.",
+      "Calling back from CANCELLED: check whether the slot is taken. Taken: reschedule. Free: confirm in Helix.",
+      "Reschedule <b>same day</b>: Patient queue › Did not wait › Remove › email the doctor.",
+      "🚨 Missed by half an hour: they need to pay <b>$80</b> (or pay for the appointment). Alert management: email Grace, CC Sash. If approved, reschedule (prepaid).",
+      "If they don't answer: voicemail and SMS.",
+      "Paediatrics: transfer to Sue or Sash."]) },
+  { cat: "Appointments", title: "Courtesy calls", tags: "courtesy call cc cll zac zak sash cease side effects not working dva external scripts aggressive letter",
+    body: ul(["Free, 15 minutes, with <b>Zac</b> (patient care coordinator) or <b>Sash</b>. Mandatory: don't cancel, reschedule.",
+      "For: ceasing treatment, side effects that aren't urgent, meds not working, not wanting to pay for or see the doctor/nurse.",
+      "Severe adverse reactions: book a courtesy call with Zak or Dr Teh.",
+      "Aggressive, or insisting they just want a letter and no call: email all the information to the care coordinators (Zak and Sash).",
+      "DVA or external scripts: forward to Sash or Will."]) },
+
+  // ----- Side effects
+  { cat: "Side effects", title: "Side effects and adverse reactions", tags: "side effects adverse palpitations hallucinations hospital twitching jittering bleeding sleeping courtesy urgent",
+    body: `<p>Immediately notify the patient coordinator and managers, and <b>book a (yellow) courtesy call</b>.</p>` +
+      say("I will not be able to help you with that today, but I will book you a courtesy call with our patient coordinator and they can take some notes and we can discuss how we are able to help the side effects for you.") +
+      warn("Update the doctor and management for: heart palpitations, hallucinations, hospitalisation in any form, twitching, jittering, bleeding, or sleeping more than 18 hours.") +
+      `<p>Urgent adverse reactions can be booked as an <b>ADMIN</b> appointment (a call with the doctor).</p>` },
+
+  // ----- Messages & templates
+  { cat: "Messages & templates", title: "Voicemail", tags: "voicemail vm sms red star clickup dispense holds",
+    body: `<p class="kb-h">Dispense</p>` + say("Hi, it's [YOUR NAME] here from PlantMed Dispense. We're calling about your medication order. Please contact us on 3193 9280 when available and we can organise that for you.") +
+      `<p class="kb-h">Holds</p>` + say("Hi, it's [YOUR NAME] here from PlantMed Dispense. We're calling about your medication order from holds. Please contact us on 3193 9280 when available and we can organise that for you.") +
+      `<p class="kb-h">Then</p><ol class="kb-steps"><li>Write in the Medication Confirmation email title: <b>VM/SMS [initials] [DATE] - [TIME]</b>.</li><li>Copy the note from ClickUp into the patient's Creator Club notes (Dispense or Holds, depending on the inbox).</li><li>Send the patient the SMS from ClickUp (Dispense or Holds).</li><li>Change the email star to a <b>red star</b>.</li></ol>` },
+  { cat: "Messages & templates", title: "SMS: appointments", tags: "sms confirm rescheduled change in schedule appointment text",
+    body: `<p class="kb-h">Confirmed</p>` + say("Hi [NAME], your doctor scripting appointment is confirmed for [DATE] at [TIME] (Telehealth - Phone) - please be ready for Dr [NAME]'s call at that time.<br><br>Thank you and have a great day!<br><br>PlantMed – 07 3193 9280") +
+      `<p class="kb-h">Rescheduled</p>` + say("Hi [NAME], I've rescheduled your appointment with [Nurse/Dr NAME] to [DATE] at [TIME] (Telehealth - Phone). Please be ready for their call at that time.<br><br>Thank you and have a great day!<br><br>PlantMed – 07 3193 9280") +
+      `<p class="kb-h">Change in schedule</p>` + say("This is a courtesy message to notify you of a change with your upcoming appointment. Your scripting appointment is booked for [DATE] at [TIME] with [Nurse/Dr NAME].<br><br>Please reply Yes or No at least 24 hours before your appointment. No response will be taken as a declined booking.<br><br>Thank you for your patience and understanding<br><br>PlantMed – 07 3193 9280") },
+  { cat: "Messages & templates", title: "SMS: orders", tags: "sms order confirmed collection courier unable to reach invoice",
+    body: `<p class="kb-h">Order confirmed for collection/courier</p>` + say("Hi [NAME], we're currently preparing your order for [collection/courier]. Please wait 24-48 hours for the invoice to be sent. Once we've received your payment, we'll send you a text message when it's ready for pickup.<br><br>Thank you and have a great day!<br><br>PlantMed – 07 3193 9280") +
+      `<p class="kb-h">Unable to reach</p>` + say("Hi, Please contact the office in regards to your HOLD/DISPENSE SCRIPT request as we were unable to reach you. Phone lines are open Mon-Fri, 8:30-16:00 ~ PlantMed Team (07) 3193 9280") },
+  { cat: "Messages & templates", title: "Inbox and Creator Club notes", tags: "note confirmed prepping courier collection tried to contact submitted website hsr email sent",
+    body: say("HOLD SCRIPTS/DISPENSE ORDER CONFIRMED WITH PT - PREPPING FOR COURIER") +
+      say("HOLD SCRIPTS/DISPENSE ORDER CONFIRMED WITH PT - PREPPING FOR COLLECTION") +
+      say("HOLD SCRIPTS/DISPENSE TRIED TO CONTACT - VM/SMS - ORDER PREPPED IN INBOX") +
+      say("HOLD SCRIPT REQUEST SUBMITTED VIA WEBSITE") +
+      say("HSR > EMAIL SENT") },
+
+  // ----- Payments
+  { cat: "Payments", title: "Invoice and payment spiels", tags: "invoice direct deposit pay button card change fee 25 pickup courier tracking",
+    body: say("We will send you the invoice shortly. You can pay via direct deposit or by clicking the pay button on the invoice to pay with a card.") +
+      say("Once we have confirmed the order, if you decide to make any changes to the medication there is a $25 dispense fee. Knowing this, are you happy to go ahead and confirm what we have spoken about today?") +
+      `<p class="kb-h">Pickup</p>` + say("You can also pay card or cash when you come to collect your medication. We will also send you an SMS to let you know when the medication is ready to be collected.") +
+      `<p class="kb-h">Courier</p>` + say("Once we've received your payment we will send you an SMS with the tracking number so you can keep an eye on the package.") +
+      warn("Card payments are being phased out from 1 October (see <b>No card payments</b>). Check before offering card.") },
+  { cat: "Payments", title: "No card payments", tags: "card rba surcharge cash direct deposit paypal payid",
+    body: say("Please be aware that we are phasing out card payments from October 1st in response to the RBA surcharge reform. We have made this decision to ensure we can keep our services affordable for our patients without needing to increase prices. We still accept Cash, Direct Deposit, PayPal, and PayID for all transactions.") },
+  { cat: "Payments", title: "Bank details and PayID", tags: "bank bsb account number payid deposit consult products",
+    body: `<table class="kb-table"><tr><th>Account</th><th>BSB</th><th>Account no.</th></tr>
+      <tr><td>Consult invoices: PlantMed Consult Holding</td><td>633 000</td><td>198 660 896</td></tr>
+      <tr><td>PlantMed Products</td><td>633 000</td><td>171 880 016</td></tr></table>` +
+      `<p><b>PayID</b> works just like a bank transfer: <b>0466 455 972</b> or <b>payments@plantmed.net.au</b>.</p>` },
+  { cat: "Payments", title: "Checking and taking payments", tags: "xero zeller credited screenshot payments team ellen grace lauren direct deposit first time price increase",
+    body: ul(["Direct deposit the first time can take 24–48 hours; the pay now button is faster.",
+      "To check if a payment is credited: Zeller › Contacts › name › Invoices.",
+      "Confirm which account they paid and whether they used the invoice number or their name, then let the payments team know (Grace, Ellen, payments).",
+      "Ask for a screenshot sent to the payments email.",
+      "Payments over the phone: transfer to Ellen, Grace or Lauren.",
+      "Prices increased in January 2026; patients were emailed."]) },
+];
+
+(function () {
+  const list = document.getElementById("kbList"), search = document.getElementById("kbSearch"), chips = document.getElementById("kbChips");
+  if (!list) return;
+  let cat = "";
+  document.getElementById("kbSource").textContent = "Source: " + KB_SOURCE;
+  chips.innerHTML = ["", ...KB_CATS].map(c => `<button type="button" class="kb-chip${c ? "" : " on"}" data-cat="${c}">${c || "All"}</button>`).join("");
+  const norm = s => s.toLowerCase().replace(/<[^>]+>/g, " ").replace(/&[a-z]+;/g, " ");
+  KB.forEach(e => { e._text = norm(e.title + " " + e.tags + " " + e.cat + " " + e.body); });
+  function draw() {
+    const words = norm(search.value).split(/\s+/).filter(Boolean);
+    const starts = words.map(w => new RegExp("(^|[^a-z0-9])" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));  // match the start of a word: "box" finds "PO Box", not "inboxes"
+    const hits = KB.filter(e => (!cat || e.cat === cat) && starts.every(r => r.test(e._text)));
+    if (!hits.length) { list.innerHTML = `<p class="kb-empty">Nothing matches "${esc(search.value)}". Try another word, or pick a topic.</p>`; return; }
+    let html = "", last = "";
+    for (const e of hits) {
+      if (e.cat !== last) { html += `<h3 class="kb-cat">${e.cat}</h3>`; last = e.cat; }
+      html += `<details class="kb-item"${words.length ? " open" : ""}><summary><span>${e.title}</span><span class="kb-chev" aria-hidden="true"></span></summary><div class="kb-body">${e.body}</div></details>`;
+    }
+    list.innerHTML = html;
+  }
+  search.addEventListener("input", draw);
+  chips.addEventListener("click", e => {
+    const b = e.target.closest(".kb-chip"); if (!b) return;
+    cat = b.dataset.cat; chips.querySelectorAll(".kb-chip").forEach(x => x.classList.toggle("on", x === b)); draw();
+  });
+  list.addEventListener("click", e => {
+    const b = e.target.closest(".kb-copy"); if (!b) return;
+    const text = b.previousElementSibling.innerText.trim();
+    const back = () => { clearTimeout(b._t); b._t = setTimeout(() => { b.textContent = "Copy"; b.classList.remove("done"); }, 1600); };
+    list.querySelectorAll(".kb-copy.done").forEach(x => { x.textContent = "Copy"; x.classList.remove("done"); });
+    try { navigator.clipboard.writeText(text).then(() => { b.textContent = "Copied"; b.classList.add("done"); back(); }, () => { b.textContent = "Copy blocked"; back(); }); }
+    catch (err) { b.textContent = "Copy blocked"; back(); }
+  });
+  draw();
 })();
 </script>
 
