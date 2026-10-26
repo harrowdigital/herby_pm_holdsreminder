@@ -285,6 +285,8 @@ button.brand { border: 0; background: none; padding: 0; color: inherit; cursor: 
 .cbd-field .hint { font-weight: 600; color: #8A8E86; margin-left: 4px; }
 .cbd-field input.dose { font-weight: 600; }
 .cbd-field input.dose::placeholder { font-weight: 500; color: #9A9E96; font-size: 15px; }
+.dose-tip { margin: 2px 0 0; font-size: 12.5px; line-height: 1.4; color: #5B5F58; }
+.dose-tip b { color: var(--ink); }
 .dose-read { margin-top: 4px; border-radius: 14px; padding: 12px 14px; font-size: 14.5px; line-height: 1.45; }
 .dose-read p { margin: 0; }
 .dose-read.ok { background: #F3FBEA; border: 1px solid #D6EFBC; color: var(--lime-ink); }
@@ -1967,7 +1969,7 @@ function addCard(c, quiet) {
   const doseEg = c.kind === "oil" ? "e.g. 0.5  ·  0.5mL TDS  ·  0.3mL mane + 0.6mL nocte" : c.unit === "pump" ? "e.g. 2  ·  1 pump BD  ·  2 pumps nocte" : "e.g. 2  ·  1 cap BD  ·  1 mane + 2 nocte";
   const what = c.kind === "pack" && c.unit !== "pump" ? "Packs" : "Bottles";
   const qtyField = `<div class="cbd-field edit"><label for="qty-${id}">${what} collected</label><div class="qty"><button type="button" class="q-btn q-minus" aria-label="One less">&minus;</button><input id="qty-${id}" class="qty-in" type="text" inputmode="numeric" value="1" autocomplete="off"><button type="button" class="q-btn q-plus" aria-label="One more">+</button></div><span class="q-total" hidden></span></div>`;
-  const doseField = `<div class="cbd-field edit wide"><label for="dose-${id}">Dose <span class="hint">type the daily amount, or the dose as written on the script</span></label><input id="dose-${id}" class="dose" type="text" autocomplete="off" spellcheck="false" placeholder="${doseEg}"><div class="dose-read" aria-live="polite" hidden></div></div>`;
+  const doseField = `<div class="cbd-field edit wide"><label for="dose-${id}">Dose <span class="hint">type the daily amount, or the dose as written on the script</span></label><input id="dose-${id}" class="dose" type="text" autocomplete="off" spellcheck="false" placeholder="${doseEg}"><p class="dose-tip"><b>PRN in the dose?</b> Put a <b>+</b> before it, e.g. 0.5mL BD <b>+</b> 0.5mL PRN, so it isn't counted in the regular dose.</p><div class="dose-read" aria-live="polite" hidden></div></div>`;
   const autos = c.blank
     ? `<div class="cbd-field"><span class="lbl">Volume of bottle</span><span class="auto">–</span></div>
        <div class="cbd-field"><span class="lbl">Concentration</span><span class="auto">–</span></div>`
