@@ -40,6 +40,6 @@ Staff-confirmed corrections the raw sheet gets wrong live in `FIXES` in `tools/b
 
 ## Tests
 
-`python3 tests/run_tests.py` needs macOS (it uses the built-in `osascript` JavaScript engine). Expect `products 315 failures 0` and `dose cases 98 failures 0` (the CBD dose reader: plain amounts and script terms such as BD, TDS, mane and nocte; PRN doses are left out).
+`python3 tests/run_tests.py` needs macOS (it uses the built-in `osascript` JavaScript engine). Expect `products 315 failures 0` and `dose cases 109 failures 0` (the CBD dose reader: plain amounts and script terms such as BD, TDS, mane and nocte; PRN and extra "if any…" doses are left out).
 
 Created by JCIHB.
