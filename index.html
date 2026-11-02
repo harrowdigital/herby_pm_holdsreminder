@@ -893,6 +893,7 @@ function tokens(s) {
   const out = [];
   s = s.replace(/['\u2019]/g, ""); // GOD'S GIFT = GODS GIFT
   s = s.replace(/\bgirl\s+scout\s+cookies?\b/gi, "$& gsc"); // GSC = Girl Scout Cookies (BEACON GSC FLOWER)
+  s = s.replace(/\bsquarebears?\b/gi, "square bears"); // SQUAREBEARS = SQUARE BEARS
   s = s.replace(/\baustralian\s+natural(\s+therapeutics?)?(\s+group)?\b/gi, "antg"); // AUSTRALIAN NATURAL = ANTG
   s = s.replace(/\bfull[\s-]*spec(trum)?\b/gi, "fs"); // FULL SPECTRUM = FS, as the pricelist writes it
   s = s.replace(/\bfs(\d{2,3})\b/gi, "fs cbd$1"); // FS200 = CBD200 FS (KIND FS200 = KIND CBD200 FS)
@@ -1100,7 +1101,9 @@ const DISPLAY = new Map();
     DISPLAY.set(p, ((hasBrand ? "" : brand + " ") + name).trim());
   }
 })();
-function displayName(p) { return DISPLAY.get(p) || cleanBase(p); }
+// Square Bears are written without their cannabinoid ratio (staff request): NOVA ECLIPX BLUEBERRY SQUARE BEARS.
+const noBearsRatio = n => /square bears/i.test(n) ? n.replace(/\s*\bCBD\d+(?::[A-Z]+\d+)+/gi, "") : n;
+function displayName(p) { return noBearsRatio(DISPLAY.get(p) || cleanBase(p)); }
 // Products staff want written a set way in the message, whatever was typed (keyed by the exact pricelist name).
 const WRITE_AS = {
   "SPECTRUM BLUE 2.5/3.75 soft gels SOFT GELS (60 )*": "SPECTRUM BLUE SOFTGEL CAPSULES",
@@ -1482,7 +1485,7 @@ function render(keepSheet) {
           : "";
         const use = it.options.length
           ? `<div class="options"><span class="options-label">Pricelist options:</span>${it.options.map((p, k) =>
-              `<button type="button" class="keep opt" data-use="${idx}:${k}">${esc(cleanProductName(p.name).toUpperCase())} <span class="opt-meta">${p.size ? p.size + " " : ""}${p.type}</span></button>`).join("")}</div>`
+              `<button type="button" class="keep opt" data-use="${idx}:${k}">${esc(noBearsRatio(cleanProductName(p.name)).toUpperCase())} <span class="opt-meta">${p.size ? p.size + " " : ""}${p.type}</span></button>`).join("")}</div>`
           : "";
         const keep = (it.status === "check" || it.status === "missing")
           ? `<button type="button" class="keep" data-keep="${idx}">Keep as typed</button>`
