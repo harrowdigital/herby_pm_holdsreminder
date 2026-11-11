@@ -563,6 +563,13 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
   .kc-guide td:nth-child(2)::before { content: "What to do"; }
   .kc-guide td:nth-child(3)::before { content: "What to say"; }
 }
+/* ---------- tool tabs: switch between Hold Scripts, CBD Calculator and Knowledge Center from any tool ---------- */
+.tool-tabs { display: flex; gap: 4px; padding: 4px; background: #FFFFFF; border: 1px solid var(--line); border-radius: 999px; box-shadow: 0 1px 2px rgba(14, 15, 13, .04); }
+.tool-tabs button { border: 0; background: none; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 13.5px; font-weight: 700; color: #5B5F58; cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease; }
+.tool-tabs button:hover { color: var(--ink); background: var(--chip); }
+.tool-tabs button.on { background: #0E0F0D; color: #FFFFFF; }
+@media (max-width: 980px) { .tool-tabs { order: 3; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); border-radius: 18px; } .tool-tabs button { white-space: normal; line-height: 1.15; padding: 9px 6px; border-radius: 14px; } }
+@media (max-width: 420px) { .tool-tabs button { font-size: 12.5px; } }
 </style>
 
 <svg class="herby-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
@@ -700,6 +707,11 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
       <div class="sub" id="toolName">PlantMed Dispensary hold reminders</div>
     </div>
   </button>
+  <nav class="tool-tabs" aria-label="Herby tools">
+    <button type="button" data-go="hold">Hold Scripts</button>
+    <button type="button" data-go="cbd">CBD Calculator</button>
+    <button type="button" data-go="kb">Knowledge Center</button>
+  </nav>
   <div class="dates">
     <button type="button" class="date-pill menu-btn" id="toMenu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Menu</button>
     <span class="date-pill"><span>Today</span><b id="today"></b></span>
@@ -1966,6 +1978,7 @@ function go(view) {
   document.getElementById("shell").hidden = !tool;
   for (const k in VIEWS) document.getElementById(VIEWS[k]).hidden = k !== tool;
   if (tool) document.getElementById("toolName").textContent = TOOL_NAMES[tool];
+  document.querySelectorAll(".tool-tabs [data-go]").forEach(b => { const on = b.dataset.go === tool; b.classList.toggle("on", on); if (on) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
   if (location.hash.slice(1) !== tool) history.replaceState(null, "", tool ? "#" + tool : location.pathname + location.search);
   window.scrollTo(0, 0);
   if (tool === "cbd") setTimeout(() => document.getElementById("cbdSearch").focus(), 50);
