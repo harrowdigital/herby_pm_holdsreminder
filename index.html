@@ -573,11 +573,29 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
   .kc-guide td:nth-child(3)::before { content: "What to say"; }
 }
 /* ---------- tool tabs: switch between Hold Scripts, CBD Calculator and Knowledge Center from any tool ---------- */
-.tool-tabs { display: flex; gap: 4px; padding: 4px; background: #FFFFFF; border: 1px solid var(--line); border-radius: 999px; box-shadow: 0 1px 2px rgba(14, 15, 13, .04); }
-.tool-tabs button { border: 0; background: none; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 13.5px; font-weight: 700; color: #5B5F58; cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease; }
-.tool-tabs button:hover { color: var(--ink); background: var(--chip); }
+/* Left rail: tools on the far left, Knowledge Center topics under them when it is open */
+.shell { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 28px; align-items: start; }
+.shell-main { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.rail { position: sticky; top: 18px; background: #FFFFFF; border: 1px solid var(--line); border-radius: 22px; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; box-shadow: 0 1px 2px rgba(14, 15, 13, .04); }
+.tool-tabs { display: flex; flex-direction: column; gap: 3px; }
+.tool-tabs button { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; border-radius: 12px; padding: 10px 10px; font: inherit; font-size: 15px; font-weight: 600; color: var(--ink); cursor: pointer; text-align: left; transition: background .15s ease, color .15s ease; }
+.tool-tabs button svg { width: 18px; height: 18px; flex: none; }
+.tool-tabs button:hover { background: var(--chip); }
 .tool-tabs button.on { background: #0E0F0D; color: #FFFFFF; }
-@media (max-width: 980px) { .tool-tabs { order: 3; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); border-radius: 18px; } .tool-tabs button { white-space: normal; line-height: 1.15; padding: 9px 6px; border-radius: 14px; } }
+.rail-kc { display: none; flex-direction: column; gap: 2px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+.shell[data-tool="kb"] .rail-kc { display: flex; }
+.kc { grid-template-columns: minmax(0, 1fr) !important; }
+@media (max-width: 980px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .rail { position: static; order: 2; padding: 6px; border-radius: 18px; }
+  .shell-main { display: contents; }
+  .shell-main > .top { order: 1; }
+  .shell-main > .view { order: 3; }
+  .rail > .kc-side-h, .rail-kc, .rail > .kc-back { display: none !important; }
+  .tool-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .tool-tabs button { justify-content: center; text-align: center; font-size: 13.5px; font-weight: 700; padding: 9px 6px; line-height: 1.15; }
+  .tool-tabs button svg { display: none; }
+}
 @media (max-width: 420px) { .tool-tabs button { font-size: 12.5px; } }
 </style>
 
@@ -708,6 +726,22 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 </dialog>
 
 <div class="shell" id="shell" hidden>
+<aside class="rail" aria-label="Herby tools">
+  <p class="kc-side-h">Tools</p>
+  <nav class="tool-tabs">
+    <button type="button" data-go="hold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/></svg>Hold Scripts</button>
+    <button type="button" data-go="cbd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v4.5L6.5 12A5 5 0 0 0 10.5 20h3a5 5 0 0 0 4-8L14 7.5V3"/></svg>CBD Calculator</button>
+    <button type="button" data-go="kb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>Knowledge Center</button>
+  </nav>
+  <div class="rail-kc">
+    <p class="kc-side-h">Topics</p>
+    <nav id="kcNav" aria-label="Knowledge Center topics"></nav>
+    <p class="kc-side-h">Support</p>
+    <button type="button" class="kc-side-link" id="kcNote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7l8 6 8-6"/></svg>Send a note to JC</button>
+  </div>
+  <button type="button" class="kc-back" data-go="">&larr; Herby home</button>
+</aside>
+<div class="shell-main">
 <header class="top">
   <button type="button" class="brand" id="brandHome" aria-label="Herby home">
     <div class="mark" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none"><use href="#hbArt" x="100" y="110" width="300" height="270"/></svg></div>
@@ -716,11 +750,6 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
       <div class="sub" id="toolName">PlantMed Dispensary hold reminders</div>
     </div>
   </button>
-  <nav class="tool-tabs" aria-label="Herby tools">
-    <button type="button" data-go="hold">Hold Scripts</button>
-    <button type="button" data-go="cbd">CBD Calculator</button>
-    <button type="button" data-go="kb">Knowledge Center</button>
-  </nav>
   <div class="dates">
     <button type="button" class="date-pill menu-btn" id="toMenu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Menu</button>
     <span class="date-pill"><span>Today</span><b id="today"></b></span>
@@ -830,14 +859,6 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 
 <div class="view" id="viewKb" hidden>
   <div class="kc">
-    <aside class="kc-side" aria-label="Knowledge Center topics">
-      <p class="kc-side-h">Topics</p>
-      <nav id="kcNav"></nav>
-      <p class="kc-side-h">Support</p>
-      <button type="button" class="kc-side-link" id="kcNote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7l8 6 8-6"/></svg>Send a note to JC</button>
-      <button type="button" class="kc-side-link" data-go="cbd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v4.5L6.5 12A5 5 0 0 0 10.5 20h3a5 5 0 0 0 4-8L14 7.5V3"/></svg>CBD Calculator</button>
-      <button type="button" class="kc-back" data-go="">&larr; Herby home</button>
-    </aside>
     <div class="kc-main">
       <div id="kcHome">
         <section class="kc-hero">
@@ -859,6 +880,7 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
     </div>
   </div>
 </div>
+</div><!-- /shell-main -->
 </div><!-- /shell -->
 
 <button type="button" class="fb-fab" id="fbOpen" aria-label="Send a note about Herby" aria-haspopup="dialog" aria-controls="fbCard" aria-expanded="false">
@@ -1987,6 +2009,7 @@ function go(view) {
   document.getElementById("shell").hidden = !tool;
   for (const k in VIEWS) document.getElementById(VIEWS[k]).hidden = k !== tool;
   if (tool) document.getElementById("toolName").textContent = TOOL_NAMES[tool];
+  document.getElementById("shell").dataset.tool = tool;
   document.querySelectorAll(".tool-tabs [data-go]").forEach(b => { const on = b.dataset.go === tool; b.classList.toggle("on", on); if (on) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
   if (location.hash.slice(1) !== tool) history.replaceState(null, "", tool ? "#" + tool : location.pathname + location.search);
   window.scrollTo(0, 0);
@@ -2425,7 +2448,7 @@ const KC = [
     results.hidden = false;
   });
   search.addEventListener("keydown", e => { if (e.key === "Enter") { const first = results.querySelector("[data-a]"); if (first) first.click(); } });
-  document.getElementById("viewKb").addEventListener("click", e => {
+  document.getElementById("shell").addEventListener("click", e => {
     const t = e.target.closest("[data-a], [data-topic], [data-home], [data-kc-go], .kc-topic-btn, .kb-copy, #kcNote");
     if (!t) return;
     if (t.matches(".kb-copy")) return copyKb(t);
