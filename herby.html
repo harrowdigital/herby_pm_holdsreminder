@@ -694,6 +694,10 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 .tz-copy.done { background: #0E0F0D; color: #FFFFFF; border-color: #0E0F0D; }
 .tz-note { color: var(--muted); font-size: 13.5px; margin: 0; }
 @media (max-width: 560px) { .tz-time { font-size: 28px; } .tz-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .tz-card { padding: 14px; } }
+/* Home: the same tools sidebar as the tool screens, in the same place */
+.home-rail { position: absolute; left: clamp(16px, 4vw, 40px); top: 18px; width: 236px; z-index: 2; }
+@media (min-width: 981px) { .home { padding-left: calc(clamp(16px, 4vw, 40px) + 264px); } .home-nav { padding-left: 0; } }
+@media (max-width: 980px) { .home-rail { display: none; } }
 </style>
 
 <svg class="herby-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
@@ -748,9 +752,17 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 <div class="glow" aria-hidden="true"></div>
 <section class="home" id="viewHome" aria-labelledby="homeQ">
   <div class="home-grid" aria-hidden="true"><span></span><span></span><span></span></div>
+  <aside class="rail home-rail" aria-label="Herby tools">
+    <p class="kc-side-h">Tools</p>
+    <nav class="tool-tabs">
+      <button type="button" data-go="hold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/></svg>Hold Scripts</button>
+      <button type="button" data-go="cbd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v4.5L6.5 12A5 5 0 0 0 10.5 20h3a5 5 0 0 0 4-8L14 7.5V3"/></svg>CBD Calculator</button>
+      <button type="button" data-go="tz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Time Zones</button>
+      <button type="button" data-go="kb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>Knowledge Center</button>
+    </nav>
+  </aside>
   <nav class="home-nav" aria-label="Herby">
     <span class="home-logo"><span class="home-logo-mark" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none"><use href="#hbArt" x="100" y="110" width="300" height="270"/></svg></span>Herby</span>
-    <div class="home-links"><button type="button" data-go="hold">Hold Scripts</button><button type="button" data-go="cbd">CBD Calculator</button><button type="button" data-go="tz">Time Zones</button><button type="button" data-go="kb">Knowledge Center</button></div>
     <span class="home-pill">Created by JCIHB</span>
   </nav>
   <div class="home-inner">
