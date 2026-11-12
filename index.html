@@ -621,10 +621,11 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
   .shell-main > .top { order: 1; }
   .shell-main > .view { order: 3; }
   .rail > .kc-side-h, .rail-kc, .rail > .kc-back { display: none !important; }
-  .tool-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .tool-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
   .tool-tabs button { justify-content: center; text-align: center; font-size: 13.5px; font-weight: 700; padding: 9px 6px; line-height: 1.15; }
   .tool-tabs button svg { display: none; }
 }
+@media (max-width: 560px) { .tool-tabs { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 420px) { .tool-tabs button { font-size: 12.5px; } }
 /* ---------- Ask Herby: chat built from the Knowledge Center (no AI, nothing leaves the page) ---------- */
 .hc-fab { position: fixed; right: 22px; bottom: 22px; z-index: 40; width: 66px; height: 66px; border-radius: 50%; border: 1px solid #DCE9CC; background: #FFFFFF; cursor: pointer; display: grid; place-items: center; box-shadow: 0 0 0 5px rgba(182, 234, 123, .35), 0 12px 30px rgba(62, 142, 31, .22); transition: transform .18s ease, box-shadow .18s ease; padding: 0; }
@@ -677,6 +678,31 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 .hc-send:hover { background: #2A2D27; }
 @media (max-width: 560px) { .hc-fab { right: 14px; bottom: 14px; width: 58px; height: 58px; } .hc-fab svg { width: 44px; height: 40px; } .hc-card { right: 8px; left: 8px; width: auto; bottom: 84px; height: calc(100vh - 110px); height: calc(100dvh - 110px); } .hc-tip { display: none; } }
 @media (prefers-reduced-motion: reduce) { .hc-card, .hc-typing i { animation: none; } }
+/* ---------- Time Zones tool ---------- */
+.tz-controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.tz-field { display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; font-weight: 700; color: #5B5F58; flex: 1 1 160px; }
+.tz-field input, .tz-field select { border: 1px solid var(--line); background: var(--chip); border-radius: 14px; padding: 11px 13px; font: inherit; font-size: 16px; font-weight: 600; color: #0E0F0D; min-height: 46px; width: 100%; }
+.tz-field input:focus, .tz-field select:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 4px var(--lime-soft); background: #FFFFFF; }
+.tz-now { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; min-height: 46px; }
+.tz-now.on { background: #0E0F0D; color: #FFFFFF; }
+.tz-live { width: 8px; height: 8px; border-radius: 50%; background: #B9BDB4; }
+.tz-now.on .tz-live { background: #8BE04E; box-shadow: 0 0 0 3px rgba(139, 224, 78, .3); }
+.tz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.tz-card { background: var(--card); border-radius: 22px; padding: 16px 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 4px; border: 1.5px solid transparent; }
+.tz-card.src { border-color: #0E0F0D; }
+.tz-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tz-st { font-weight: 800; font-size: 15px; letter-spacing: .02em; }
+.tz-name { font-size: 12.5px; color: var(--muted); }
+.tz-time { font-family: "Inter Tight", var(--f-body); font-weight: 800; font-size: 34px; letter-spacing: -0.03em; line-height: 1.1; margin-top: 6px; }
+.tz-day { font-size: 12.5px; font-weight: 700; color: #8A5A2B; }
+.tz-diff { font-size: 13px; color: #5B5F58; }
+.tz-badge { font-size: 11px; font-weight: 800; letter-spacing: .03em; padding: 3px 8px; border-radius: 999px; background: var(--chip); color: #5B5F58; white-space: nowrap; }
+.tz-badge.dst { background: var(--lime-soft); color: var(--forest); border: 1px solid var(--lime-deep); }
+.tz-copy { margin-top: 8px; align-self: flex-start; border: 1px solid var(--line); background: var(--chip); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 12.5px; font-weight: 700; color: #0E0F0D; cursor: pointer; }
+.tz-copy:hover { border-color: var(--lime-deep); background: var(--lime-soft); }
+.tz-copy.done { background: #0E0F0D; color: #FFFFFF; border-color: #0E0F0D; }
+.tz-note { color: var(--muted); font-size: 13.5px; margin: 0; }
+@media (max-width: 560px) { .tz-time { font-size: 28px; } .tz-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .tz-card { padding: 14px; } }
 </style>
 
 <svg class="herby-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
@@ -733,7 +759,7 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
   <div class="home-grid" aria-hidden="true"><span></span><span></span><span></span></div>
   <nav class="home-nav" aria-label="Herby">
     <span class="home-logo"><span class="home-logo-mark" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none"><use href="#hbArt" x="100" y="110" width="300" height="270"/></svg></span>Herby</span>
-    <div class="home-links"><button type="button" data-go="hold">Hold Scripts</button><button type="button" data-go="cbd">CBD Calculator</button><button type="button" data-go="kb">Knowledge Center</button></div>
+    <div class="home-links"><button type="button" data-go="hold">Hold Scripts</button><button type="button" data-go="cbd">CBD Calculator</button><button type="button" data-go="tz">Time Zones</button><button type="button" data-go="kb">Knowledge Center</button></div>
     <span class="home-pill">Created by JCIHB</span>
   </nav>
   <div class="home-inner">
@@ -779,6 +805,7 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
     <div class="home-ctas">
       <button type="button" class="cta primary" data-go="hold">Hold Scripts Reminder</button>
       <button type="button" class="cta" data-go="cbd">CBD Calculator</button>
+      <button type="button" class="cta" data-go="tz">Time Zones</button>
       <button type="button" class="cta" data-go="kb">Knowledge Center <span aria-hidden="true">&rarr;</span></button>
     </div>
     <p class="home-foot" id="homeToday"></p>
@@ -811,6 +838,7 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
   <nav class="tool-tabs">
     <button type="button" data-go="hold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/></svg>Hold Scripts</button>
     <button type="button" data-go="cbd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v4.5L6.5 12A5 5 0 0 0 10.5 20h3a5 5 0 0 0 4-8L14 7.5V3"/></svg>CBD Calculator</button>
+    <button type="button" data-go="tz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Time Zones</button>
     <button type="button" data-go="kb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>Knowledge Center</button>
   </nav>
   <div class="rail-kc">
@@ -937,6 +965,20 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
   <p class="cbd-empty" id="cbdEmpty" hidden></p>
 </div>
 
+<div class="view" id="viewTz" hidden>
+  <section class="panel tz-panel" aria-labelledby="t-tz">
+    <div class="panel-head"><h2 class="panel-title" id="t-tz"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Time Zones</h2></div>
+    <p class="hint">Pick a time and where it's from. Herby shows it in every Australian state, with daylight saving applied for that date.</p>
+    <div class="tz-controls">
+      <label class="tz-field"><span>Time</span><input type="time" id="tzTime" step="300"></label>
+      <label class="tz-field"><span>Time is in</span><select id="tzFrom"></select></label>
+      <label class="tz-field"><span>Date</span><input type="date" id="tzDate"></label>
+      <button type="button" class="cta tz-now" id="tzNow"><span class="tz-live"></span>Now</button>
+    </div>
+  </section>
+  <div class="tz-grid" id="tzGrid"></div>
+  <p class="tz-note" id="tzNote"></p>
+</div>
 <div class="view" id="viewKb" hidden>
   <div class="kc">
     <div class="kc-main">
@@ -1983,8 +2025,8 @@ function readDose(text, kind, mgEach) {
 </script>
 <script>
 // ---------- screens: home menu, hold scripts, CBD calculator ----------
-const VIEWS = { hold: "viewHold", cbd: "viewCbd", kb: "viewKb" };
-const TOOL_NAMES = { hold: "Hold scripts reminder", cbd: "CBD calculator", kb: "Knowledge Center" };
+const VIEWS = { hold: "viewHold", cbd: "viewCbd", tz: "viewTz", kb: "viewKb" };
+const TOOL_NAMES = { hold: "Hold scripts reminder", cbd: "CBD calculator", tz: "Time zones", kb: "Knowledge Center" };
 // ---------- password for Hold Scripts ----------
 // Only a SHA-256 fingerprint of the password is stored here, never the password itself.
 const HOLD_PASS_HASH = "57991d0f84d501283b39a6754390a47253d356e31edf0d7eb7f3ab2201e7491e";
@@ -2618,7 +2660,7 @@ const KC = [
     if (!tm) { // e.g. "what's the time difference with SA?"
       const list = (found.length === 1 && found[0].st === "QLD" ? Object.keys(ZONES).filter(s => s !== "QLD") : found.map(f => f.st).filter(s => s !== "QLD"));
       const rows = list.map(s => `<li><b>${s}</b> is ${diffTxt(tzOffset(ZONES[s], now) - tzOffset(ZONES.QLD, now))} QLD${inDst(s, now) ? " (daylight saving)" : ""}. Right now it's ${fmtT(now, s)} there.</li>`).join("");
-      return { html: `<p>Right now it's <b>${fmtT(now, "QLD")}</b> in QLD.</p><ul>${rows}</ul>${dstNote}` };
+      return { html: `<p>Right now it's <b>${fmtT(now, "QLD")}</b> in QLD.</p><ul>${rows}</ul>${dstNote}<button type="button" class="hc-src" data-hc-go="tz">Open Time Zones →</button>` };
     }
     let h, mi = 0;
     if (tm[6]) { h = /midnight/i.test(tm[6]) ? 0 : 12; }
@@ -2638,7 +2680,7 @@ const KC = [
     const rows = targets.map(s => `<li><b>${fmtT(when, s)}</b> in ${s}${inDst(s, when) ? " (daylight saving)" : ""}</li>`).join("");
     const one = targets.length === 1 ? targets[0] : null;
     const spiel = src === "QLD" && one ? `<p class="kc-say">“At ${fmtT(when, "QLD")} QLD time, but for you that would be ${fmtT(when, one)}.”</p>` : "";
-    return { html: `<p><b>${fmtT(when, src)} ${src}</b> today is:</p><ul>${rows}</ul>${spiel}${dstNote}` };
+    return { html: `<p><b>${fmtT(when, src)} ${src}</b> today is:</p><ul>${rows}</ul>${spiel}${dstNote}<button type="button" class="hc-src" data-hc-go="tz">Open Time Zones →</button>` };
   }
   function answer(text) {
     const raw = text.trim(), low = raw.toLowerCase();
@@ -2689,6 +2731,51 @@ const KC = [
     if (b.dataset.hcGo) { go(b.dataset.hcGo); if (matchMedia("(max-width: 560px)").matches) close(); }
   });
   window.herbyAnswer = answer; // used by the checks
+  window.herbyTz = { ZONES, tzOffset, inDst, fmtT };
+})();
+
+// ---------- Time Zones tool: every Australian state, daylight saving from the real time zones ----------
+(function () {
+  const T = window.herbyTz; if (!T || !document.getElementById("viewTz")) return;
+  const NAMES = { QLD: "Queensland", NSW: "New South Wales", ACT: "Australian Capital Territory", VIC: "Victoria", TAS: "Tasmania", SA: "South Australia", NT: "Northern Territory", WA: "Western Australia" };
+  const ORDER = ["QLD", "NSW", "ACT", "VIC", "TAS", "SA", "NT", "WA"];
+  const timeEl = document.getElementById("tzTime"), fromEl = document.getElementById("tzFrom"), dateEl = document.getElementById("tzDate"), nowBtn = document.getElementById("tzNow"), grid = document.getElementById("tzGrid"), note = document.getElementById("tzNote");
+  fromEl.innerHTML = ORDER.map(s => `<option value="${s}">${s} · ${NAMES[s]}</option>`).join("");
+  const parts = (d, tz, o) => Object.fromEntries(new Intl.DateTimeFormat("en-US", Object.assign({ timeZone: tz, hourCycle: "h23" }, o)).formatToParts(d).map(x => [x.type, x.value]));
+  const pad = n => String(n).padStart(2, "0");
+  let live = true, timer = null;
+  function fillNow() { const p = parts(new Date(), T.ZONES[fromEl.value], { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }); timeEl.value = `${p.hour}:${p.minute}`; dateEl.value = `${p.year}-${p.month}-${p.day}`; }
+  function moment() {
+    const [y, mo, d] = dateEl.value.split("-").map(Number), [h, mi] = (timeEl.value || "00:00").split(":").map(Number), src = T.ZONES[fromEl.value];
+    const guess = Date.UTC(y, mo - 1, d, h, mi); let w = new Date(guess - T.tzOffset(src, new Date(guess)) * 60000); return new Date(guess - T.tzOffset(src, w) * 60000);
+  }
+  const dayKey = (d, st) => { const p = parts(d, T.ZONES[st], { year: "numeric", month: "2-digit", day: "2-digit" }); return `${p.year}${p.month}${p.day}`; };
+  const diffTxt = m => { if (!m) return "Same as QLD"; const a = Math.abs(m), h = Math.floor(a / 60), half = a % 60 ? "½" : ""; return `${!h && half ? "½ hour" : h + half + (a === 60 ? " hour" : " hours")} ${m > 0 ? "ahead of" : "behind"} QLD`; };
+  function render() {
+    if (!dateEl.value || !timeEl.value) return;
+    const when = moment(), src = fromEl.value, srcDay = dayKey(when, src);
+    grid.innerHTML = ORDER.map(st => {
+      const dk = dayKey(when, st), day = dk > srcDay ? "Next day" : dk < srcDay ? "Previous day" : "";
+      const dst = T.inDst(st, when), diff = T.tzOffset(T.ZONES[st], when) - T.tzOffset(T.ZONES.QLD, when);
+      const line = src === "QLD" ? (st === "QLD" ? "" : `At ${T.fmtT(when, "QLD")} QLD time, but for you that would be ${T.fmtT(when, st)}.`) : (st === "QLD" ? `${T.fmtT(when, src)} ${src} time is ${T.fmtT(when, "QLD")} our time in QLD.` : "");
+      return `<article class="tz-card${st === src ? " src" : ""}"><div class="tz-card-top"><span class="tz-st">${st}</span><span class="tz-badge${dst ? " dst" : ""}">${dst ? "Daylight saving" : "Standard time"}</span></div>
+        <span class="tz-name">${NAMES[st]}</span><span class="tz-time">${T.fmtT(when, st)}</span>${day ? `<span class="tz-day">${day}</span>` : ""}<span class="tz-diff">${st === "QLD" ? "Our time" : diffTxt(diff)}</span>
+        ${line ? `<button type="button" class="tz-copy" data-line="${line.replace(/"/g, "&quot;")}">Copy line</button>` : ""}</article>`;
+    }).join("");
+    const on = ORDER.filter(st => st !== "ACT" && T.inDst(st, when));
+    note.textContent = (on.length ? `On this date ${on.join(", ")}${on.includes("NSW") ? " and ACT" : ""} are on daylight saving.` : "No state is on daylight saving on this date.") + " QLD, WA and NT never change their clocks.";
+    nowBtn.classList.toggle("on", live);
+  }
+  function setLive(v) { live = v; clearInterval(timer); if (live) { fillNow(); timer = setInterval(() => { if (!document.getElementById("viewTz").hidden) { fillNow(); render(); } }, 20000); } render(); }
+  [timeEl, dateEl].forEach(el => el.addEventListener("input", () => { live = false; clearInterval(timer); render(); }));
+  fromEl.addEventListener("change", () => { if (live) fillNow(); render(); });
+  nowBtn.addEventListener("click", () => setLive(true));
+  grid.addEventListener("click", e => {
+    const b = e.target.closest(".tz-copy"); if (!b) return;
+    const done = () => { b.textContent = "Copied"; b.classList.add("done"); setTimeout(() => { b.textContent = "Copy line"; b.classList.remove("done"); }, 1500); };
+    try { navigator.clipboard.writeText(b.dataset.line).then(done, () => { b.textContent = "Copy blocked"; }); } catch (err) { b.textContent = "Copy blocked"; }
+  });
+  setLive(true);
 })();
 </script>
 
