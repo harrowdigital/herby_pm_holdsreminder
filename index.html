@@ -425,39 +425,6 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 @keyframes wiggle { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-2deg) scale(1.02); } 75% { transform: rotate(2deg) scale(1.02); } }
 @media (prefers-reduced-motion: reduce) { .bubble, .home-robot.waving, .home-robot.waving .arm-r, .bubble.wiggle { animation: none; } }
 /* ---------- feedback: a little plant in the corner that takes staff notes to JC ---------- */
-.fb-fab { position: fixed; right: 22px; bottom: 22px; z-index: 40; width: 62px; height: 62px; border-radius: 50%; border: 1px solid #DCE9CC; background: #FFFFFF; cursor: pointer;
-  display: grid; place-items: center; box-shadow: 0 1px 2px rgba(14, 15, 13, .06), 0 14px 34px rgba(62, 142, 31, .22); transition: transform .2s ease, box-shadow .2s ease; padding: 0; }
-.fb-fab:hover, .fb-fab:focus-visible { transform: translateY(-3px) rotate(-4deg); box-shadow: 0 0 0 6px rgba(182, 234, 123, .55), 0 16px 36px rgba(62, 142, 31, .3); outline: none; }
-.fb-fab svg { width: 38px; height: 38px; }
-.fb-fab .leaf-l, .fb-fab .leaf-r { transform-box: fill-box; transform-origin: 50% 100%; }
-.fb-fab:hover .leaf-l { animation: sway-l 1s ease-in-out infinite alternate; }
-.fb-fab:hover .leaf-r { animation: sway-r 1s ease-in-out infinite alternate; }
-@keyframes sway-l { from { transform: rotate(0); } to { transform: rotate(-10deg); } }
-@keyframes sway-r { from { transform: rotate(0); } to { transform: rotate(10deg); } }
-.fb-tip { position: fixed; right: 94px; bottom: 36px; z-index: 40; background: #0E0F0D; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 8px 13px; border-radius: 999px;
-  white-space: nowrap; pointer-events: none; opacity: 0; transform: translateX(6px); transition: opacity .2s ease, transform .2s ease; }
-.fb-fab:hover + .fb-tip, .fb-fab:focus-visible + .fb-tip { opacity: 1; transform: none; }
-.fb-card { position: fixed; right: 22px; bottom: 98px; z-index: 41; width: min(380px, calc(100vw - 32px)); background: #FFFFFF; color: #0E0F0D; border: 1px solid var(--line);
-  border-radius: 24px; box-shadow: 0 30px 80px rgba(14, 15, 13, .22); padding: 20px 20px 18px; display: flex; flex-direction: column; gap: 10px;
-  transform-origin: 100% 100%; animation: pop .25s cubic-bezier(.2, 1.3, .4, 1); }
-.fb-card[hidden] { display: none; }
-.fb-head { display: flex; align-items: center; gap: 10px; }
-.fb-head h2 { margin: 0; font-family: "Inter Tight", var(--f-body); font-weight: 800; font-size: 19px; letter-spacing: -0.02em; flex: 1; }
-.fb-close { width: 32px; height: 32px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; }
-.fb-close:hover { background: var(--chip); color: #0E0F0D; }
-.fb-card p { margin: 0; color: #5B5F58; font-size: 13.5px; line-height: 1.45; }
-.fb-card label { font-size: 12.5px; font-weight: 700; color: #5B5F58; display: flex; flex-direction: column; gap: 5px; }
-.fb-card textarea, .fb-card input { width: 100%; border: 1px solid var(--line); background: var(--chip); border-radius: 14px; padding: 11px 13px; font: inherit; font-size: 15px; font-weight: 500; color: #0E0F0D; }
-.fb-card textarea { min-height: 120px; resize: vertical; line-height: 1.4; }
-.fb-card textarea:focus, .fb-card input:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 4px var(--lime-soft); background: #FFFFFF; }
-.fb-card .fb-warn { font-size: 12.5px; color: #8A5A2B; background: var(--orange-soft); border: 1px solid var(--orange-line); border-radius: 12px; padding: 8px 10px; }
-.fb-card .cta { padding: 12px 18px; }
-.fb-card .fb-status { font-size: 13.5px; font-weight: 600; }
-.fb-card .fb-status.ok { color: var(--good); }
-.fb-card .fb-status.bad { color: var(--red); }
-.fb-trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
-@media (max-width: 560px) { .fb-fab { right: 14px; bottom: 14px; width: 56px; height: 56px; } .fb-card { right: 16px; bottom: 82px; } .fb-tip { display: none; } }
-@media (prefers-reduced-motion: reduce) { .fb-fab:hover .leaf-l, .fb-fab:hover .leaf-r, .fb-card { animation: none; } }
 .herby-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 /* ---------- Knowledge Center: a help centre (sidebar, "How can we help?", topic cards, articles) ---------- */
 .kc { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 28px; align-items: start; }
@@ -659,6 +626,55 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
   .tool-tabs button svg { display: none; }
 }
 @media (max-width: 420px) { .tool-tabs button { font-size: 12.5px; } }
+/* ---------- Ask Herby: chat built from the Knowledge Center (no AI, nothing leaves the page) ---------- */
+.hc-fab { position: fixed; right: 22px; bottom: 22px; z-index: 40; width: 66px; height: 66px; border-radius: 50%; border: 1px solid #DCE9CC; background: #FFFFFF; cursor: pointer; display: grid; place-items: center; box-shadow: 0 0 0 5px rgba(182, 234, 123, .35), 0 12px 30px rgba(62, 142, 31, .22); transition: transform .18s ease, box-shadow .18s ease; padding: 0; }
+.hc-fab svg { width: 50px; height: 45px; margin-top: 2px; }
+.hc-fab:hover, .hc-fab:focus-visible, .hc-fab[aria-expanded="true"] { transform: translateY(-3px); box-shadow: 0 0 0 7px rgba(182, 234, 123, .55), 0 16px 36px rgba(62, 142, 31, .3); outline: none; }
+.hc-tip { position: fixed; right: 98px; bottom: 40px; z-index: 40; background: #0E0F0D; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 8px 13px; border-radius: 12px; pointer-events: none; opacity: 0; transform: translateX(6px); transition: opacity .15s ease, transform .15s ease; }
+.hc-fab:hover + .hc-tip, .hc-fab:focus-visible + .hc-tip { opacity: 1; transform: none; }
+.hc-fab[aria-expanded="true"] + .hc-tip { opacity: 0; }
+.hc-card { position: fixed; right: 22px; bottom: 102px; z-index: 41; width: min(420px, calc(100vw - 32px)); height: min(620px, calc(100vh - 130px)); background: #FFFFFF; color: #0E0F0D; border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 24px 60px rgba(14, 15, 13, .18); display: flex; flex-direction: column; overflow: hidden; animation: pop .2s ease; }
+.hc-card[hidden] { display: none; }
+.hc-head { display: flex; align-items: center; gap: 11px; padding: 14px 14px 12px 16px; background: linear-gradient(180deg, var(--lime-soft), #FFFFFF); border-bottom: 1px solid var(--line); }
+.hc-ava { width: 44px; height: 44px; border-radius: 50%; background: #FFFFFF; border: 1px solid #DCE9CC; display: grid; place-items: center; flex: none; }
+.hc-ava svg { width: 34px; height: 31px; }
+.hc-title { flex: 1; min-width: 0; }
+.hc-title h2 { margin: 0; font-family: "Inter Tight", var(--f-body); font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
+.hc-title p { margin: 1px 0 0; font-size: 12.5px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.hc-dot { width: 7px; height: 7px; border-radius: 50%; background: #5FBF3A; box-shadow: 0 0 0 3px rgba(95, 191, 58, .2); }
+.hc-close { width: 34px; height: 34px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font-size: 24px; line-height: 1; cursor: pointer; }
+.hc-close:hover { background: var(--chip); color: #0E0F0D; }
+.hc-log { flex: 1; overflow-y: auto; padding: 16px 14px 10px; display: flex; flex-direction: column; gap: 10px; background: #FBFCF9; overscroll-behavior: contain; }
+.hc-msg { max-width: 92%; font-size: 14px; line-height: 1.5; border-radius: 18px; padding: 10px 13px; }
+.hc-msg.me { align-self: flex-end; background: #0E0F0D; color: #FFFFFF; border-bottom-right-radius: 6px; }
+.hc-msg.bot { align-self: flex-start; background: #FFFFFF; border: 1px solid var(--line); border-bottom-left-radius: 6px; }
+.hc-msg.bot p { margin: 0 0 6px; }
+.hc-msg.bot p:last-child { margin-bottom: 0; }
+.hc-msg ul { margin: 4px 0 0; padding-left: 18px; }
+.hc-msg li { margin: 0 0 3px; }
+.hc-fact { border: 1px solid var(--line); background: #FBFCF9; border-radius: 14px; padding: 9px 11px; margin-top: 8px; }
+.hc-fact-h { font-weight: 700; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.hc-fact-h .kc-code { margin-top: 0; }
+.hc-fact .kc-say { margin: 4px 0 0; }
+.hc-fact .flow-pick, .hc-fact .flow-code { margin: 2px 0; }
+.hc-fact .hc-k { font-size: 11.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+.hc-src { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; border: 0; background: var(--lime-soft); color: var(--forest); font: inherit; font-size: 12.5px; font-weight: 700; padding: 5px 10px; border-radius: 999px; cursor: pointer; }
+.hc-src:hover { background: var(--lime); }
+.hc-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.hc-chip { border: 1px solid var(--line); background: #FFFFFF; border-radius: 999px; padding: 6px 11px; font: inherit; font-size: 13px; font-weight: 600; color: #0E0F0D; cursor: pointer; text-align: left; }
+.hc-chip:hover { border-color: var(--lime-deep); background: var(--lime-soft); }
+.hc-typing { display: inline-flex; gap: 4px; padding: 13px 14px; }
+.hc-typing i { width: 6px; height: 6px; border-radius: 50%; background: #B9BDB4; animation: hcDot 1s infinite ease-in-out; }
+.hc-typing i:nth-child(2) { animation-delay: .15s; } .hc-typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes hcDot { 0%, 80%, 100% { transform: translateY(0); opacity: .5; } 40% { transform: translateY(-4px); opacity: 1; } }
+.hc-form { display: flex; gap: 8px; padding: 10px 12px 12px; border-top: 1px solid var(--line); background: #FFFFFF; }
+.hc-form input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--chip); border-radius: 14px; padding: 11px 13px; font: inherit; font-size: 14.5px; color: #0E0F0D; }
+.hc-form input:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 4px var(--lime-soft); background: #FFFFFF; }
+.hc-send { width: 44px; flex: none; border: 0; border-radius: 14px; background: #0E0F0D; color: #FFFFFF; cursor: pointer; display: grid; place-items: center; }
+.hc-send svg { width: 19px; height: 19px; }
+.hc-send:hover { background: #2A2D27; }
+@media (max-width: 560px) { .hc-fab { right: 14px; bottom: 14px; width: 58px; height: 58px; } .hc-fab svg { width: 44px; height: 40px; } .hc-card { right: 8px; left: 8px; width: auto; bottom: 84px; height: calc(100vh - 110px); height: calc(100dvh - 110px); } .hc-tip { display: none; } }
+@media (prefers-reduced-motion: reduce) { .hc-card, .hc-typing i { animation: none; } }
 </style>
 
 <svg class="herby-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
@@ -799,7 +815,7 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
     <p class="kc-side-h">Topics</p>
     <nav id="kcNav" aria-label="Knowledge Center topics"></nav>
     <p class="kc-side-h">Support</p>
-    <button type="button" class="kc-side-link" id="kcNote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7l8 6 8-6"/></svg>Send a note to JC</button>
+    <button type="button" class="kc-side-link" id="kcAsk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 10.5h6M9 13.5h4"/></svg>Ask Herby</button>
   </div>
   <button type="button" class="kc-back" data-go="">&larr; Herby home</button>
 </aside>
@@ -945,26 +961,13 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 </div><!-- /shell-main -->
 </div><!-- /shell -->
 
-<button type="button" class="fb-fab" id="fbOpen" aria-label="Send a note about Herby" aria-haspopup="dialog" aria-controls="fbCard" aria-expanded="false">
-  <svg viewBox="0 0 48 48" aria-hidden="true">
-    <path class="leaf-l" d="M23 26c-1-7-6-11-13-11 0 7 5 12 13 11z" fill="#7DBE4E"/>
-    <path class="leaf-r" d="M25 24c1-8 7-13 15-12 0 8-6 13-15 12z" fill="#A3DE5E"/>
-    <path d="M24 34V22" stroke="#3E7F22" stroke-width="2.4" stroke-linecap="round"/>
-    <path d="M13 30h22l-2.6 13.2a2 2 0 0 1-2 1.8H17.6a2 2 0 0 1-2-1.8z" fill="#0E0F0D"/>
-    <rect x="11.5" y="28" width="25" height="5" rx="2" fill="#2A2D27"/>
-  </svg>
-</button>
-<span class="fb-tip" aria-hidden="true">Something not right? Tell JC</span>
-<form class="fb-card" id="fbCard" role="dialog" aria-labelledby="fbTitle" hidden>
-  <div class="fb-head"><h2 id="fbTitle">Send a note to JC</h2><button type="button" class="fb-close" id="fbClose" aria-label="Close">×</button></div>
-  <p>Found a wrong name, a bug, or have an idea? Write it here and it goes straight to JC's email.</p>
-  <label>What happened?<textarea id="fbMsg" required placeholder="e.g. Herby wrote KIND ROSA FLOWER but the script was for the cart"></textarea></label>
-  <label>Your name (optional)<input id="fbName" autocomplete="name" placeholder="So JC knows who to ask"></label>
-  <input class="fb-trap" id="fbTrap" tabindex="-1" autocomplete="off" aria-hidden="true">
-  <p class="fb-warn">Please don't include patient names, phone numbers or other personal details.</p>
-  <p class="fb-status" id="fbStatus" role="status" hidden></p>
-  <button type="submit" class="cta primary" id="fbSend">Send to JC</button>
-</form>
+<button type="button" class="hc-fab" id="hcOpen" aria-label="Ask Herby a question" aria-haspopup="dialog" aria-controls="hcCard" aria-expanded="false"><svg viewBox="100 110 300 270" fill="none" aria-hidden="true"><use href="#hbArt" x="100" y="110" width="300" height="270"/></svg></button>
+<span class="hc-tip" aria-hidden="true">Ask Herby</span>
+<section class="hc-card" id="hcCard" role="dialog" aria-labelledby="hcTitle" hidden>
+  <header class="hc-head"><span class="hc-ava"><svg viewBox="100 110 300 270" fill="none" aria-hidden="true"><use href="#hbArt" x="100" y="110" width="300" height="270"/></svg></span><div class="hc-title"><h2 id="hcTitle">Ask Herby</h2><p><span class="hc-dot"></span>Answers from Herby's Knowledge Center</p></div><button type="button" class="hc-close" id="hcClose" aria-label="Close">×</button></header>
+  <div class="hc-log" id="hcLog" aria-live="polite"></div>
+  <form class="hc-form" id="hcForm" autocomplete="off"><input id="hcInput" type="text" spellcheck="true" placeholder="Ask anything, e.g. how much is a med review?" aria-label="Ask Herby a question"><button type="submit" class="hc-send" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
+</section>
 <script>
 const CATALOG = [["Alfie CBD100 complete 30mL( NOTE 5mg THC/mL)","ALFIE","OIL","30ml"],["Alfie 25:25 Sativa Oil 30mL* (SATIVA)","ALFIE","OIL","30ml"],["ANTG Elan CBD100","ANTG","OIL","30ml"],["ANTG Rocky THC oil* (indica)","ANTG","OIL","50ml"],["ANTG Eve CBD oil (full spec)","ANTG","OIL","50ml"],["ANTG Luna Oil* (10:10) 50mL","ANTG","OIL","50ml"],["ANTG Luna Oil* (25:25) 50mL","ANTG","OIL","50ml"],["ANTG Elan Oil (0% THC - isolated CBD)","ANTG","OIL","30ml"],["ANTG Eve #4 CBD oil (100mg/mL)","ANTG","OIL","50ml"],["Aura CBD200** (indica)","AURA THERAPEUTICS","OIL","30ml"],["Aura THC50 (INDICA)","AURA THERAPEUTICS","OIL","50ml"],["Beacon THC30 GSC oil (girl scout cookies)","BEACON","OIL","30ml"],["C12T12 Ruby Balanced oil","Cannatrek","OIL","30ml"],["C25T25 Ruby Balanced oil*","Cannatrek","OIL","30ml"],["T25 Ruby oil (sativa dom)","Cannatrek","OIL","30ml"],["T50 Ruby oil*(sativa dom)","Cannatrek","OIL","30ml"],["T25 Topaz oil (indica)","Cannatrek","OIL","30ml"],["T50 Topaz oil (indica)*","Cannatrek","OIL","30ml"],["Cybis oil 30mL (organic)","CYMRA","OIL","30ml"],["Entoura CBD200 Full Spectrum","ENTOURA","OIL","30ml"],["Entoura CBD200 Broad Spectrum (30mL) 200mg CBD/mL","ENTOURA","OIL","30ml"],["Entoura EMC 10:15 (30mL)","ENTOURA","OIL","30ml"],["Entoura EMC THC30 (30mL)","ENTOURA","OIL","30ml"],["Entoura THCV 25 OIL (30mL)","ENTOURA","OIL","30ml"],["Entoura ULTRA spectrum 350 oil (CBD240 Broad Spectrum (30mL)","ENTOURA","OIL","30ml"],["Grandiosa Water Soluble CBD","Grandiosa Balance","OIL","10ml"],["Grandiosa Balance- THC/CBD oil 25mg/25mg 30mL*","Grandiosa Balance","OIL","30ml"],["Grandiosa CBD200 30mL/ thirty","Grandiosa Balance","OIL","30ml"],["Heyday CBD:CBDv OIL","Heyday","OIL","30ml"],["KIND Rosa Oil (50:1)- INDICA*","KIND","OIL","30ml"],["KIND Libra Oil (25:25)- THC: CBD balanced*","KIND","OIL","30ml"],["KIND CBD200 FS","KIND","OIL","60ml"],["LGP 20:5 50mL","LGP","OIL","50ml"],["LGP CBD50 50mL","LGP","OIL","50ml"],["Medcan FX01","Medcan","OIL","30ml"],["Medcan FX05","Medcan","OIL","30ml"],["Medcan FX06*","Medcan","OIL","30ml"],["Medcan FX200","Medcan","OIL","30ml"],["Medicabilis 200 CBD FS","MEDICABILIS","OIL","30ml"],["Medicabilis T25:C25 30mL***","MEDICABILIS","OIL","30ml"],["SatiOil CBD 200FS","SATIVITE","OIL","60ml"],["Solara THC 35 sunset oil (50mL)","SOLARA BOTANICS","OIL","50ml"],["Solara 2:250:30 Femme CBD oil (50mL)","SOLARA BOTANICS","OIL","50ml"],["Somai 25:25 balanced Oil Indica**","SOMAI","OIL","30ml"],["Spectrum Blue Oil 50mL (sativa dom hybrid)","SPECTRUM","OIL","50ml"],["Spectrum Red Oil 50mL (indica)","SPECTRUM","OIL","50ml"],["T50 oral liquid (ind dom)","Tasmanian Botanics (Tasbot, TB)","OIL","30ml"],["C100 oral liquid","Tasmanian Botanics (Tasbot, TB)","OIL","30ml"],["Alfie Coastal Kush 22% (Kurpel Fantasy x Sherbert)","ALFIE","FLOWER","10g"],["Alfie GT Haze (Ghost OG x Nevilles Wreck)","ALFIE","FLOWER","10g"],["Alfie Queen Sangria 27%","ALFIE","FLOWER","10g"],["Alfie Orion Kush 29% (ind dom)","ALFIE","FLOWER","10g"],["Alfie K MINTS 22% (ind dom)","ALFIE","FLOWER","10g"],["Alfie SKY WALKER OG 28% (ind dom)","ALFIE","FLOWER","10g"],["Grape Galena 25% (OG Kush x Lost Sailor x Platinum Kush)*","ALMA","FLOWER","10g"],["Flawless Victory 26% (Ice Cream Cake x Cherry Cheesecake)*","ALMA","FLOWER","10g"],["Pink Zugar 27% (Skittlez x Strawberry Guava)*","ALMA","FLOWER","10g"],["Cream Fritter 27% Apple Fritter x Grape Cream Cake)*","ALMA","FLOWER","10g"],["Eve CBD FLOWER","ANTG","FLOWER","10g"],["JUNO (balanced)**","ANTG","FLOWER","10g"],["Mariposa**","ANTG","FLOWER","10g"],["ANTG Rocky Flower **","ANTG","FLOWER","10g"],["Aura Apples and Bananas*","Aura Therapeutics","FLOWER","10g"],["Aura Key Lime Kush*","Aura Therapeutics","FLOWER","10g"],["Aura Purple Raine*","Aura Therapeutics","FLOWER","15g"],["Aura Snowman**","Aura Therapeutics","FLOWER","10g"],["Aura Base+ Mocha Truffle T27 (INDICA)","Aura Therapeutics","FLOWER","15g"],["Aura Base+ Zupa T27 (SATIVA)","Aura Therapeutics","FLOWER","15g"],["Aura Base AB smalls T24","Aura Therapeutics","FLOWER","15g"],["Aura Base KINGS TART T27","Aura Therapeutics","FLOWER","15g"],["Aura Base Jokerz Candy T24","Aura Therapeutics","FLOWER","15g"],["Aussie Budz Outback diesel 26 (Aussie Budz) 10g","AUSSIE BUDZ","FLOWER","10g"],["Aussie Budz Brissy Berry 26 (Aussie Budz) 10g","AUSSIE BUDZ","FLOWER","10g"],["Aussie Budz Velvet Thunder 25 (Aussie Budz) 10g","AUSSIE BUDZ","FLOWER","10g"],["AVANI LIME HAZE T23 SATIVA **","AVANI","FLOWER","10g"],["AVANI MANGO PASSION T25 INDICA**","AVANI","FLOWER","10g"],["AVANI BLING BLAU T30 INDICA***","AVANI","FLOWER","10g"],["BAKERY Rotation 25 Sativa","BAKERY","FLOWER","15g"],["BAKERY Rotation 25 Indica","BAKERY","FLOWER","15g"],["Bathera 28 Facetz *** (2.2% terps)- 30G","BATHERA","FLOWER","30g"],["Bathera 25 Blue Z *** (3% terps)- 30G","BATHERA","FLOWER","30g"],["Girl Scout Cookies","BEACON MEDICAL","FLOWER","10g"],["Pink Kush (Beacon) 22%","BEACON MEDICAL","FLOWER","10g"],["Sensi Star","BEACON MEDICAL","FLOWER","10g"],["Wappa","BEACON MEDICAL","FLOWER","10g"],["Black Dolato","BEACON MEDICAL","FLOWER","10g"],["Ventura Dawg","BEACON MEDICAL","FLOWER","10g"],["Beacon Face Mintz THC30","BEACON MEDICAL","FLOWER","10g"],["Beacon Select THC30*","BEACON MEDICAL","FLOWER","10g"],["Broken Coast AH THC 26 (AMNESIA HAZE)***","Broken Coast","FLOWER","10g"],["Broken CCC THC 24 (CHERRY CHEESE CAKE)***","Broken Coast","FLOWER","10g"],["Broken Coast EMZ THC 26 (EMERGENZ)***","Broken Coast","FLOWER","10g"],["Broken Coast PP THC 28 (PLATINUM PAVE)***","Broken Coast","FLOWER","10g"],["Broken Coast OGKB THC 25 (OG Kush Breath)***","Broken Coast","FLOWER","10g"],["Crystalbrook Cream THC 28 (PROJECT 33)*","Byron Bioceutiocals","FLOWER","10g"],["Daybreak Don Green THC 28 (DON GREEN)*","Byron Bioceutiocals","FLOWER","10g"],["Bubba Moonshade THC 25 *","Byron Bioceutiocals","FLOWER","10g"],["Candied Pine Cinderella THC 22 *","Byron Bioceutiocals","FLOWER","10g"],["Twighlight Glow Cake THC 28 *","Byron Bioceutiocals","FLOWER","10g"],["T25 Topaz Flower ** (Kush cookies)","Cannatrek","FLOWER","10g"],["C9T7 Argaman (White Widow x CBD critical mass)","Cannatrek","FLOWER","10g"],["T27 Narooma (GSC + Chemdawg)","Cannatrek","FLOWER","10g"],["T25 Golden Bay (Ultra Sour)","Cannatrek","FLOWER","10g"],["T26 Sorrento (Sour Diesel X Sage)","Cannatrek","FLOWER","10g"],["T28 Eden (Medelin = Wedding cake X Chemdawg)","Cannatrek","FLOWER","10g"],["Cannatrek Gold T28 Jet Fuel Gelato 10g **","Cannatrek","FLOWER","10g"],["T55 Topaz Bubble Hash (Kush Cookies)*","EXTRACTS","EXTRACT",""],["Curaleaf Daybreak THC22%- Huckleberry","Curaleaf","FLOWER","10g"],["Curaleaf Nightfall THC THC25% - Fire OG","Curaleaf","FLOWER","10g"],["Superbly Rosey (CBD)**","CYMRA BOTANICALS","FLOWER","10g"],["Superbly Blissy (22% THC Banana OG)**","CYMRA BOTANICALS","FLOWER","10g"],["Superbly Sunny (25% THC Super lemon Haze)**","CYMRA BOTANICALS","FLOWER","10g"],["Superbly Buzzy (22% THC Sativa, Durban Poison)**","CYMRA BOTANICALS","FLOWER","10g"],["Superbly Dusky (25% THC Vanilla cream cookies)**","CYMRA BOTANICALS","FLOWER","10g"],["Rainbow Region Moonlight 25% LSO","CYMRA BOTANICALS","FLOWER","15g"],["Rainbow Region Rainbow Roots 28% LSO","CYMRA BOTANICALS","FLOWER","15g"],["Elysian Harmony 16% CBD 10g*","Elysian Botanics","FLOWER","10g"],["Entoura Varaski T26 15g*","ENTOURA","FLOWER","15g"],["Entoura Tropicana Cookies T26","ENTOURA","FLOWER","10g"],["Entoura GSD THCv 12% THC 5% (10g/ten g)","ENTOURA","FLOWER","10g"],["Sol Northern lights 10g (heritage chemovar)","Gamma Biomed","FLOWER","10g"],["Grandiosa Gorilla Glue***","GRANDIOSA BALANCE","FLOWER","10g"],["Grandiosa Bubba Jungle Pie***","GRANDIOSA BALANCE","FLOWER","10g"],["Grandiosa Original Blitz ***","GRANDIOSA BALANCE","FLOWER","10g"],["Grandiosa Limoncello Daydream**","GRANDIOSA BALANCE","FLOWER","10g"],["Grandiosa Golden Kief 50% THC** (blue cheese)","GRANDIOSA EXTRACTS","EXTRACT",""],["Grandiosa HASH- BUENAS NOCHES ** T48 \"GSC = \"Durban poison x OG kush\"","GRANDIOSA EXTRACTS","EXTRACT",""],["Grandiosa HASH-N BUENOS DIAS HASH** T48 \"Sour Diesel\"","GRANDIOSA EXTRACTS","EXTRACT",""],["Green weekend Jungle Cake","GREEN WEEKEND","FLOWER","15g"],["Green weekend Mandarin Sunset","GREEN WEEKEND","FLOWER","15g"],["Green weekend Blue Cheese (Baby Buds) 15g","GREEN WEEKEND","FLOWER","15g"],["Green weekend BLUEBERRY Cheese (Baby Buds) 15g","GREEN WEEKEND","FLOWER","15g"],["Haiiku White Hot Guava","Haiiku","FLOWER","10g"],["Hana Blue Tango 25% (Sativa Dom Hybrid)","HANA wellness","FLOWER","10g"],["Hana Lemon Skunk (Sativa Dom Hybrid)","HANA wellness","FLOWER","10g"],["Hana Gelato 30% (Balance Hybrid)","HANA wellness","FLOWER","10g"],["Hana Sugar baby 25% (Indica Dom Hybrid)","HANA wellness","FLOWER","10g"],["KIND Libra","KIND medical","FLOWER","10g"],["KIND Azure","KIND medical","FLOWER","10g"],["KIND Iris","KIND medical","FLOWER","10g"],["KIND Sol- CBD ONLY FLOWER","KIND medical","FLOWER","10g"],["KIND Rosa","KIND medical","FLOWER","10g"],["KIND Dulce","KIND medical","FLOWER","10g"],["KIND Thea","KIND medical","FLOWER","10g"],["KIND Deus","KIND medical","FLOWER","10g"],["Kind permanent marker (indica)","KIND medical","FLOWER","10g"],["KIND Payton Pie (Gary Payton x georgia pie) 29% THC*","KIND medical","FLOWER","10g"],["Desert Flame - sativa (Australian grown)","LGP","FLOWER","10g"],["Moonlight THC 22 - indica","LGP","FLOWER","10g"],["Lemon Glow THC 20 - sativa","LGP","FLOWER","10g"],["Bush Lantern THC25- indica","LGP","FLOWER","10g"],["Silver Mist CBD flower - CBD","LGP","FLOWER","10g"],["LGP Frosted King THC26 - Sativa (Australian grown)","LGP","FLOWER","10g"],["LGP Wild Sunset THC26 - Indica (Australian grown)","LGP","FLOWER","10g"],["Lot420 Gelato #33*","Lot420","FLOWER","10g"],["Lush Labs GastroPop 28% Indica","Lush Labs (LGP premium)","FLOWER","10g"],["Lush Labs Black BiscottiI 25% Indica","Lush Labs (LGP premium)","FLOWER","10g"],["Lush Labs Mac Powdered Donuts 22% Indica","Lush Labs (LGP premium)","FLOWER","10g"],["Lush Labs Lemon Mac 25% Sativa","Lush Labs (LGP premium)","FLOWER","10g"],["Lush Labs Royal mac 20% Hybrid","Lush Labs (LGP premium)","FLOWER","10g"],["CC01 (Cold Creek Kush/ Afghan Kush) 10g","MEDCAN","FLOWER","10g"],["SC01 (Strawberry Cake) 10g","MEDCAN","FLOWER","10g"],["ULTRA01 (Ultra Sour) 10g","MEDCAN","FLOWER","10g"],["GLU01 (Sherbert Glu) 10g*","MEDCAN","FLOWER","10g"],["STT01 (Scotties Cake) 10g","MEDCAN","FLOWER","10g"],["HGH01 (Human Growth Hormone) 10g","MEDCAN","FLOWER","10g"],["SAC01 (Space Age Cake) 10g*","MEDCAN","FLOWER","10g"],["Medcan LAK01 (L.A. Kush Cake)","MEDCAN","FLOWER","10g"],["FGW smalls T25 indica Green dragon","MEDICABILIS","FLOWER","15g"],["FGW smalls T20 Sativa Super Lemon Haze 15g","MEDICABILIS","FLOWER","15g"],["Mediquest Bazookas THC 10g**","MEDIQUEST","FLOWER","10g"],["Mediquest Gas Cake THC 10g**","MEDIQUEST","FLOWER","10g"],["Mediquest Dirty Taxi THC 10g ***","MEDIQUEST","FLOWER","10g"],["Mediquest Long Valley Legend THC 10g**","MEDIQUEST","FLOWER","10g"],["Mediquest Grape Stank THC 10g**","MEDIQUEST","FLOWER","10g"],["Motherplant CCN(Critical Condition)","Motherplant","FLOWER","10g"],["Motherplant MPC (Forum GSC)","Motherplant","FLOWER","10g"],["Afghan Layer Cake THC 30","Mystery Mountain","FLOWER","15g"],["Kimbo Gelato THC 25","Mystery Mountain","FLOWER","15g"],["Sunset Soap THC 25","Mystery Mountain","FLOWER","15g"],["The Big Mango THC8 CBD 11","Mystery Mountain","FLOWER","15g"],["Stone Fruit Cake THC 30","Mystery Mountain","FLOWER","15g"],["Jealous Pop THC 30 (gastro pop x jealousy)","Mystery Mountain","FLOWER","15g"],["Candy Blast THC 25","Mystery Mountain","FLOWER","15g"],["Cookies n Chem THC 25","Mystery Mountain","FLOWER","15g"],["Coco-Bamba THC 27","Mystery Mountain","FLOWER","15g"],["NOOSA SELECTS T23 SATIVA (15G/FIFTEEN)","PHARMACROP","FLOWER","15g"],["NOOSA SELECTS T25 SATIVA (15G/FIFTEEN)","PHARMACROP","FLOWER","15g"],["NOOSA SELECTS T26 INDICA (15G/FIFTEEN)","PHARMACROP","FLOWER","15g"],["Wedding Cake THC27 10g***","PEACE NATURALS","FLOWER","10g"],["Phytoca Monkey Business THC23 (LSO)10g***","PHYTOCA","FLOWER","10g"],["Phytoca Zurple Punch THC21 (LSO)10g***","PHYTOCA","FLOWER","10g"],["Phytoca Cherry Skunk 10g*","PHYTOCA","FLOWER","10g"],["Bunyipp 31 10g (Titanimal- heavy indica 31 %)***","Sativite","FLOWER","10g"],["DIRRAG LSO 27 10g ( 27 %)***","Sativite","FLOWER","10g"],["Eurroka 29 10g (Mango Sour - stimulating sativa 29%)","Sativite","FLOWER","10g"],["Moorok 21 LSO (balanced hybrid)- MAC 1","Sativite","FLOWER","10g"],["Walken 26% 10g (Gastropop- heavy indica 26%)**","Sativite","FLOWER","10g"],["Pankinna 25% 10g (Zurple Sunset - Zurple x citradelic sunset)**","Sativite","FLOWER","10g"],["Sativite Azsend HBx 22% (Heladosa x Randylosa Cherry) AUSTRALIA","Sativite","FLOWER","10g"],["Sativite PACT SW01 THC","Sativite","FLOWER","15g"],["Sativite PACT SW02 THC (Huckleberry)","Sativite","FLOWER","15g"],["Sativite PACT (GMO animal cookies- Chem D X animal cookies)***","Sativite","FLOWER","10g"],["Cerenity Marlin THC26 (GMO animal cookies - Chem D x animal cookies 26%)","Sativite Cerenity","FLOWER","10g"],["Cerenity Pink Cusk THC26 (Pink Gas (bubba kush x pink kush- indica 26%)","Sativite Cerenity","FLOWER","10g"],["Southern Sky - INDICA 26% (10g)","SOUTHERN SKY (Alfie Therapeutics)","FLOWER","10g"],["Southern Sky - HYBRID 26% (10g)","SOUTHERN SKY (Alfie Therapeutics)","FLOWER","10g"],["Southern Sky - SATIVA 24% (10g)","SOUTHERN SKY (Alfie Therapeutics)","FLOWER","10g"],["Spectrum Red No1 flower 15g***","SPECTRUM","FLOWER","15g"],["Tweed Krypton Kush25 15g***","SPECTRUM","FLOWER","15g"],["Canopy Hindu Kush 23 15g","SPECTRUM","FLOWER","15g"],["Canopy OGD 27 15g","SPECTRUM","FLOWER","15g"],["Canopy FZ 30 15g*","SPECTRUM","FLOWER","15g"],["Canopy KMI 28 15g**","SPECTRUM","FLOWER","15g"],["TWEED Orange Chemsicle 28 15g***","SPECTRUM","FLOWER","15g"],["Canopy VALLEY 12:14 10g *** (CBD:THC BALANCED )","SPECTRUM","FLOWER","10g"],["7 Acres Jack Frost 10g SATIVA","SPECTRUM","FLOWER","10g"],["7 Acres Ultra Jack 10g SATIVA","SPECTRUM","FLOWER","10g"],["7 Acres GPS 22 10g *** INDICA","SPECTRUM","FLOWER","10g"],["Jungle Driver THC26","SPIRIT BEAR","FLOWER","10g"],["Frosted Guava THC25","SPIRIT BEAR","FLOWER","10g"],["Citrus Temple THC25","SPIRIT BEAR","FLOWER","10g"],["Strawberry Meltshake THC28","SPIRIT BEAR","FLOWER","10g"],["Fruit Sundae THC30","SPIRIT BEAR","FLOWER","10g"],["Stanley Brothers INDICA 25 flower 15g","STANLEY BROTHERS","FLOWER","15g"],["Stanley Brothers SATIVA 22 flower 15g","STANLEY BROTHERS","FLOWER","15g"],["Stanley Brothers INDICA 28 15g","STANLEY BROTHERS","FLOWER","15g"],["Super Seed Blueberry Purps 10g LSO","SUPER SEED","FLOWER","10g"],["Herb Pave (Paris OG x The Menthol)","TREEHOUSE","FLOWER","10g"],["Delta Tetra (Orange Cake)","TREEHOUSE","FLOWER","10g"],["MIDZ INDICA (rotating curation)","TREEHOUSE","FLOWER","15g"],["MIDZ SATIVA (rotating curation)","TREEHOUSE","FLOWER","15g"],["Zaari GMO Cookies Live Rosin 2g","ZAARI (supplied Entoura)","EXTRACT",""],["Zaari Strawnana Live Rosin 2g","ZAARI (supplied Entoura)","EXTRACT",""],["Zaari Gorilla DieselLive Rosin 2g","ZAARI (supplied Entoura)","EXTRACT",""],["ANTG Rocky cart 1g INDICA**","ANTG","CART",""],["ANTG Juno cart 1g (CBD: THC balanced)**","ANTG","CART",""],["Aura Dymond Jealosy LR cart 1g (LIVE RESIN)","AURA","CART",""],["ALFIE GT Haze Vape 1g (SATIVA DOMINANT)","","CART",""],["ALFIE Balanced GTH/CBD 1g (balanced hybrid day + CBD balanced)","","CART",""],["ALFIE Crescendo Kush Vape 1g (INDICA)","","CART",""],["ALFIE EVO LIVE RESIN Vape 1g (BALANCED HYBRID)","","CART",""],["Beacon GSC cart 850mg Indica (LIVE RESIN)","BEACON","CART",""],["Beacon PK Cart 850mg Indica (LIVE RESIN)","BEACON","CART",""],["Beacon CBB Cart 850mg Sativa (LIVE RESIN)","BEACON","CART",""],["Beacon Pineapple Haze Cart CBD (LIVE RESIN)","BEACON","CART",""],["mCART THC NIGHT 1g (INDICA) (Kush Cookies= TOPAZ)","CANNATREK CARTS","CART",""],["mCART THC DAY 1g (SATIVA) (Blueberry Indica x super silver haze)","CANNATREK CARTS","CART",""],["mCART BLEND S 1g (CBD:THC BALANCED) (Cherry blossom x Blue dream)","CANNATREK CARTS","CART",""],["mCart Petra 1.0g BALANCED HYBRID (Creamy Kees, karels haze x cookies and cream)","CANNATREK CARTS","CART",""],["mCart Sheba 1.0g SATIVA HYBRID (Bafokens Choice, white lemon x marala bay)","CANNATREK CARTS","CART",""],["mCart Babylon 1.0g INDICA (Critical Kush)","CANNATREK CARTS","CART",""],["Elysian Aria FS CBD vape 1g","ELYSIAN","CART",""],["ELYSIAN Aria FS CBD Vape 1g STARTER (includes battery)","ELYSIAN","CART",""],["Cymra Zingy Cart sativa 1g (Organic)","CYMRA","CART",""],["Cymra Zenny Cart indica 1g (Organic)","CYMRA","CART",""],["Buenos Diaz Cart 1g (DAY) (Jack Herer)","GRANDIOSA","CART",""],["Buenos Noches Cart 1g (night ) (wedding cake)","GRANDIOSA","CART",""],["Buenos Diaz Cart 1g (DAY) + Battery (STARTER KIT) (Jack Herer)","GRANDIOSA","CART",""],["Buenos Noches Cart 1g (NIGHT) + Battery (STARTER KIT) (wedding cake)","GRANDIOSA","CART",""],["Harbour LR Day Cart 2g- LIVE RESIN- biodynamic","HARBOUR","CART",""],["Harbour LR NIGHT Cart 2g- LIVE RESIN-biodynamic","HARBOUR","CART",""],["KIND libra cart 1G (indica)- CO2 extraction","KIND","CART",""],["KIND Azure cart 1G (Sativa dominant)- CO2 extraction","KIND","CART",""],["KIND Rosa cart 1G- (Indica) CO2 extraction","KIND","CART",""],["KIND LUNA cart 1G- (Indica) CO2 extraction","KIND","CART",""],["LGP Cart Night 1G (indica)","LGP","CART",""],["LGP Cart Day 1G (sativa)","LGP","CART",""],["LGP Live resin Day Cart 1G (sativa)** (LIVE RESIN)","LGP","CART",""],["LGP Live resin Night Cart 1G (indica)** (LIVE RESIN)","LGP","CART",""],["Medcan CC01-V (cart)","MEDCAN","CART",""],["Medcan SC01-V (cart)","MEDCAN","CART",""],["Medcan GLU01-V (cart)","MEDCAN","CART",""],["Edison Black Cherry Punch 1g/one g (cart) INDICA","","CART",""],["Edison LIMELIGHT 1g/one g (cart) SATIVA","","CART",""],["BoxHot Strawberry Diesel THC:CBD:CBG 1.2g/one point two g (cart) SATIVA","","CART",""],["BoxHot Cherry KushTHC + CBN 1.2g/one point two g (cart) INDICA","","CART",""],["Phytoca BK Cart (BlueBerry Kush)","PHYTOCA","CART",""],["Phytoca BCP Cart (Black Cherry Punch)**","PHYTOCA","CART",""],["Phytoca Sour Tangie LR (Sativa)** (LIVE RESIN)","PHYTOCA","CART",""],["REDECAN Live Rosin Daytime THC pen 1g","REDECAN","CART",""],["REDECAN Live Rosin THCv Skinny Vape 1g","REDECAN","CART",""],["Satipen PC01 (Peach Chem) 1g (LIVE RESIN)","SATIVITE","CART",""],["7 Acres Fondant LR vape 1g/ one g - INDICA","SPECTRUM","CART",""],["Spectrum Reserve Berea LR vape 1g/ one g - SATIVA","SPECTRUM","CART",""],["ALMA Revive Pastilles SATIVA pastilles (60 chews) Pineapple (THC/ CBD/CBG/CBC)","","PASTILLE",""],["ALMA Mellow Pastilles INDICA pastilles (60 chews) Mixed Berry (THC/ CBD/CBN/CBC)","","PASTILLE",""],["ALMA Calma Pastilles INDICA pastilles (60 chews) Sour Cola (THC/ CBD/CBN/CBC)","","PASTILLE",""],["JUNO 20:20 balanced pastilles (60 chews)","ANTG","PASTILLE",""],["Rocky THC 30 pastilles (60 chews)","ANTG","PASTILLE",""],["Aura Blood Orange 10:10 Gummies- VEGAN","","PASTILLE",""],["Aura Live Cola Pastilles VEGAN***","","PASTILLE",""],["Aura 40:20:20 LIVE NIGHT BERRY Pastilles VEGAN***","","PASTILLE",""],["Avani THC10 caps","","CAPS",""],["Avani Balanced 5:5 caps","","CAPS",""],["Avani Advanced 2.5:20","AVANI","CAPS",""],["Avani Advanced 2.5:20","AVANI","PASTILLE",""],["Avani Advanced CBD25","AVANI","CAPS",""],["Avani Advanced CBD25","AVANI","PASTILLE",""],["Ctrek C10T10 Medibles- Strawberry 60 chews)","Cannatrek","PASTILLE",""],["Cymra Aurelius DAY Pastilles C100 (60 chews)","CYMRA","PASTILLE",""],["Cymra Cylin NIGHT Pastilles C100 (60 chews)","CYMRA","PASTILLE",""],["Entoura THC10 soft chew (90 chews)*","ENTOURA","PASTILLE",""],["Entoura 15:15 soft chews (90 chews)*","ENTOURA","PASTILLE",""],["Grandiosa CBD100 patilles 60/sixty","GRANDIOSA","PASTILLE",""],["Heyday Tangerine Threes (60 chews)","HEYDAY","PASTILLE",""],["MediChew Lime 50 CBD (60 chews)","MEDCAN","PASTILLE",""],["MediChew 10:25 (60 chew)","MEDCAN","PASTILLE",""],["EclipX Mango Square Bears CBD50:CBG20:CBC3 (SATIVA)","NOVA","PASTILLE",""],["EclipX Blueberry Square Bears CBD50:CBN20:CBG5 (INDICA)","NOVA","PASTILLE",""],["Phytoca Indica 30 rosin pastilles*","PHYTOCA","PASTILLE",""],["Saticap CBD50 softgel (60 caps)","SATIVITE","CAPS",""],["SPECTRUM BLUE 2.5/3.75 soft gels SOFT GELS (60 )*","SPECTRUM","CAPS",""],["Stanley 40:40:40 PASTILLES (60pack)","STANLEY BROTHERS","PASTILLE",""],["Superseed CBD100 PASTILLES (60pack)","SUPERSEED","PASTILLE",""],["MTL Frosted Flakes 30% (Cereal Milk xd MAC 1)**","ALMA / MTL","FLOWER","15g"],["MTL Larry Black 22% (Biscotti x Scotty 2 Hotty)**","ALMA / MTL","FLOWER","15g"],["Aura Base KINGS TART T24","Aura Therapeutics","FLOWER","15g"],["AVANI BLING BLAU T30 INDICA**","AVANI","FLOWER","10g"],["Green weekend Dry Flower Blue Cheese (Baby Buds) 15g","GREEN WEEKEND","FLOWER","15g"],["FGW smalls T25 indica Green dragon***","MEDICABILIS","FLOWER","15g"],["FGWsmalls T20 Sativa Super Lemon Haze 15g***","MEDICABILIS","FLOWER","15g"]];
 const DISCONTINUED = ["Ananda Hemp 1500mg endo relief cream 60g","Alfie GT Haze 25:1 oil 50mL","Ananda Hemp 1000mg CBD roll on (50mL)","ANTG Eve Oil CBD 50mL","ANTG Felix 10g","Anytime Hybrid oil 30mL (organic)","Aura CBD100 30ml","Aura Joker Juice 22% THC - indica dominant","Aura Mango Rosa 10:2 30 chews","Aura Organic Live Resin Vape 1g / one","Aura Organic Live Rosin Concetrate 70% (two g/ )","Aura Super Sativa 23% THC sativa","Azure Oil (50:1)- SATIVA DOMINAN","Bathera Blue Z 10g","Bathera Facetz 10g","Blue Cheese (Big Flwr) 15g","Canopy KMI 28 (Kush Mints) 10g","Canopy Krypton","CART Hybrid THC 600:CBD 200","Cerenity Blue Fin T26 10g/ ten g","Cerenity Pink Cusk T26 10g/ ten g","Cerenity Swordfish THC24 (10g)","Ctrek Medic C10T5 inhaler 1000mg CBD 500mg TH","Ctrek Medic C15 inhaler 1500mg CBD","Delta 9 - White Runtz T23","Delta Tetra Cherry Guava 24%THC Indica Dominant Hybrid","EclipX Mango Square Bears Pastille","EMERGENZ 26%THC Sativa Hybrid","Freash Mint (pk 4 Pods) $45","FX04","Grandiosa Bubba Jungle Pie 10g","Grandiosa Buenos Noches STARTER","Grandiosa Jillybean 10g","Grandiosa Kief 50% 3g","Grandiosa Kosher Kush 10g/ Ten","Grandiosa Mandarin Mints 22%","Grow White Runtz 27%THC Indica Dominant","Grow WIFI 28%THC Indica Dominant","Helix T21 Sativa 10g","Heyday CBD Suver Haze","Heyday CBD:CBDv OIL","Heyday CBG Double Black","Heyday Rise","High Country KK Mints 25%THC","High Country LA Kush Cake 28%THC","KIND CBD200 BROAD SPEC 60ml","Kind Taurus","Light Maple (pk 4 Pods) $45","Lumir GAS/CA (Gasoline Cream)","Lush Labs Garlic Truffle 28%","Mimosa","Motherplant CBB THC25","Motherplant CCN THC29 10g","Motherplant RBX","Motherplant SGZ T70 live hash 2g / two","MTL Frosted Flakes 30% 10g/ ten g","MTL Larry Black T22 10g/ ten g","MTL Peanut Butter Gelato T25 (10g/ ten)","MTL Strawberry Mintz 26% (10g/ ten)","MTL West Coast Kush T28 10g/ ten g","Mystery Mountain El Chapo 15g","Mystery Mountain Gods Gift 15g","Pinku","RAINBOW GUMMIES 30 chews (Indica dom)","Ringo Nana Hybrid","Rua Rau Hiwa T23 legacy cultivar 01","Saabi vape pen $85","Sativite Dirrag 10g","Sativite PACT T26 10g/ ten g","Somai Essentials 10:10 PLUS MINT","Somai Essentials 50:1 Hybrid oil (30mL/ Thirty)","SOMAI Origins THC Vape INDICA GS 1g (LIVE RESIN)","SOMAI Origins THC Vape Sativa SSC 1g (LIVE RESIN)","SOMAI Origins THC Vape TW Hybrid 1g (LIVE RESIN)","Spectrum Canopy TC28 15g","Stanley Brothers Balance 10g","Stanley Brothers Day 10g","Stanley Brothers Night 10g","Summer Sun THC27","Sunset Safari","Super Seed Biscotti Pancakes T25 10g/ ten g","Superbly Cozey 22% THC Indica domnant Hybrid","Superbly Dusky 25% THC Indica domnant Hybrid","Superseed Day Pastilles (30pack)","Superseed Live Rosin Gummies (30pack)","Superseed Night Pastilles (30pack)","T24 Sapphire THC24% Hybrid","T25 Limestone 25% THC","Tasmainian Botanics C25:T25 30mL","TORFINO RIPPER- Berry gelato THC 20 indica 30g","True Apple (pk 4 Pods) $45","Tweed Lemon Meringue Pie 28% THC 15g","Woomerah 23 (7g)","Alma Cream Fritter 27% 10g","Mystery Mountain Sunset Soap 25% THC 15g","Phytoca Banjo T30 10g/ ten","Phytoca monkey Business 10g"];
@@ -2369,49 +2372,6 @@ function copySummary(el, btn) {
   const done = () => { btn.textContent = "Copied"; btn.classList.add("done"); setTimeout(() => { btn.textContent = "Copy date"; btn.classList.remove("done"); }, 1600); };
   try { navigator.clipboard.writeText(el._sum).then(done, () => { btn.textContent = "Copy blocked"; }); } catch (e) { btn.textContent = "Copy blocked"; }
 }
-// ---------- feedback: staff notes are emailed to JC through FormSubmit (a free form-to-email relay) ----------
-const FEEDBACK_TO = "jc.hbagaslao@gmail.com";
-(function () {
-  const fab = document.getElementById("fbOpen"), card = document.getElementById("fbCard");
-  if (!fab) return;
-  const msg = document.getElementById("fbMsg"), name = document.getElementById("fbName"), status = document.getElementById("fbStatus"), send = document.getElementById("fbSend");
-  try { name.value = localStorage.getItem("herbyFbName") || ""; } catch (e) {}
-  const say = (text, kind) => { status.hidden = !text; status.textContent = text; status.className = "fb-status" + (kind ? " " + kind : ""); };
-  const open = () => { card.hidden = false; fab.setAttribute("aria-expanded", "true"); say(""); setTimeout(() => msg.focus(), 30); };
-  const close = () => { card.hidden = true; fab.setAttribute("aria-expanded", "false"); };
-  fab.addEventListener("click", () => card.hidden ? open() : close());
-  document.getElementById("fbClose").addEventListener("click", close);
-  document.addEventListener("keydown", e => { if (e.key === "Escape" && !card.hidden) close(); });
-  document.addEventListener("pointerdown", e => { if (!card.hidden && !card.contains(e.target) && !fab.contains(e.target)) close(); });
-
-  card.addEventListener("submit", async e => {
-    e.preventDefault();
-    const text = msg.value.trim();
-    if (!text) { msg.focus(); return; }
-    if (document.getElementById("fbTrap").value) return; // filled in only by spam bots
-    try { localStorage.setItem("herbyFbName", name.value.trim()); } catch (err) {}
-    const screen = location.hash === "#hold" ? "Hold Scripts Reminder" : location.hash === "#cbd" ? "CBD Calculator" : "Home";
-    const from = name.value.trim() || "A staff member";
-    const when = new Date().toLocaleString("en-AU");
-    send.disabled = true; send.textContent = "Sending…"; say("");
-    try {
-      const res = await fetch("https://formsubmit.co/ajax/" + FEEDBACK_TO, {
-        method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ _subject: "Herby feedback from " + from, _template: "table", _captcha: "false",
-          From: from, Screen: screen, Sent: when, Message: text })
-      });
-      const out = await res.json().catch(() => ({}));
-      if (!res.ok || String(out.success) !== "true") throw new Error(out.message || res.status);
-      msg.value = ""; say("Sent! Thanks, JC will take a look.", "ok");
-      setTimeout(() => { if (!msg.value) close(); }, 2200);
-    } catch (err) {
-      // Couldn't reach the email service: open the staff member's own email app with the note filled in instead.
-      say("Couldn't send from here, so your email app is opening with the note ready. Just press Send there.", "bad");
-      const body = text + "\n\nFrom: " + from + "\nScreen: " + screen + "\nSent: " + when;
-      location.href = "mailto:" + FEEDBACK_TO + "?subject=" + encodeURIComponent("Herby feedback from " + from) + "&body=" + encodeURIComponent(body);
-    } finally { send.disabled = false; send.textContent = "Send to JC"; }
-  });
-})();
 // ---------- Knowledge Center: articles from the Notion page PlantMed AU › Knowledge Center ----------
 // One topic per card; each topic holds articles. To update, change an article below (or ask Claude to re-read
 // the Notion page). say() is a spiel staff can copy.
@@ -2516,10 +2476,10 @@ const KC = [
   });
   search.addEventListener("keydown", e => { if (e.key === "Enter") { const first = results.querySelector("[data-a]"); if (first) first.click(); } });
   document.getElementById("shell").addEventListener("click", e => {
-    const t = e.target.closest("[data-a], [data-topic], [data-home], [data-kc-go], .kc-topic-btn, .kb-copy, #kcNote");
+    const t = e.target.closest("[data-a], [data-topic], [data-home], [data-kc-go], .kc-topic-btn, .kb-copy, #kcAsk");
     if (!t) return;
     if (t.matches(".kb-copy")) return copyKb(t);
-    if (t.id === "kcNote") return document.getElementById("fbOpen").click();
+    if (t.id === "kcAsk") return window.herbyChatOpen && window.herbyChatOpen();
     if (t.dataset.kcGo) return go(t.dataset.kcGo);
     if (t.matches(".kc-topic-btn")) {
       const box = t.parentElement, topic = KC.find(x => x.id === box.dataset.t);
@@ -2537,7 +2497,146 @@ const KC = [
     try { navigator.clipboard.writeText(text).then(() => { b.textContent = "Copied"; b.classList.add("done"); back(); }, () => { b.textContent = "Copy blocked"; back(); }); }
     catch (err) { b.textContent = "Copy blocked"; back(); }
   }
+  window.kcOpenArticle = id => { go("kb"); showArticle(id); };
   window.kcShowHome = showHome; // opening the Knowledge Center from the menu starts on its home page
+})();
+// ---------- Ask Herby: answers come only from the Knowledge Center articles above plus a few tool tips ----------
+// Every table row, flowchart step, list item and vaporiser card becomes a "fact"; a question is matched to the
+// facts by shared words (with PlantMed shorthand like MED REV, DR SCRPT treated as the same words).
+(function () {
+  const fab = document.getElementById("hcOpen"), card = document.getElementById("hcCard");
+  if (!fab) return;
+  const log = document.getElementById("hcLog"), form = document.getElementById("hcForm"), input = document.getElementById("hcInput");
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const SYN = { cost: "price", costs: "price", fee: "price", fees: "price", charge: "price", charged: "price", prices: "price", pay: "price", much: "price", free: "price",
+    vape: "vaporiser", vapes: "vaporiser", vaporizer: "vaporiser", vaporizers: "vaporiser", vaporisers: "vaporiser", device: "vaporiser", devices: "vaporiser",
+    review: "rev", reviews: "rev", medication: "med", medications: "med", meds: "med", medicine: "med",
+    script: "scrpt", scripts: "scrpt", scripting: "scrpt", prescription: "scrpt", prescriptions: "scrpt",
+    doctor: "dr", doctors: "dr", nurse: "nrs", nurses: "nrs", nursing: "nrs", reapplication: "reapp", reapply: "reapp", reapplying: "reapp",
+    letter: "ltr", letters: "ltr", draft: "drft", drafting: "drft", appointment: "appt", appointments: "appt", consult: "appt", consults: "appt", consultation: "appt", consultations: "appt",
+    booking: "book", bookings: "book", booked: "book", courtesy: "cc", call: "cll", calls: "cll", calling: "cll",
+    cease: "ceasing", ceased: "ceasing", stop: "ceasing", stopping: "ceasing", quit: "ceasing", discharge: "ceasing",
+    minutes: "min", mins: "min", minute: "min", hour: "hr", hours: "hr", long: "min", duration: "min",
+    approval: "approvals", expire: "expired", expiry: "expired", expiring: "expired", years: "year", yrs: "year", months: "month", mos: "month", mo: "month", weeks: "week", wks: "week",
+    titration: "titr", initial: "int", new: "int", coordinator: "coordinator", coordinators: "coordinator", noncompliant: "compliant", compliance: "compliant",
+    carts: "cart", cartridge: "cart", cartridges: "cart", herb: "flower", herbs: "flower", flowers: "flower", dried: "flower", battery: "cart", paeds: "paediatric", peds: "paediatric", pediatric: "paediatric", kids: "paediatric", children: "paediatric", phone: "phn" };
+  const STOP = new Set("a an the is are was were do does did i we you they it its to of for in on at and or with what whats how can could should would will who whom when where which my our their your this that these those be been if as by from me us need needs get got have has had about pt patient patients please tell know any there here just so than then also into up out".split(" "));
+  const words = t => String(t).toLowerCase().replace(/[’']/g, "").replace(/(\d)\s*(ml|g)\b/g, "$1$2").replace(/[^a-z0-9$.+]+/g, " ").replace(/(^|\s)\.|\.(\s|$)/g, " ").split(" ").filter(Boolean).map(w => SYN[w] || w);
+  const keyWords = t => words(t).filter(w => !STOP.has(w));
+
+  // ---- facts ----
+  const facts = [];
+  const add = (html, text, art, extra) => {
+    const ws = words(text + " " + (extra || "")); if (/\$\d|\bfree\b/i.test(text)) ws.push("price");
+    const hd = document.createElement("div"); hd.innerHTML = html; const h = hd.querySelector(".hc-fact-h");
+    facts.push({ html, art, ws: new Set(ws), flat: " " + ws.filter(w => !STOP.has(w)).join(" ") + " ", head: " " + (h ? keyWords(txt(h)).join(" ") : "") + " ", n: ws.length });
+  };
+  const box = document.createElement("div");
+  const txt = el => { const c = el.cloneNode(true); c.querySelectorAll("*").forEach(n => n.append(" ")); return c.textContent.replace(/\s+/g, " ").trim(); };
+  for (const t of KC) for (const a of t.articles) {
+    box.innerHTML = a.body;
+    box.querySelectorAll(".kc-step, input").forEach(x => x.remove());
+    const ctx = a.title + " " + t.topic;
+    box.querySelectorAll("table tr").forEach(tr => {
+      const cells = [...tr.children]; if (!cells.length || tr.querySelector("th")) return;
+      const head = tr.closest("thead") ? null : cells[0];
+      const isTypes = tr.closest(".kc-types"), isGuide = tr.closest(".kc-guide");
+      let html;
+      if (isTypes) html = `<div class="hc-fact-h">${cells[0].innerHTML}<span>${cells[2] ? cells[2].innerHTML : ""}</span></div>${cells[1].innerHTML}`;
+      else if (isGuide) html = `<div class="hc-fact-h">${cells[0].innerHTML}</div><div class="hc-k">What to do</div>${cells[1].innerHTML}<div class="hc-k">What to say</div>${cells[2].innerHTML}`;
+      else html = `<div class="hc-fact-h">${head.innerHTML}</div>${cells.slice(1).map(c => `<div>${c.innerHTML}</div>`).join("")}`;
+      add(html, txt(tr), a, ctx);
+    });
+    box.querySelectorAll(".flow-row").forEach(r => {
+      const q = r.querySelector(".flow-q"), ans = r.querySelector(".flow-a"), end = r.querySelector(".flow-end");
+      if (q && ans) add(`<div class="hc-fact-h">${q.querySelector("b").innerHTML}</div><div>${q.querySelector("small").innerHTML}</div><div class="hc-k">If yes, book</div><b>${ans.querySelector("b").innerHTML}</b><div>${ans.querySelector("small").innerHTML}</div>${ans.querySelector(".flow-codes").outerHTML}`, txt(r), a, ctx);
+      if (end) add(end.innerHTML, txt(end), a, ctx);
+    });
+    const steps = [...box.querySelectorAll(".flow-row")].filter(r => r.querySelector(".flow-a"));
+    if (steps.length) add(`<div class="hc-fact-h">Which appointment to book</div><div>Stop at the first <b>Yes</b>:</div><ul>${steps.map(r => `<li>${r.querySelector(".flow-q b").innerHTML} → ${r.querySelector(".flow-code").outerHTML}</li>`).join("")}<li>All No → normal scripting: <span class="flow-code">DR SCRPT</span> or <span class="flow-code">NRS SCRPT</span></li></ul>`, "which appointment to book book appointment what appointment type to book choose decide helix calendar flowchart book which", a);
+    const chk = box.querySelector(".flow-check");
+    if (chk) add(`<div class="hc-fact-h">Check patient details are correct and current</div><ul>${[...chk.querySelectorAll("label")].map(l => `<li>${txt(l)}</li>`).join("")}</ul><div>${chk.querySelector(".flow-warn").innerHTML}</div>`, txt(chk) + " verify verification check details profile", a, ctx);
+    box.querySelectorAll(".kc-tips li").forEach(li => add(li.innerHTML, txt(li), a, ctx));
+    box.querySelectorAll(".vape").forEach(v => add(`<div class="hc-fact-h">${txt(v.querySelector("h4"))}<span>${txt(v.querySelector(".vape-price"))}</span></div><div>${txt(v.querySelector(".vape-tag"))}</div><ul>${v.querySelector("ul").innerHTML}</ul>`, txt(v), a, ctx + " vaporiser"));
+    box.querySelectorAll(".kb-note, .kc-lead").forEach(n => { if (txt(n).length > 40) add(n.innerHTML, txt(n), a, ctx); });
+  }
+  // Tool tips (how Herby's own tools work).
+  const TIPS = [
+    ["How to use the CBD Calculator", "Open <b>CBD Calculator</b>, search the CBD product, type the dose (e.g. <i>0.5mL TDS</i>), set <b>Bottles collected</b> and the <b>Collection date</b>. Herby shows how long it lasts and the next bottle due date.", "cbd calculator calculate due date next bottle how long last dose bottles collected collection", "cbd"],
+    ["PRN doses", "Put a <b>+</b> before the PRN part, e.g. <i>0.5mL BD + 0.5mL PRN</i>. Only the part before the + counts as the regular dose. Extra doses like “+0.5mL if any seizure activity” aren't counted either.", "prn as needed plus extra dose seizure if any calculator not counted regular", "cbd"],
+    ["Writing doses", "Type the dose as written on the script: <i>0.5</i>, <i>0.5mL TDS</i>, <i>0.3mL mane + 0.6mL nocte</i>. <b>.5</b> means 0.5 mL. If Herby isn't sure what a term means, it suggests a reading and asks you to confirm.", "dose tds bd mane nocte daily .5 0.5 ml term mean abbreviation calculator", "cbd"],
+    ["How to use Hold Scripts", "Open <b>Hold Scripts</b>, copy the rows from the holds sheet and paste them into the table. Herby writes each product name from the pricelist and builds the reminder message. Check any flagged rows, then copy the message.", "hold scripts holds reminder paste sheet message sms email expiry repeats flagged", "hold"],
+    ["Hold Scripts password", "Hold Scripts asks for a password the first time you open it. Ask JC if you don't have it.", "hold scripts password locked unlock login", "hold"],
+    ["Knowledge Center search", "Open <b>Knowledge Center</b> and type in the search box, or pick a topic on the left: Pricing, Bookings, CBD, Vaporisers.", "knowledge center search find article topic", "kb"],
+  ];
+  for (const [h, body, kw, tool] of TIPS) add(`<div class="hc-fact-h">${h}</div><div>${body}</div>`, h + " " + kw, null, tool);
+  TIPS.forEach((t, i) => { facts[facts.length - TIPS.length + i].tool = t[3]; });
+
+  const df = new Map(); facts.forEach(f => f.ws.forEach(w => df.set(w, (df.get(w) || 0) + 1)));
+  const idf = w => Math.log(1 + facts.length / (1 + (df.get(w) || 0)));
+  function score(q, f) {
+    let sc = 0, hit = 0;
+    for (const w of q) {
+      if (f.ws.has(w)) { sc += idf(w); hit++; }
+      else if (w.length >= 4 && [...f.ws].some(x => x.startsWith(w) || (x.length >= 4 && w.startsWith(x)))) { sc += .6 * idf(w); hit++; }
+    }
+    for (let i = 0; i + 1 < q.length; i++) {
+      const bg = " " + q[i] + " " + q[i + 1] + " ";
+      if (f.flat.includes(bg)) sc += 1.5 * (idf(q[i]) + idf(q[i + 1])) / 2;
+      if (f.head.includes(bg)) sc += 1.5 * (idf(q[i]) + idf(q[i + 1])) / 2;
+    }
+    for (const w of q) if (f.head.includes(" " + w + " ")) sc += .3 * idf(w);
+    if (q.length > 1 && hit === 1) sc *= .6;
+    return sc / (1 + Math.log(1 + f.n) / 5);
+  }
+  function answer(text) {
+    const raw = text.trim(), low = raw.toLowerCase();
+    if (/^(hi|hello|hey|yo|good (morning|afternoon|evening))\b/.test(low) && low.split(/\s+/).length <= 3) return { html: "<p>Hi! Ask me anything about prices, which appointment to book, CBD, vaporisers or how to use Herby.</p>", chips: STARTERS };
+    if (/^(thanks|thank you|ty|cheers|ok|okay|great|perfect)\b/.test(low)) return { html: "<p>You're welcome! Anything else?</p>" };
+    const q = keyWords(raw);
+    if (!q.length) return { html: "<p>Could you ask that another way? For example: <i>how much is a med review?</i></p>", chips: STARTERS };
+    const ranked = facts.map(f => ({ f, s: score(q, f) })).filter(x => x.s > 0).sort((a, b) => b.s - a.s);
+    if (!ranked.length || ranked[0].s < 1.2) return { html: "<p>Sorry, I couldn't find that in the Knowledge Center yet. Try other words, or browse a topic:</p>", chips: STARTERS, topics: true };
+    const top = ranked[0].s, picks = ranked.filter(x => x.s >= top * .72).slice(0, 3);
+    let html = `<p>${picks.length > 1 ? "Here's what I found:" : "Here you go:"}</p>`;
+    for (const { f } of picks) html += `<div class="hc-fact">${f.html}${f.art ? `<button type="button" class="hc-src" data-hc-a="${f.art.id}">Open “${esc(f.art.title)}” →</button>` : f.tool ? `<button type="button" class="hc-src" data-hc-go="${f.tool}">Open ${f.tool === "cbd" ? "CBD Calculator" : f.tool === "hold" ? "Hold Scripts" : "Knowledge Center"} →</button>` : ""}</div>`;
+    return { html };
+  }
+  const STARTERS = ["How much is a med review?", "Which appointment do I book?", "Who do I book a courtesy call with?", "Patient doesn't want CBD", "How do I write PRN doses?", "Cheapest vaporiser for carts"];
+
+  // ---- UI ----
+  const scrollEnd = () => { log.scrollTop = log.scrollHeight; };
+  function bubble(cls, html) { const d = document.createElement("div"); d.className = "hc-msg " + cls; d.innerHTML = html; log.appendChild(d); scrollEnd(); return d; }
+  function chips(list, topics) {
+    const d = document.createElement("div"); d.className = "hc-chips";
+    d.innerHTML = (topics ? KC.map(t => `<button type="button" class="hc-chip" data-hc-a="${t.articles[0].id}">${esc(t.topic)}</button>`).join("") : "") + (list || []).map(c => `<button type="button" class="hc-chip" data-hc-q="${esc(c)}">${esc(c)}</button>`).join("");
+    log.appendChild(d); scrollEnd();
+  }
+  function ask(text) {
+    if (!text.trim()) return;
+    bubble("me", esc(text));
+    const typing = bubble("bot hc-typing", "<i></i><i></i><i></i>");
+    setTimeout(() => { typing.remove(); const r = answer(text); bubble("bot", r.html); if (r.chips || r.topics) chips(r.topics ? [] : r.chips, r.topics); }, 380);
+  }
+  let started = false;
+  function open() {
+    card.hidden = false; fab.setAttribute("aria-expanded", "true");
+    if (!started) { started = true; bubble("bot", "<p>Hi, I'm <b>Herby</b>! 👋 Ask me about prices, which appointment to book, CBD, vaporisers, or how to use my tools.</p><p>I only answer from the Knowledge Center, so please don't type patient details.</p>"); chips(STARTERS); }
+    setTimeout(() => input.focus(), 30);
+  }
+  const close = () => { card.hidden = true; fab.setAttribute("aria-expanded", "false"); };
+  window.herbyChatOpen = open;
+  fab.addEventListener("click", () => card.hidden ? open() : close());
+  document.getElementById("hcClose").addEventListener("click", close);
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !card.hidden) close(); });
+  form.addEventListener("submit", e => { e.preventDefault(); const v = input.value; input.value = ""; ask(v); });
+  log.addEventListener("click", e => {
+    const b = e.target.closest("[data-hc-q], [data-hc-a], [data-hc-go]"); if (!b) return;
+    if (b.dataset.hcQ) return ask(b.dataset.hcQ);
+    if (b.dataset.hcA) { if (window.kcOpenArticle) window.kcOpenArticle(b.dataset.hcA); if (matchMedia("(max-width: 560px)").matches) close(); return; }
+    if (b.dataset.hcGo) { go(b.dataset.hcGo); if (matchMedia("(max-width: 560px)").matches) close(); }
+  });
+  window.herbyAnswer = answer; // used by the checks
 })();
 </script>
 
