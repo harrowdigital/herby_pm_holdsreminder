@@ -697,6 +697,12 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 .tz-controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
 .tz-field { display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; font-weight: 700; color: #5B5F58; flex: 1 1 160px; }
 .tz-field input, .tz-field select { border: 1px solid var(--line); background: var(--chip); border-radius: 14px; padding: 11px 13px; font: inherit; font-size: 16px; font-weight: 600; color: #0E0F0D; min-height: 46px; width: 100%; }
+.tz-timef { flex: 1.3 1 220px; }
+.tz-tsel { display: flex; align-items: center; gap: 6px; }
+.tz-tsel select { flex: 1 1 0; min-width: 0; padding: 11px 8px; text-align: center; }
+.tz-combo { position: relative; flex: 1 1 0; min-width: 0; }
+.tz-field .tz-combo input { padding: 11px 8px; text-align: center; }
+.tz-colon { font-size: 18px; font-weight: 800; color: #0E0F0D; }
 .tz-field input:focus, .tz-field select:focus { outline: none; border-color: var(--lime-deep); box-shadow: 0 0 0 4px var(--lime-soft); background: #FFFFFF; }
 .tz-now { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; min-height: 46px; }
 .tz-now.on { background: #0E0F0D; color: #FFFFFF; }
@@ -1003,7 +1009,12 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
     <div class="panel-head"><h2 class="panel-title" id="t-tz"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Time Zones</h2></div>
     <p class="hint">Pick a time and where it's from. Herby shows it in every Australian state, with daylight saving applied for that date.</p>
     <div class="tz-controls">
-      <label class="tz-field"><span>Time</span><input type="time" id="tzTime" step="300"></label>
+      <div class="tz-field tz-timef"><span id="tzTimeLbl">Time</span><input type="hidden" id="tzTime">
+        <div class="tz-tsel" role="group" aria-labelledby="tzTimeLbl">
+          <div class="tz-combo"><input id="tzHour" type="text" inputmode="numeric" autocomplete="off" maxlength="2" placeholder="h" aria-label="Hour"></div><span class="tz-colon">:</span>
+          <div class="tz-combo"><input id="tzMin" type="text" inputmode="numeric" autocomplete="off" maxlength="2" placeholder="mm" aria-label="Minutes"></div>
+          <select id="tzAmpm" aria-label="AM or PM"><option value="AM">AM</option><option value="PM">PM</option></select>
+        </div></div>
       <label class="tz-field"><span>Time is in</span><select id="tzFrom"></select></label>
       <label class="tz-field"><span>Date</span><input type="date" id="tzDate"></label>
       <button type="button" class="cta tz-now" id="tzNow"><span class="tz-live"></span>Now</button>
@@ -2813,11 +2824,37 @@ const KC = [
   const NAMES = { QLD: "Queensland", NSW: "New South Wales", ACT: "Australian Capital Territory", VIC: "Victoria", TAS: "Tasmania", SA: "South Australia", NT: "Northern Territory", WA: "Western Australia" };
   const ORDER = ["QLD", "NSW", "ACT", "VIC", "TAS", "SA", "NT", "WA"];
   const timeEl = document.getElementById("tzTime"), fromEl = document.getElementById("tzFrom"), dateEl = document.getElementById("tzDate"), nowBtn = document.getElementById("tzNow"), grid = document.getElementById("tzGrid"), note = document.getElementById("tzNote");
+  const hEl = document.getElementById("tzHour"), mEl = document.getElementById("tzMin"), apEl = document.getElementById("tzAmpm");
+  const pad2 = n => String(n).padStart(2, "0");
+  // Typed hour can be 1-12, 0-23 (24-hour sets AM/PM) or a whole time like "2:30pm"
+  function readTyped() {
+    const raw = hEl.value.trim().toLowerCase(), whole = raw.match(/^(\d{1,2})[:.\s]?(\d{2})?\s*(a|p)?m?$/);
+    let h = parseInt(raw, 10), m = parseInt(mEl.value, 10), ap = apEl.value;
+    if (whole && (whole[2] || whole[3])) { h = +whole[1]; if (whole[2]) m = +whole[2]; if (whole[3]) ap = whole[3] === "p" ? "PM" : "AM"; }
+    if (isNaN(h) || h > 23) return null; if (isNaN(m)) m = 0; if (m > 59) return null;
+    if (h > 12) { ap = "PM"; h -= 12; } else if (h === 0) { ap = "AM"; h = 12; }
+    return { h, m, ap };
+  }
+  function selToTime(normalise) {
+    const t = readTyped(); if (!t) return false;
+    let h = t.h % 12; if (t.ap === "PM") h += 12; timeEl.value = `${pad2(h)}:${pad2(t.m)}`;
+    if (normalise) { hEl.value = String(t.h); mEl.value = pad2(t.m); apEl.value = t.ap; }
+    return true;
+  }
+  function timeToSel() { const [h, m] = (timeEl.value || "00:00").split(":").map(Number); hEl.value = String(h % 12 || 12); mEl.value = pad2(m); apEl.value = h >= 12 ? "PM" : "AM"; }
+  function changed(normalise) { if (selToTime(normalise)) { live = false; clearInterval(timer); render(); } }
+  [hEl, mEl].forEach(inp => {
+    inp.addEventListener("input", () => { inp.value = inp === hEl ? inp.value.replace(/[^\d:.apmAPM\s]/g, "") : inp.value.replace(/\D/g, ""); inp.maxLength = inp === hEl && /[:.apm\s]/i.test(inp.value) ? 8 : 2; changed(false); });
+    inp.addEventListener("blur", () => { if (!selToTime(true)) timeToSel(); inp.maxLength = 2; });
+    inp.addEventListener("focus", () => inp.select());
+    inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); changed(true); } });
+  });
+  apEl.addEventListener("change", () => changed(true));
   fromEl.innerHTML = ORDER.map(s => `<option value="${s}">${s} · ${NAMES[s]}</option>`).join("");
   const parts = (d, tz, o) => Object.fromEntries(new Intl.DateTimeFormat("en-US", Object.assign({ timeZone: tz, hourCycle: "h23" }, o)).formatToParts(d).map(x => [x.type, x.value]));
   const pad = n => String(n).padStart(2, "0");
   let live = true, timer = null;
-  function fillNow() { const p = parts(new Date(), T.ZONES[fromEl.value], { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }); timeEl.value = `${p.hour}:${p.minute}`; dateEl.value = `${p.year}-${p.month}-${p.day}`; }
+  function fillNow() { const p = parts(new Date(), T.ZONES[fromEl.value], { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }); timeEl.value = `${p.hour}:${p.minute}`; timeToSel(); dateEl.value = `${p.year}-${p.month}-${p.day}`; }
   function moment() {
     const [y, mo, d] = dateEl.value.split("-").map(Number), [h, mi] = (timeEl.value || "00:00").split(":").map(Number), src = T.ZONES[fromEl.value];
     const guess = Date.UTC(y, mo - 1, d, h, mi); let w = new Date(guess - T.tzOffset(src, new Date(guess)) * 60000); return new Date(guess - T.tzOffset(src, w) * 60000);
@@ -2840,7 +2877,7 @@ const KC = [
     nowBtn.classList.toggle("on", live);
   }
   function setLive(v) { live = v; clearInterval(timer); if (live) { fillNow(); timer = setInterval(() => { if (!document.getElementById("viewTz").hidden) { fillNow(); render(); } }, 20000); } render(); }
-  [timeEl, dateEl].forEach(el => el.addEventListener("input", () => { live = false; clearInterval(timer); render(); }));
+  [dateEl].forEach(el => el.addEventListener("input", () => { live = false; clearInterval(timer); render(); }));
   fromEl.addEventListener("change", () => { if (live) fillNow(); render(); });
   nowBtn.addEventListener("click", () => setLive(true));
   grid.addEventListener("click", e => {
