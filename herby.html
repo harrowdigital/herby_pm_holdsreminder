@@ -594,24 +594,21 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 }
 /* ---------- tool tabs: switch between Hold Scripts, CBD Calculator and Knowledge Center from any tool ---------- */
 /* Left rail: tools on the far left, Knowledge Center topics under them when it is open */
-.shell { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 28px; align-items: start; max-width: none; margin: 0; }
+.shell { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; align-items: start; max-width: none; margin: 0; }
 .shell-main { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
-.rail { position: sticky; top: 18px; background: #FFFFFF; border: 1px solid var(--line); border-radius: 22px; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; box-shadow: 0 1px 2px rgba(14, 15, 13, .04); }
+.rail { display: none !important; position: sticky; top: 18px; background: #FFFFFF; border: 1px solid var(--line); border-radius: 22px; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; box-shadow: 0 1px 2px rgba(14, 15, 13, .04); }
 .tool-tabs { display: flex; flex-direction: column; gap: 3px; }
 .tool-tabs button { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; border-radius: 12px; padding: 10px 10px; font: inherit; font-size: 15px; font-weight: 600; color: var(--ink); cursor: pointer; text-align: left; transition: background .15s ease, color .15s ease; }
 .tool-tabs button svg { width: 18px; height: 18px; flex: none; }
 .tool-tabs button:hover { background: var(--chip); }
 .tool-tabs button.on { background: #0E0F0D; color: #FFFFFF; }
-.rail-kc { display: none; flex-direction: column; gap: 2px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
-.shell[data-tool="kb"] .rail-kc { display: flex; }
-.kc { grid-template-columns: minmax(0, 1fr) !important; }
 @media (max-width: 980px) {
   .shell { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-  .rail { position: static; order: 2; padding: 6px; border-radius: 18px; }
+  .rail { display: flex !important; position: static; order: 2; padding: 6px; border-radius: 18px; }
   .shell-main { display: contents; }
   .shell-main > .top { order: 1; }
   .shell-main > .view { order: 3; }
-  .rail > .kc-side-h, .rail-kc, .rail > .kc-back { display: none !important; }
+  .rail > .kc-side-h { display: none !important; }
   .tool-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
   .tool-tabs button { justify-content: center; text-align: center; font-size: 13.5px; font-weight: 700; padding: 9px 6px; line-height: 1.15; }
   .tool-tabs button svg { display: none; }
@@ -694,10 +691,24 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 .tz-copy.done { background: #0E0F0D; color: #FFFFFF; border-color: #0E0F0D; }
 .tz-note { color: var(--muted); font-size: 13.5px; margin: 0; }
 @media (max-width: 560px) { .tz-time { font-size: 28px; } .tz-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .tz-card { padding: 14px; } }
-/* Home: the same tools sidebar as the tool screens, in the same place */
-.home-rail { position: absolute; left: clamp(16px, 4vw, 40px); top: 18px; width: 236px; z-index: 2; }
-@media (min-width: 981px) { .home { padding-left: calc(clamp(16px, 4vw, 40px) + 264px); } .home-nav { padding-left: 0; } }
-@media (max-width: 980px) { .home-rail { display: none; } }
+/* ---------- Dock: floating tool icons, left middle of the screen; they grow on hover and show their name ---------- */
+.dock { position: fixed; left: 22px; top: 50%; transform: translateY(-50%); z-index: 30; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.dock button { position: relative; width: 50px; height: 50px; border-radius: 16px; border: 1px solid rgba(14, 15, 13, .08); background: rgba(255, 255, 255, .82); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: #2A2D27; display: grid; place-items: center; cursor: pointer; padding: 0;
+  box-shadow: 0 1px 2px rgba(14, 15, 13, .05), 0 8px 22px rgba(14, 15, 13, .07); transition: transform .22s cubic-bezier(.2, .9, .3, 1.3), box-shadow .22s ease, background .2s ease, color .2s ease; transform-origin: left center; }
+.dock button > svg { width: 22px; height: 22px; }
+.dock .dock-home > svg { width: 36px; height: 32px; }
+.dock button:hover, .dock button:focus-visible { transform: scale(1.2); outline: none; box-shadow: 0 0 0 5px rgba(182, 234, 123, .45), 0 14px 30px rgba(62, 142, 31, .22); color: #0E0F0D; background: #FFFFFF; z-index: 2; }
+.dock button:has(+ button:hover), .dock button:hover + button, .dock button:has(+ .dock-sep + button:hover), .dock button:hover + .dock-sep + button { transform: scale(1.07); }
+.dock button.on { background: #0E0F0D; color: #FFFFFF; border-color: #0E0F0D; }
+.dock button.on::before { content: ""; position: absolute; left: -12px; top: 50%; width: 4px; height: 20px; margin-top: -10px; border-radius: 4px; background: var(--lime-deep); }
+.dock .dock-home.on { background: #FFFFFF; color: #0E0F0D; border-color: rgba(14, 15, 13, .08); }
+.dock-sep { width: 22px; height: 1px; background: rgba(14, 15, 13, .12); }
+.dock-label { position: absolute; left: calc(100% + 14px); top: 50%; transform: translate(-6px, -50%) scale(.84); transform-origin: left center; white-space: nowrap; background: #0E0F0D; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 7px 12px; border-radius: 10px; pointer-events: none; opacity: 0; transition: opacity .15s ease, transform .2s ease; }
+.dock-label::before { content: ""; position: absolute; left: -4px; top: 50%; width: 8px; height: 8px; background: #0E0F0D; transform: translateY(-50%) rotate(45deg); border-radius: 1px; }
+.dock button:hover .dock-label, .dock button:focus-visible .dock-label { opacity: 1; transform: translate(0, -50%) scale(.84); }
+@media (min-width: 981px) { body:not(.on-home) { padding-left: 104px; } .home { padding-left: 84px; } }
+@media (max-width: 980px) { .dock { display: none; } }
+@media (prefers-reduced-motion: reduce) { .dock button { transition: none; } }
 </style>
 
 <svg class="herby-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
@@ -752,15 +763,6 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 <div class="glow" aria-hidden="true"></div>
 <section class="home" id="viewHome" aria-labelledby="homeQ">
   <div class="home-grid" aria-hidden="true"><span></span><span></span><span></span></div>
-  <aside class="rail home-rail" aria-label="Herby tools">
-    <p class="kc-side-h">Tools</p>
-    <nav class="tool-tabs">
-      <button type="button" data-go="hold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/></svg>Hold Scripts</button>
-      <button type="button" data-go="cbd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v4.5L6.5 12A5 5 0 0 0 10.5 20h3a5 5 0 0 0 4-8L14 7.5V3"/></svg>CBD Calculator</button>
-      <button type="button" data-go="tz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Time Zones</button>
-      <button type="button" data-go="kb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>Knowledge Center</button>
-    </nav>
-  </aside>
   <nav class="home-nav" aria-label="Herby">
     <span class="home-logo"><span class="home-logo-mark" aria-hidden="true"><svg viewBox="100 110 300 270" fill="none"><use href="#hbArt" x="100" y="110" width="300" height="270"/></svg></span>Herby</span>
     <span class="home-pill">Created by JCIHB</span>
@@ -835,6 +837,14 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
   </form>
 </dialog>
 
+<nav class="dock" aria-label="Herby tools">
+  <button type="button" class="dock-home" data-go=""><svg viewBox="100 110 300 270" fill="none" aria-hidden="true"><use href="#hbArt" x="100" y="110" width="300" height="270"/></svg><span class="dock-label">Herby home</span></button>
+  <span class="dock-sep" aria-hidden="true"></span>
+  <button type="button" data-go="hold" aria-label="Hold Scripts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/></svg><span class="dock-label">Hold Scripts</span></button>
+  <button type="button" data-go="cbd" aria-label="CBD Calculator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v4.5L6.5 12A5 5 0 0 0 10.5 20h3a5 5 0 0 0 4-8L14 7.5V3"/></svg><span class="dock-label">CBD Calculator</span></button>
+  <button type="button" data-go="tz" aria-label="Time Zones"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="dock-label">Time Zones</span></button>
+  <button type="button" data-go="kb" aria-label="Knowledge Center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span class="dock-label">Knowledge Center</span></button>
+</nav>
 <div class="shell" id="shell" hidden>
 <aside class="rail" aria-label="Herby tools">
   <p class="kc-side-h">Tools</p>
@@ -844,13 +854,6 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
     <button type="button" data-go="tz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Time Zones</button>
     <button type="button" data-go="kb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>Knowledge Center</button>
   </nav>
-  <div class="rail-kc">
-    <p class="kc-side-h">Topics</p>
-    <nav id="kcNav" aria-label="Knowledge Center topics"></nav>
-    <p class="kc-side-h">Support</p>
-    <button type="button" class="kc-side-link" id="kcAsk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 10.5h6M9 13.5h4"/></svg>Ask Herby</button>
-  </div>
-  <button type="button" class="kc-back" data-go="">&larr; Herby home</button>
 </aside>
 <div class="shell-main">
 <header class="top">
@@ -984,6 +987,13 @@ button.home-robot { border: 0; background: none; padding: 0; cursor: pointer; wi
 </div>
 <div class="view" id="viewKb" hidden>
   <div class="kc">
+    <aside class="kc-side" aria-label="Knowledge Center topics">
+      <p class="kc-side-h">Topics</p>
+      <nav id="kcNav" aria-label="Knowledge Center topics"></nav>
+      <p class="kc-side-h">Support</p>
+      <button type="button" class="kc-side-link" id="kcAsk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 10.5h6M9 13.5h4"/></svg>Ask Herby</button>
+      <button type="button" class="kc-back" data-go="">&larr; Herby home</button>
+    </aside>
     <div class="kc-main">
       <div id="kcHome">
         <section class="kc-hero">
@@ -2122,7 +2132,7 @@ function go(view) {
   for (const k in VIEWS) document.getElementById(VIEWS[k]).hidden = k !== tool;
   if (tool) document.getElementById("toolName").textContent = TOOL_NAMES[tool];
   document.getElementById("shell").dataset.tool = tool;
-  document.querySelectorAll(".tool-tabs [data-go]").forEach(b => { const on = b.dataset.go === tool; b.classList.toggle("on", on); if (on) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  document.querySelectorAll(".tool-tabs [data-go], .dock [data-go]").forEach(b => { const on = b.dataset.go === tool; b.classList.toggle("on", on); if (on) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
   if (location.hash.slice(1) !== tool) history.replaceState(null, "", tool ? "#" + tool : location.pathname + location.search);
   window.scrollTo(0, 0);
   if (tool === "cbd") setTimeout(() => document.getElementById("cbdSearch").focus(), 50);
