@@ -21,15 +21,15 @@ SAME_ROW_BRANDS={'cymra':'CYMRA','cymra gummies':'CYMRA','entoura':'ENTOURA','en
   'phytoca':'PHYTOCA','redecan':'REDECAN','sativite':'SATIVITE','antg gummies':'ANTG','cannatrek gummies':'Cannatrek',
   'grandiosa gummies':'GRANDIOSA','hey day gummies':'HEYDAY','medcan medichew gummies':'MEDCAN','nova gummies':'NOVA',
   'phytoca gummies':'PHYTOCA','sativite caps':'SATIVITE','stanley brothers (gummies)':'STANLEY BROTHERS',
-  'superseed (gummies)':'SUPERSEED'}
+  'superseed (gummies)':'SUPERSEED','wellford (gummies)':'WELLFORD','wellford':'WELLFORD'}
 def typ(name,cat,default):
   s=(name+' '+cat).lower()
   if re.search(r'\b(cart|vape|pen)\b|satipen',s): return 'CART'
   if re.search(r'pastille|patille|gumm|chew|medible',s): return 'PASTILLE'
   if re.search(r'\bcaps\b|softgel|soft gel',s): return 'CAPS'
   if re.search(r'\boil\b|oral liquid',s): return 'OIL'
-  # Whole words only: "Sherbert" must not count as "herb". "herb" and "extract" are category labels for hash, kief and rosin.
-  if re.search(r'\b(hash|kief|rosin)\b',name.lower()) or re.search(r'\b(extract|herb)\b',cat.lower()): return 'EXTRACT'
+  # Whole words only: "Sherbert" must not count as "herb". "herb", "extract" and "ext" (Category 5 ext) are category labels for hash, kief and rosin.
+  if re.search(r'\b(hash|kief|rosin)\b',name.lower()) or re.search(r'\b(extract|ext|herb)\b',cat.lower()): return 'EXTRACT'
   return default
 out={};
 for ws in wb.worksheets:
