@@ -1137,13 +1137,23 @@ PLEASE NOTE:</span></span><button type="button" class="note-copy" data-line="Pat
           <button type="button" class="tm-btn" id="apTimeBtn" aria-label="Pick from the time list" aria-expanded="false" aria-controls="apTimeList"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
           <div class="tm-list" id="apTimeList" role="listbox" aria-label="Times" hidden></div>
         </div><span class="tm-hint" id="apTimeHint"></span></div>
-      <label class="tz-field ap-full"><span id="apWhoLbl">Be ready for</span><select id="apWho">
+      <label class="tz-field"><span id="apWhoLbl">With</span><select id="apWho">
         <option value="Dr Teh">Dr Teh</option>
         <option value="Dr Salifu">Dr Salifu</option>
         <option value="Nurse Jane">Nurse Jane</option>
         <option value="Nurse Alli">Nurse Alli</option>
         <option value="Olivia">Olivia (patient care coordinator)</option>
         <option value="Zak">Zak (patient care coordinator)</option>
+      </select></label>
+      <label class="tz-field"><span>Patient's time zone</span><select id="apZone">
+        <option value="QLD">QLD time</option>
+        <option value="NSW">NSW time</option>
+        <option value="VIC">VIC time</option>
+        <option value="ACT">ACT time</option>
+        <option value="TAS">TAS time</option>
+        <option value="SA">SA time</option>
+        <option value="NT">NT time</option>
+        <option value="WA">WA time</option>
       </select></label>
     </div>
     <div class="msg ap-msg" id="apMsg" aria-live="polite"></div>
@@ -3171,32 +3181,32 @@ function herbyCopy(text) {
   date.value = fmtDate(today);
   attachCalendar(date, render, { years: [today.getFullYear(), today.getFullYear() + 1], label: "Choose appointment date" });
   let status = "confirmed", where = "tele";
-  const wseg = $("apWhere");
+  const wseg = $("apWhere"), zone = $("apZone");
   const esc = x => x.replace(/&/g, "&amp;").replace(/</g, "&lt;");
   function parts() {
     const n = name.value.trim();
     const dt = parseDate(date.value);
-    const day = dt ? `${MONTHS[dt.getMonth()]} ${dt.getDate()}` : "";
+    const nth = d => d + (d % 100 >= 11 && d % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][d % 10] || "th");
+    const day = dt ? `${["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][dt.getDay()]} ${nth(dt.getDate())} ${MONTHS[dt.getMonth()]}` : "";
+    const tv = timeVal(), tm = tv ? tv.replace(/(am|pm)$/, x => " " + x.toUpperCase()) : "";
     return [
-      ["Hi "], [n, "name"], [", your "], [type.value, "pick"], [" is "], [status, "pick"], [" for "], [day, "date"], [" at "], [timeVal() || "", "time"], [" "],
-      ...(where === "clinic"
-        ? [["(In clinic)", "pick"], [" - please arrive 10 minutes early to see "], [who.value, "pick"], ["."]]
-        : [["(Telehealth - Phone)", "pick"], [" - please be ready for "], [who.value, "pick"], ["'s call at that time."]]),
-      ["\n\nThank you and have a great day!\n\nPlantMed – 07 3193 9280"]
+      ["Hi "], [n, "name"], [", thank you for "], [status === "booked" ? "booking" : "confirming", "pick"], [" your "], [type.value, "pick"],
+      [" at PlantMed on "], [day, "date"], [" at "], [tm, "time"], [" "], [`${zone.value} time`, "pick"], [" with "], [who.value, "pick"], [" "],
+      [where === "clinic" ? "(In clinic)" : "(Telehealth - Phone)", "pick"], ["."],
+      ["\n\nA kind reminder that cancellation or rescheduling must take place at least 24 hours prior to the appointment. Fees are non-refundable, and the full consult fee is payable if you cancel less than 24 hours before the appointment.\n\nThank you!\n\nPlantMed – 07 3193 9280"]
     ];
   }
   const text = () => parts().map(([t, k]) => t || (k === "name" ? "[NAME]" : k === "date" ? "[DATE]" : k === "time" ? "[TIME]" : "")).join("");
   function render() {
     seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.st === status)));
     wseg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.wh === where)));
-    $("apWhoLbl").textContent = where === "clinic" ? "Seeing" : "Be ready for";
     out.innerHTML = parts().map(([t, k]) => !k ? esc(t) : t ? `<span class="ap-fill">${esc(t)}</span>` : `<span class="ap-empty">${k === "name" ? "[NAME]" : k === "date" ? "[DATE]" : "[TIME]"}</span>`).join("");
     $("apNote").textContent = ""; $("apNote").className = "copy-note";
     const tbad = (hEl.value || mEl.value) && !timeVal();
     thint.textContent = tbad ? "Hour 1 to 12, minutes 00 to 59" : ""; thint.className = "tm-hint" + (tbad ? " bad" : "");
   }
   [name, date].forEach(el => el.addEventListener("input", render));
-  [type, who].forEach(el => el.addEventListener("change", render));
+  [type, who, zone].forEach(el => el.addEventListener("change", render));
   seg.addEventListener("click", e => { const b = e.target.closest("[data-st]"); if (!b) return; status = b.dataset.st; render(); });
   wseg.addEventListener("click", e => { const b = e.target.closest("[data-wh]"); if (!b) return; where = b.dataset.wh; render(); });
   $("apCopy").addEventListener("click", () => {
