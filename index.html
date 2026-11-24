@@ -229,6 +229,18 @@ body.on-home { background: #FAFBF8; padding: 0; }
 .home-q { margin: 0; font-family: "Inter Tight", var(--f-body); font-weight: 800; font-size: clamp(44px, 8.2vw, 108px); line-height: .94; letter-spacing: -0.055em; text-wrap: balance; max-width: 11ch; }
 .home-sub { margin: 0; max-width: 46ch; font-size: clamp(15px, 1.6vw, 18px); line-height: 1.5; color: #5B5F58; font-weight: 500; }
 .home-sub .hl { color: #3E8E1F; font-weight: 700; }
+.home-bar { margin-top: 6px; display: flex; justify-content: center; max-width: 100%; }
+.home-bar-in { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; background: #FFFFFF; border: 1px solid var(--line); border-radius: 999px; padding: 6px; box-shadow: 0 1px 2px rgba(14, 15, 13, .05), 0 14px 34px rgba(14, 15, 13, .07); }
+.hb-tool { display: inline-flex; align-items: center; gap: 8px; border: 0; background: transparent; color: #0E0F0D; font: inherit; font-size: 15px; font-weight: 700; padding: 11px 18px; border-radius: 999px; cursor: pointer; transition: background .15s ease, color .15s ease, transform .15s ease; }
+.hb-tool svg { width: 18px; height: 18px; flex: none; color: #3E8E1F; }
+.hb-tool:hover, .hb-tool:focus-visible { background: var(--lime-soft); outline: none; }
+.hb-tool:active { transform: scale(.97); }
+.hb-tool.on { background: var(--lime); color: var(--lime-ink); }
+.hb-tool.on svg { color: var(--lime-ink); }
+.hb-tool.on:hover, .hb-tool.on:focus-visible { background: var(--lime-deep); }
+.home-bar-in { flex-wrap: nowrap; }
+@media (max-width: 1000px) { .hb-tool { font-size: 14px; padding: 9px 12px; gap: 6px; } .hb-tool svg { width: 16px; height: 16px; } }
+@media (max-width: 700px) { .home-bar { width: 100%; } .home-bar-in { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; border-radius: 24px; } .hb-tool { justify-content: center; } .hb-tool:last-child { grid-column: 1 / -1; } }
 .home-ctas { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
 .cta { border: 1px solid #0E0F0D; background: #FFFFFF; color: #0E0F0D; font: inherit; font-size: 15px; font-weight: 700; padding: 14px 24px; border-radius: 999px; cursor: pointer;
   transition: transform .15s ease, box-shadow .2s ease, background .2s ease; }
@@ -711,6 +723,7 @@ tr.kc-hl > td:first-child { box-shadow: inset 4px 0 0 var(--lime-deep); }
 .ap-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .ap-controls .tz-field { flex: none; }
 .ap-panel { overflow: visible; z-index: 3; }
+.ap-full { grid-column: 1 / -1; }
 .ap-controls .on-seg { align-self: flex-start; }
 .ap-controls .on-seg button { padding: 10px 18px; }
 .ap-msg .ap-fill { background: var(--lime-soft); color: var(--forest); border-radius: 6px; padding: 0 4px; font-weight: 700; }
@@ -873,13 +886,15 @@ tr.kc-hl > td:first-child { box-shadow: inset 4px 0 0 var(--lime-deep); }
     </svg></button>
     </div>
     <p class="home-sub">Your PlantMed assistant for hold script reminders, CBD calculations and call know-how, <span class="hl">done in seconds</span>.</p>
-    <div class="home-ctas">
-      <button type="button" class="cta primary" data-go="hold">Hold Scripts Reminder</button>
-      <button type="button" class="cta" data-go="cbd">CBD Calculator</button>
-      <button type="button" class="cta" data-go="notes">Notes</button>
-      <button type="button" class="cta" data-go="tz">Time Zones</button>
-      <button type="button" class="cta" data-go="kb">Knowledge Center <span aria-hidden="true">&rarr;</span></button>
-    </div>
+    <nav class="home-bar" aria-label="Herby tools">
+      <div class="home-bar-in">
+        <button type="button" class="hb-tool on" data-go="hold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/></svg><span>Hold Scripts</span></button>
+        <button type="button" class="hb-tool" data-go="cbd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v4.5L6.5 12A5 5 0 0 0 10.5 20h3a5 5 0 0 0 4-8L14 7.5V3"/></svg><span>CBD Calculator</span></button>
+        <button type="button" class="hb-tool" data-go="notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg><span>Notes</span></button>
+        <button type="button" class="hb-tool" data-go="tz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Time Zones</span></button>
+        <button type="button" class="hb-tool" data-go="kb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span>Knowledge Center</span></button>
+      </div>
+    </nav>
     <p class="home-foot" id="homeToday"></p>
   </div>
 </section>
@@ -1096,7 +1111,14 @@ PLEASE NOTE:</span></span><button type="button" class="note-copy" data-line="Pat
           <button type="button" data-st="booked" aria-pressed="false">Booked</button>
           <button type="button" data-st="confirmed" aria-pressed="true">Confirmed</button>
         </div></div>
-      <label class="tz-field"><span>Be ready for</span><select id="apWho">
+      <div class="tz-field"><span id="apWhereLbl">Where</span>
+        <div class="on-seg" role="group" aria-labelledby="apWhereLbl" id="apWhere">
+          <button type="button" data-wh="tele" aria-pressed="true">Telehealth - Phone</button>
+          <button type="button" data-wh="clinic" aria-pressed="false">In clinic</button>
+        </div></div>
+      <div class="tz-field"><label for="apDate">Date</label><div class="cal-wrap"><input id="apDate" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" aria-haspopup="dialog"><button type="button" class="cal-btn" aria-label="Open calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button></div></div>
+      <label class="tz-field"><span>Time</span><select id="apTime"></select></label>
+      <label class="tz-field ap-full"><span id="apWhoLbl">Be ready for</span><select id="apWho">
         <option value="Dr Teh">Dr Teh</option>
         <option value="Dr Salifu">Dr Salifu</option>
         <option value="Nurse Jane">Nurse Jane</option>
@@ -1104,8 +1126,6 @@ PLEASE NOTE:</span></span><button type="button" class="note-copy" data-line="Pat
         <option value="Olivia">Olivia (patient care coordinator)</option>
         <option value="Zak">Zak (patient care coordinator)</option>
       </select></label>
-      <div class="tz-field"><label for="apDate">Date</label><div class="cal-wrap"><input id="apDate" type="text" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" aria-haspopup="dialog"><button type="button" class="cal-btn" aria-label="Open calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button></div></div>
-      <label class="tz-field"><span>Time</span><select id="apTime"></select></label>
     </div>
     <div class="msg ap-msg" id="apMsg" aria-live="polite"></div>
     <div class="copy-row">
@@ -3100,25 +3120,29 @@ function herbyCopy(text) {
   time.value = "10:00am";
   date.value = fmtDate(today);
   attachCalendar(date, render, { years: [today.getFullYear(), today.getFullYear() + 1], label: "Choose appointment date" });
-  let status = "confirmed";
+  let status = "confirmed", where = "tele";
+  const wseg = $("apWhere");
   const esc = x => x.replace(/&/g, "&amp;").replace(/</g, "&lt;");
   function parts() {
     const n = name.value.trim();
     const dt = parseDate(date.value);
     const day = dt ? `${MONTHS[dt.getMonth()]} ${dt.getDate()}` : "";
     return [
-      ["Hi "], [n, "name"], [`, your ${type.value} is ${status} for `], [day, "date"], [` at ${time.value} (Telehealth - Phone) - please be ready for ${who.value}'s call at that time.\n\nThank you and have a great day!\n\nPlantMed – 07 3193 9280`]
+      ["Hi "], [n, "name"], [`, your ${type.value} is ${status} for `], [day, "date"], [` at ${time.value} ${where === "clinic" ? `(In clinic) - please arrive 10 minutes early to see ${who.value}.` : `(Telehealth - Phone) - please be ready for ${who.value}'s call at that time.`}\n\nThank you and have a great day!\n\nPlantMed – 07 3193 9280`]
     ];
   }
   const text = () => parts().map(([t, k]) => t || (k === "name" ? "[NAME]" : k === "date" ? "[DATE]" : "")).join("");
   function render() {
     seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.st === status)));
+    wseg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.wh === where)));
+    $("apWhoLbl").textContent = where === "clinic" ? "Seeing" : "Be ready for";
     out.innerHTML = parts().map(([t, k]) => !k ? esc(t) : t ? `<span class="ap-fill">${esc(t)}</span>` : `<span class="ap-empty">${k === "name" ? "[NAME]" : "[DATE]"}</span>`).join("");
     $("apNote").textContent = ""; $("apNote").className = "copy-note";
   }
   [name, date].forEach(el => el.addEventListener("input", render));
   [type, who, time].forEach(el => el.addEventListener("change", render));
   seg.addEventListener("click", e => { const b = e.target.closest("[data-st]"); if (!b) return; status = b.dataset.st; render(); });
+  wseg.addEventListener("click", e => { const b = e.target.closest("[data-wh]"); if (!b) return; where = b.dataset.wh; render(); });
   $("apCopy").addEventListener("click", () => {
     const note = $("apNote"), lbl = $("apCopyLabel");
     if (!name.value.trim()) { note.textContent = "Add the patient's name first"; note.className = "copy-note bad"; name.focus(); return; }
